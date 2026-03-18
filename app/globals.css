@@ -39,9 +39,11 @@ h1, h2, h3, h4 {
   color: var(--foreground);
 }
 
-::-webkit-scrollbar { width: 3px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb {
-  background: rgba(92, 232, 208, 0.15);
-  border-radius: 2px;
+/* Hide scrollbar on all devices */
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+*::-webkit-scrollbar {
+  display: none;
 }

@@ -7,14 +7,10 @@ import React, { useRef, useState } from 'react';
 const APP_STORE_URL = 'https://apps.apple.com/app/symponia/id6744058607';
 
 const C = {
-  bg: '#08061c',
-  bgMid: '#0e0b26',
+  bg: '#08061c', bgMid: '#0e0b26',
   bgCard: 'rgba(255,255,255,0.03)',
-  fg: '#eae6f8',
-  sub: '#b8b0d8',
-  dim: '#7c70a8',
-  cyan: '#5ce8d0',
-  violet: '#a78bfa',
+  fg: '#eae6f8', sub: '#b8b0d8', dim: '#7c70a8',
+  cyan: '#5ce8d0', violet: '#a78bfa',
   border: 'rgba(255,255,255,0.07)',
   borderStrong: 'rgba(255,255,255,0.13)',
   heading: "var(--font-cormorant), 'Georgia', serif",
@@ -31,27 +27,25 @@ function FadeIn({ children, delay = 0, style = {} }: { children: React.ReactNode
       initial={{ opacity: 0, y: 24 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.75, delay, ease: [0.22, 1, 0.36, 1] }}
-    >
-      {children}
-    </motion.div>
+    >{children}</motion.div>
   );
 }
 
 function Card({ children, style = {} }: { children: React.ReactNode; style?: React.CSSProperties }) {
   return (
-    <div style={{
-      background: C.bgCard,
-      border: `0.5px solid ${C.border}`,
-      borderRadius: '20px',
-      backdropFilter: 'blur(12px)',
-      position: 'relative',
-      overflow: 'hidden',
-      ...style,
-    }}>
+    <div style={{ background: C.bgCard, border: `0.5px solid ${C.border}`, borderRadius: 20, backdropFilter: 'blur(12px)', position: 'relative', overflow: 'hidden', ...style }}>
       <div style={{ position: 'absolute', inset: '0 0 auto 0', height: '0.5px', background: C.borderStrong }} />
       {children}
     </div>
   );
+}
+
+function Label({ children }: { children: string }) {
+  return <p style={{ fontFamily: C.body, fontSize: '0.7rem', letterSpacing: '0.22em', color: C.cyan, textTransform: 'uppercase', marginBottom: 16 }}>{children}</p>;
+}
+
+function H2({ children }: { children: React.ReactNode }) {
+  return <h2 style={{ fontFamily: C.heading, fontWeight: 300, fontSize: 'clamp(2rem, 4.5vw, 3.4rem)', color: C.fg, lineHeight: 1.15 }}>{children}</h2>;
 }
 
 function AppleIcon() {
@@ -62,82 +56,150 @@ function AppleIcon() {
   );
 }
 
-const label = (text: string) => (
-  <p style={{ fontFamily: C.body, fontSize: '0.7rem', letterSpacing: '0.22em', color: C.cyan, textTransform: 'uppercase' as const, marginBottom: 16 }}>
-    {text}
-  </p>
-);
+// ── Spiritual SVG Illustrations ───────────────────────────────────────────────
 
-const h2 = (children: React.ReactNode) => (
-  <h2 style={{ fontFamily: C.heading, fontWeight: 300, fontSize: 'clamp(2.2rem, 4.5vw, 3.6rem)', color: C.fg, lineHeight: 1.15, marginBottom: 0 }}>
-    {children}
-  </h2>
-);
+function ConstellationSVG() {
+  const stars = [
+    [80,40],[160,90],[240,35],[320,110],[400,60],[480,100],[560,30],[640,80],
+    [120,160],[280,170],[440,155],[600,175],[200,250],[380,240],[520,260],
+    [60,300],[340,310],[620,295],[160,380],[500,370],[280,400],
+  ];
+  const lines = [
+    [0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[1,8],[3,9],[5,10],[7,11],
+    [8,12],[9,12],[9,13],[10,13],[10,14],[11,14],[12,15],[13,16],[14,17],
+    [15,18],[16,19],[17,19],[18,20],[19,20],
+  ];
+  return (
+    <svg viewBox="0 0 700 430" style={{ width: '100%', maxWidth: 700, height: 'auto', opacity: 0.35 }}>
+      {lines.map(([a,b], i) => (
+        <line key={i} x1={stars[a][0]} y1={stars[a][1]} x2={stars[b][0]} y2={stars[b][1]}
+          stroke={C.cyan} strokeWidth="0.5" strokeOpacity="0.4" />
+      ))}
+      {stars.map(([x,y], i) => (
+        <g key={i}>
+          <circle cx={x} cy={y} r="3" fill={C.cyan} opacity="0.7" />
+          <circle cx={x} cy={y} r="6" fill="none" stroke={C.cyan} strokeWidth="0.5" opacity="0.25" />
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+function OracleSVG() {
+  return (
+    <svg viewBox="0 0 200 200" style={{ width: 180, height: 180, opacity: 0.6 }}>
+      {[80,65,50,35,20].map((r,i) => (
+        <circle key={i} cx="100" cy="100" r={r} fill="none" stroke={i%2===0?C.cyan:C.violet} strokeWidth="0.6" opacity={0.3 + i*0.08} />
+      ))}
+      <ellipse cx="100" cy="100" rx="18" ry="28" fill="none" stroke={C.cyan} strokeWidth="1" opacity="0.7" />
+      <ellipse cx="100" cy="100" rx="7" ry="7" fill={C.cyan} opacity="0.5" />
+      <line x1="20" y1="100" x2="80" y2="100" stroke={C.cyan} strokeWidth="0.5" opacity="0.3" />
+      <line x1="120" y1="100" x2="180" y2="100" stroke={C.cyan} strokeWidth="0.5" opacity="0.3" />
+      <line x1="100" y1="20" x2="100" y2="72" stroke={C.cyan} strokeWidth="0.5" opacity="0.3" />
+      <line x1="100" y1="128" x2="100" y2="180" stroke={C.cyan} strokeWidth="0.5" opacity="0.3" />
+      {[0,45,90,135].map(deg => (
+        <line key={deg}
+          x1={100 + 85*Math.cos(deg*Math.PI/180)} y1={100 + 85*Math.sin(deg*Math.PI/180)}
+          x2={100 + 85*Math.cos((deg+180)*Math.PI/180)} y2={100 + 85*Math.sin((deg+180)*Math.PI/180)}
+          stroke={C.violet} strokeWidth="0.4" opacity="0.2" />
+      ))}
+    </svg>
+  );
+}
+
+function MoonPhaseSVG() {
+  const phases = [0, 0.15, 0.35, 0.5, 0.65, 0.85, 1.0];
+  return (
+    <svg viewBox="0 0 420 60" style={{ width: '100%', maxWidth: 420, height: 60, opacity: 0.55 }}>
+      {phases.map((phase, i) => {
+        const cx = 30 + i * 60;
+        const r = 18;
+        if (phase === 0) return <circle key={i} cx={cx} cy={30} r={r} fill="none" stroke={C.cyan} strokeWidth="0.8" opacity="0.4" />;
+        if (phase === 1.0) return <circle key={i} cx={cx} cy={30} r={r} fill={C.cyan} opacity="0.25" />;
+        const lit = phase > 0.5 ? 1 - (phase - 0.5) * 2 : phase * 2;
+        const side = phase <= 0.5 ? 1 : -1;
+        const rx = r * lit;
+        return (
+          <g key={i}>
+            <circle cx={cx} cy={30} r={r} fill="none" stroke={C.cyan} strokeWidth="0.8" opacity="0.3" />
+            <path d={`M ${cx} ${30-r} A ${r} ${r} 0 0 ${side>0?1:0} ${cx} ${30+r} A ${rx} ${r} 0 0 ${side>0?0:1} ${cx} ${30-r}`}
+              fill={C.cyan} opacity="0.22" />
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+function SacredCircleSVG() {
+  return (
+    <svg viewBox="0 0 300 300" style={{ width: 260, height: 260, opacity: 0.3 }}>
+      <circle cx="150" cy="150" r="130" fill="none" stroke={C.violet} strokeWidth="0.6" />
+      <circle cx="150" cy="150" r="100" fill="none" stroke={C.cyan} strokeWidth="0.5" />
+      <circle cx="150" cy="150" r="70" fill="none" stroke={C.violet} strokeWidth="0.6" />
+      {Array.from({length:6}).map((_,i) => {
+        const a = (i/6)*Math.PI*2;
+        return <circle key={i} cx={150+100*Math.cos(a)} cy={150+100*Math.sin(a)} r="100" fill="none" stroke={C.cyan} strokeWidth="0.4" opacity="0.5" />;
+      })}
+      {Array.from({length:6}).map((_,i) => {
+        const a = (i/6)*Math.PI*2;
+        return (
+          <line key={i} x1={150} y1={150}
+            x2={150+130*Math.cos(a)} y2={150+130*Math.sin(a)}
+            stroke={C.violet} strokeWidth="0.4" opacity="0.4" />
+        );
+      })}
+      <circle cx="150" cy="150" r="8" fill={C.cyan} opacity="0.4" />
+    </svg>
+  );
+}
 
 // ── Nav ───────────────────────────────────────────────────────────────────────
 
 function Nav() {
   const [open, setOpen] = useState(false);
-  const links = [['How it works', '#how-it-works'], ['Modes', '#modes'], ['FAQ', '#faq']];
-
+  const links = [['How it works','#how-it-works'],['Modes','#modes'],['Credits','/credits'],['FAQ','#faq']];
   return (
     <>
-      <nav style={{
-        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
-        background: 'rgba(8,6,28,0.85)', backdropFilter: 'blur(24px)',
-        borderBottom: `0.5px solid ${C.border}`,
-      }}>
+      <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, background: 'rgba(8,6,28,0.88)', backdropFilter: 'blur(24px)', borderBottom: `0.5px solid ${C.border}` }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 28px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <a href="#" style={{ fontFamily: C.heading, fontSize: '1.45rem', fontWeight: 400, letterSpacing: '0.08em', color: C.fg, textDecoration: 'none' }}>
-            Symponia
+          <a href="#" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+            <img src="/logo.jpg" alt="Symponia" style={{ width: 30, height: 30, borderRadius: 8, objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).style.display='none'; }} />
+            <span style={{ fontFamily: C.heading, fontSize: '1.45rem', fontWeight: 400, letterSpacing: '0.08em', color: C.fg }}>Symponia</span>
           </a>
-
-          {/* Desktop */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 36 }} className="desk-nav">
-            <style>{`.desk-nav { display: flex } @media(max-width:768px){.desk-nav{display:none!important}}`}</style>
-            {links.map(([l, h]) => (
-              <a key={l} href={h} style={{ fontFamily: C.body, fontSize: '0.75rem', letterSpacing: '0.14em', color: C.dim, textDecoration: 'none', textTransform: 'uppercase' }}>
-                {l}
-              </a>
+            <style>{`.desk-nav{display:flex}@media(max-width:768px){.desk-nav{display:none!important}}`}</style>
+            {links.map(([l,h]) => (
+              <a key={l} href={h} style={{ fontFamily: C.body, fontSize: '0.75rem', letterSpacing: '0.14em', color: C.dim, textDecoration: 'none', textTransform: 'uppercase' }}>{l}</a>
             ))}
             <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer"
-              style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 22px', borderRadius: 100, background: C.cyan, color: C.bg, fontFamily: C.body, fontSize: '0.78rem', fontWeight: 500, letterSpacing: '0.04em', textDecoration: 'none' }}
-            >
-              <AppleIcon /> Download
-            </a>
+              style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 22px', borderRadius: 100, background: C.cyan, color: C.bg, fontFamily: C.body, fontSize: '0.78rem', fontWeight: 500, textDecoration: 'none' }}
+            ><AppleIcon /> Download</a>
           </div>
-
-          {/* Mobile hamburger */}
           <button onClick={() => setOpen(!open)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 8, display: 'none' }} className="mob-btn">
-            <style>{`.mob-btn{display:none!important} @media(max-width:768px){.mob-btn{display:block!important}}`}</style>
-            {[0, 1, 2].map((i) => (
-              <motion.span key={i} style={{ display: 'block', width: 22, height: 1.5, background: C.fg, marginBottom: i < 2 ? 5 : 0, transformOrigin: 'center' }}
-                animate={open ? (i === 1 ? { opacity: 0 } : { rotate: i === 0 ? 45 : -45, y: i === 0 ? 6.5 : -6.5 }) : { opacity: 1, rotate: 0, y: 0 }}
+            <style>{`.mob-btn{display:none!important}@media(max-width:768px){.mob-btn{display:block!important}}`}</style>
+            {[0,1,2].map(i => (
+              <motion.span key={i} style={{ display: 'block', width: 22, height: 1.5, background: C.fg, marginBottom: i<2?5:0 }}
+                animate={open?(i===1?{opacity:0}:{rotate:i===0?45:-45,y:i===0?6.5:-6.5}):{opacity:1,rotate:0,y:0}}
                 transition={{ duration: 0.2 }}
               />
             ))}
           </button>
         </div>
       </nav>
-
-      {/* Mobile drawer */}
       <AnimatePresence>
         {open && (
-          <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.18 }}
-            style={{ position: 'fixed', top: 64, left: 0, right: 0, zIndex: 49, background: 'rgba(8,6,28,0.97)', backdropFilter: 'blur(24px)', borderBottom: `0.5px solid ${C.border}`, padding: '24px 28px 28px' }}
+          <motion.div initial={{opacity:0,y:-4}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-4}} transition={{duration:0.18}}
+            style={{position:'fixed',top:64,left:0,right:0,zIndex:49,background:'rgba(8,6,28,0.97)',backdropFilter:'blur(24px)',borderBottom:`0.5px solid ${C.border}`,padding:'24px 28px 28px'}}
           >
-            {links.map(([l, h]) => (
+            {links.map(([l,h]) => (
               <a key={l} href={h} onClick={() => setOpen(false)}
-                style={{ display: 'block', fontFamily: C.body, fontSize: '0.85rem', letterSpacing: '0.14em', color: C.sub, textDecoration: 'none', textTransform: 'uppercase', padding: '14px 0', borderBottom: `0.5px solid ${C.border}` }}
-              >
-                {l}
-              </a>
+                style={{display:'block',fontFamily:C.body,fontSize:'0.85rem',letterSpacing:'0.14em',color:C.sub,textDecoration:'none',textTransform:'uppercase',padding:'14px 0',borderBottom:`0.5px solid ${C.border}`}}
+              >{l}</a>
             ))}
             <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginTop: 20, padding: '15px', borderRadius: 100, background: C.cyan, color: C.bg, fontFamily: C.body, fontSize: '0.88rem', fontWeight: 500, textDecoration: 'none' }}
-            >
-              <AppleIcon /> Download on the App Store
-            </a>
+              style={{display:'flex',alignItems:'center',justifyContent:'center',gap:10,marginTop:20,padding:'15px',borderRadius:100,background:C.cyan,color:C.bg,fontFamily:C.body,fontSize:'0.88rem',fontWeight:500,textDecoration:'none'}}
+            ><AppleIcon /> Download on the App Store</a>
           </motion.div>
         )}
       </AnimatePresence>
@@ -150,69 +212,63 @@ function Nav() {
 function Hero() {
   return (
     <section style={{ position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', overflow: 'hidden', padding: '120px 28px 80px' }}>
-      <GradientDots duration={45} dotSize={5} spacing={13} />
-      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 85% 85% at 50% 50%, rgba(8,6,28,0.1) 0%, rgba(8,6,28,0.82) 58%, #08061c 100%)', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 90% 90% at 50% 50%, rgba(8,6,28,0.05) 0%, rgba(8,6,28,0.75) 55%, #08061c 100%)', pointerEvents: 'none' }} />
 
-      <div style={{ position: 'relative', zIndex: 1, maxWidth: 760, margin: '0 auto' }}>
-        {/* Badge */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '8px 18px', borderRadius: 100, border: `0.5px solid ${C.borderStrong}`, background: 'rgba(92,232,208,0.07)', marginBottom: 36 }}
+      <div style={{ position: 'relative', zIndex: 1, maxWidth: 800, margin: '0 auto' }}>
+        {/* Logo */}
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, delay: 0.2 }}
+          style={{ marginBottom: 32, display: 'flex', justifyContent: 'center' }}
         >
-          <span style={{ width: 6, height: 6, borderRadius: '50%', background: C.cyan, flexShrink: 0 }} />
-          <span style={{ fontFamily: C.body, fontSize: '0.68rem', letterSpacing: '0.22em', color: C.cyan, textTransform: 'uppercase' }}>
-            Now available on the App Store
-          </span>
+          <img src="/logo.jpg" alt="Symponia" style={{ width: 72, height: 72, borderRadius: 20, objectFit: 'cover', boxShadow: `0 0 40px rgba(92,232,208,0.2)` }}
+            onError={e => { (e.target as HTMLImageElement).style.display='none'; }} />
         </motion.div>
 
-        {/* Headline */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '7px 18px', borderRadius: 100, border: `0.5px solid ${C.borderStrong}`, background: 'rgba(92,232,208,0.07)', marginBottom: 32 }}
+        >
+          <span style={{ width: 5, height: 5, borderRadius: '50%', background: C.cyan }} />
+          <span style={{ fontFamily: C.body, fontSize: '0.68rem', letterSpacing: '0.22em', color: C.cyan, textTransform: 'uppercase' }}>Now on the App Store · Free to begin</span>
+        </motion.div>
+
         <motion.h1 initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          style={{ fontFamily: C.heading, fontWeight: 300, fontSize: 'clamp(3.2rem, 7vw, 6rem)', lineHeight: 1.1, color: C.fg, marginBottom: 28 }}
+          style={{ fontFamily: C.heading, fontWeight: 300, fontSize: 'clamp(3rem, 7vw, 5.8rem)', lineHeight: 1.1, color: C.fg, marginBottom: 28 }}
         >
           What if you could
-          <br />
-          <em style={{ color: C.cyan, fontStyle: 'italic' }}>hear yourself</em>
-          <br />
-          again?
+          <br /><em style={{ color: C.cyan, fontStyle: 'italic' }}>hear yourself</em>
+          <br />again?
         </motion.h1>
 
-        {/* Sub */}
         <motion.p initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.75 }}
-          style={{ fontFamily: C.body, fontWeight: 300, fontSize: '1rem', lineHeight: 1.85, color: C.sub, maxWidth: 500, margin: '0 auto 40px' }}
+          style={{ fontFamily: C.body, fontWeight: 300, fontSize: '1.05rem', lineHeight: 1.85, color: C.sub, maxWidth: 520, margin: '0 auto 44px' }}
         >
-          An AI oracle for the inner life — animal archetypes, daily readings, dream work, and deep conversation. No judgment. No noise. Just the truth you already carry.
+          Symponia is an AI oracle for the inner life — animal archetypes, daily readings, dream work, and deep conversation. Built for the moments when everything feels loud except the one voice that matters.
         </motion.p>
 
-        {/* Buttons */}
         <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 1 }}
           style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 14 }}
         >
           <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer"
-            style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 32px', borderRadius: 100, background: C.cyan, color: C.bg, fontFamily: C.body, fontSize: '0.88rem', fontWeight: 500, letterSpacing: '0.04em', textDecoration: 'none', boxShadow: '0 0 50px rgba(92,232,208,0.2)' }}
-          >
-            <AppleIcon /> Download on the App Store
-          </a>
+            style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '15px 34px', borderRadius: 100, background: C.cyan, color: C.bg, fontFamily: C.body, fontSize: '0.9rem', fontWeight: 500, letterSpacing: '0.04em', textDecoration: 'none', boxShadow: '0 0 60px rgba(92,232,208,0.22)' }}
+          ><AppleIcon /> Download on the App Store</a>
           <a href="#how-it-works"
-            style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 28px', borderRadius: 100, border: `0.5px solid ${C.borderStrong}`, color: C.sub, fontFamily: C.body, fontSize: '0.88rem', fontWeight: 300, textDecoration: 'none', background: 'rgba(255,255,255,0.02)' }}
-          >
-            See how it works <span style={{ opacity: 0.5 }}>↓</span>
-          </a>
+            style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '15px 28px', borderRadius: 100, border: `0.5px solid ${C.borderStrong}`, color: C.sub, fontFamily: C.body, fontSize: '0.88rem', fontWeight: 300, textDecoration: 'none', background: 'rgba(255,255,255,0.02)' }}
+          >See how it works <span style={{ opacity: 0.5 }}>↓</span></a>
         </motion.div>
 
         {/* Stats */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 1.4 }}
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 48, marginTop: 60 }}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 1.5 }}
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 48, marginTop: 60, paddingTop: 48, borderTop: `0.5px solid ${C.border}` }}
         >
-          {[['7', 'Animal archetypes'], ['6', 'Oracle modes'], ['∞', 'Depth of field']].map(([v, l]) => (
+          {[['7','Spirit animals'],['6','Oracle modes'],['∞','Depth'],['0','Judgment']].map(([v,l]) => (
             <div key={l} style={{ textAlign: 'center' }}>
-              <div style={{ fontFamily: C.heading, fontSize: '2rem', fontWeight: 300, color: C.cyan, lineHeight: 1 }}>{v}</div>
-              <div style={{ fontFamily: C.body, fontSize: '0.66rem', letterSpacing: '0.15em', color: C.dim, textTransform: 'uppercase', marginTop: 7 }}>{l}</div>
+              <div style={{ fontFamily: C.heading, fontSize: '1.9rem', fontWeight: 300, color: C.cyan, lineHeight: 1 }}>{v}</div>
+              <div style={{ fontFamily: C.body, fontSize: '0.63rem', letterSpacing: '0.15em', color: C.dim, textTransform: 'uppercase', marginTop: 6 }}>{l}</div>
             </div>
           ))}
         </motion.div>
       </div>
 
-      {/* Scroll line */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2 }}
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.2 }}
         style={{ position: 'absolute', bottom: 32, left: '50%', transform: 'translateX(-50%)' }}
       >
         <motion.div animate={{ y: [0, 10, 0] }} transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
@@ -223,30 +279,115 @@ function Hero() {
   );
 }
 
+// ── Who it's for ──────────────────────────────────────────────────────────────
+
+const PROFILES = [
+  {
+    icon: '🌙',
+    title: 'The one who questions everything',
+    body: 'You think deeply, feel deeply, and you are tired of conversations that stay on the surface. You want a space where your complexity is not too much — where it is, in fact, exactly the point.',
+    accent: C.cyan,
+  },
+  {
+    icon: '🔥',
+    title: 'The one in the middle of change',
+    body: 'A relationship, a career, a version of yourself — something is ending or beginning and the ground feels uncertain. You do not need advice. You need a mirror that does not flinch.',
+    accent: C.violet,
+  },
+  {
+    icon: '🌿',
+    title: 'The one building a daily practice',
+    body: 'Morning ritual, evening reflection, or both. You want something that grows with you — not a productivity tool, but a living practice of self-awareness that deepens over time.',
+    accent: C.cyan,
+  },
+  {
+    icon: '🌊',
+    title: 'The one who feels everything',
+    body: 'You are highly sensitive. The world overwhelms you sometimes, and your inner life is rich and complex. You need a space that honours that — not a space that tries to fix it.',
+    accent: C.violet,
+  },
+];
+
+function WhoItsFor() {
+  return (
+    <section style={{ padding: '100px 28px' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+        <FadeIn style={{ textAlign: 'center', marginBottom: 56 }}>
+          <Label>Who it is for</Label>
+          <H2>Made for anyone who<br /><em style={{ fontStyle: 'italic', color: C.dim }}>lives from the inside out</em></H2>
+          <p style={{ fontFamily: C.body, fontSize: '0.9rem', fontWeight: 300, color: C.dim, maxWidth: 500, margin: '18px auto 0', lineHeight: 1.85 }}>
+            Men and women. Seekers and sceptics. People who have tried therapy, journaling, meditation — and still feel something is missing.
+          </p>
+        </FadeIn>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
+          {PROFILES.map((p, i) => (
+            <FadeIn key={i} delay={i * 0.1}>
+              <Card style={{ padding: '32px 28px', height: '100%' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                  <span style={{ fontSize: '1.8rem' }}>{p.icon}</span>
+                  <div style={{ width: 28, height: 1, background: p.accent, opacity: 0.5 }} />
+                </div>
+                <h3 style={{ fontFamily: C.heading, fontSize: '1.2rem', fontWeight: 500, color: p.accent, marginBottom: 12, lineHeight: 1.3 }}>{p.title}</h3>
+                <p style={{ fontFamily: C.body, fontSize: '0.84rem', fontWeight: 300, lineHeight: 1.85, color: C.dim }}>{p.body}</p>
+              </Card>
+            </FadeIn>
+          ))}
+        </div>
+
+        {/* Constellation visual */}
+        <FadeIn style={{ display: 'flex', justifyContent: 'center', marginTop: 64 }}>
+          <ConstellationSVG />
+        </FadeIn>
+      </div>
+    </section>
+  );
+}
+
 // ── Pain points ───────────────────────────────────────────────────────────────
 
 const PAINS = [
-  { icon: '🌀', title: 'The noise never stops', body: 'You scroll, consume, and talk — but somewhere inside, a voice you used to trust has gone quiet. You can feel the distance between who you are and who you are becoming.' },
-  { icon: '🪞', title: 'Advice that misses the mark', body: 'Therapists, friends, apps — they mean well. But they speak to the surface. You are searching for something that can meet you in the depth without flinching.' },
-  { icon: '🌑', title: 'You sense there is more', body: 'Not a crisis — a persistent feeling that there are layers to yourself you have not yet touched, and that the right question could change everything.' },
+  {
+    title: 'You are surrounded by noise',
+    body: 'Notifications, opinions, expectations — the world is louder than ever. But somewhere inside, a voice you used to trust has gone quiet. You can feel the distance between who you are and who you are becoming.',
+    sub: 'Symponia creates a space of genuine silence. Not absence — presence.',
+    icon: '🌀',
+  },
+  {
+    title: 'The help available feels shallow',
+    body: 'You have tried apps, journals, maybe therapy. They help — but they speak to the surface. They offer frameworks when what you need is resonance. A space that meets you where you actually are.',
+    sub: 'The Oracle does not fix. It listens — then reflects what it hears.',
+    icon: '🪞',
+  },
+  {
+    title: 'You sense there is more to you',
+    body: 'Not a crisis. A persistent feeling that there are layers to yourself you have never touched — gifts you are not using, shadows you are avoiding, a pattern you have not yet seen.',
+    sub: 'Your animals reveal the pattern. Every reading is a step deeper.',
+    icon: '🌑',
+  },
 ];
 
 function PainPoints() {
   return (
-    <section style={{ padding: '100px 28px', background: `linear-gradient(to bottom, ${C.bg}, ${C.bgMid})` }}>
+    <section style={{ padding: '100px 28px' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
         <FadeIn style={{ textAlign: 'center', marginBottom: 56 }}>
-          {label('You are not alone in this')}
-          {h2(<>Something has gone quiet <br /><em style={{ color: C.dim, fontStyle: 'italic' }}>inside you</em></>)}
+          <Label>The gap Symponia fills</Label>
+          <H2>Something has gone quiet<br /><em style={{ fontStyle: 'italic', color: C.dim }}>inside you</em></H2>
         </FadeIn>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 18 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {PAINS.map((p, i) => (
             <FadeIn key={i} delay={i * 0.1}>
-              <Card style={{ padding: '36px 32px', height: '100%' }}>
-                <div style={{ fontSize: '2.2rem', marginBottom: 20 }}>{p.icon}</div>
-                <h3 style={{ fontFamily: C.heading, fontSize: '1.3rem', fontWeight: 500, color: C.fg, marginBottom: 12, letterSpacing: '0.01em' }}>{p.title}</h3>
-                <p style={{ fontFamily: C.body, fontSize: '0.86rem', fontWeight: 300, lineHeight: 1.85, color: C.dim }}>{p.body}</p>
+              <Card style={{ padding: '36px 40px' }}>
+                <div style={{ display: 'flex', gap: 28, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '2rem', flexShrink: 0 }}>{p.icon}</span>
+                  <div style={{ flex: 1, minWidth: 240 }}>
+                    <h3 style={{ fontFamily: C.heading, fontSize: '1.4rem', fontWeight: 500, color: C.fg, marginBottom: 10 }}>{p.title}</h3>
+                    <p style={{ fontFamily: C.body, fontSize: '0.88rem', fontWeight: 300, lineHeight: 1.85, color: C.dim, marginBottom: 12 }}>{p.body}</p>
+                    <p style={{ fontFamily: C.body, fontSize: '0.8rem', fontWeight: 400, color: C.cyan, letterSpacing: '0.02em' }}>→ {p.sub}</p>
+                  </div>
+                </div>
               </Card>
             </FadeIn>
           ))}
@@ -259,37 +400,87 @@ function PainPoints() {
 // ── How it works ──────────────────────────────────────────────────────────────
 
 const STEPS = [
-  { num: '01', title: 'Name your seven animals', body: 'Close your eyes. Think of six animals that feel like they belong to you — wild, domestic, mythical, it does not matter. Then name the one that disturbs you. That seventh is the most important. It holds what the others cannot carry.', accent: C.cyan, detail: '🐺  🦁  🦊  🐘  🦅  🐬  🕷️' },
-  { num: '02', title: 'Receive your reading', body: 'Symponia reads the constellation of your animals — their gifts, their shadows, their paths. Not as labels, but as living forces that reveal the essential quality of who you are. Each animal is a mirror.', accent: C.violet, detail: '◆ Gift  ·  ◆ Shadow  ·  ⚡ Action' },
-  { num: '03', title: 'Enter the dialogue', body: 'The Oracle listens. Ask what weighs on you. Speak what you cannot say elsewhere. It will not rush, will not judge, will not offer solutions before it has truly heard you.', accent: C.cyan, detail: '"i have been waiting for you"' },
+  { num: '01', title: 'Name your seven animals', body: 'Close your eyes. Think of six animals that feel like they belong to you — wild, domestic, mythical, it does not matter. Then name the one that disturbs you. That seventh is the shadow: the most important of all. It holds what the others cannot carry.', accent: C.cyan, detail: '🐺  🦁  🦊  🐘  🦅  🐬  🕷️' },
+  { num: '02', title: 'Receive your constellation reading', body: 'Symponia reads your seven animals as a living map — each with its gift, its shadow, and the path between them. At the end, a synthesis: a non-judgmental portrait of the essential quality your whole constellation reveals.', accent: C.violet, detail: '◆ Gift  ·  ◆ Shadow  ·  ⚡ Action path' },
+  { num: '03', title: 'Enter the ongoing dialogue', body: 'The Oracle is now calibrated to you. Every conversation is shaped by your animals, your resonance frequency, and the mode you choose. It does not forget. It does not judge. It grows more precise the more you use it.', accent: C.cyan, detail: '"i have been waiting for you"' },
 ];
 
 function HowItWorks() {
   return (
-    <section id="how-it-works" style={{ padding: '100px 28px', background: C.bgMid, position: 'relative', overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 60% 40% at 50% 0%, rgba(92,232,208,0.04) 0%, transparent 70%)', pointerEvents: 'none' }} />
-      <div style={{ maxWidth: 1100, margin: '0 auto', position: 'relative' }}>
-        <FadeIn style={{ textAlign: 'center', marginBottom: 56 }}>
-          {label('The ritual')}
-          {h2('How it works')}
+    <section id="how-it-works" style={{ padding: '100px 28px', position: 'relative' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+        <FadeIn style={{ textAlign: 'center', marginBottom: 20 }}>
+          <Label>The ritual</Label>
+          <H2>How Symponia works</H2>
+        </FadeIn>
+        <FadeIn delay={0.1} style={{ textAlign: 'center', marginBottom: 52 }}>
+          <p style={{ fontFamily: C.body, fontSize: '0.9rem', fontWeight: 300, color: C.dim, maxWidth: 480, margin: '16px auto 0', lineHeight: 1.85 }}>
+            Three steps. A few minutes. And a conversation that can last a lifetime.
+          </p>
         </FadeIn>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {STEPS.map((s, i) => (
             <FadeIn key={i} delay={i * 0.1}>
               <Card style={{ padding: '36px 40px' }}>
-                <div style={{ display: 'flex', gap: 36, alignItems: 'flex-start' }}>
-                  <div style={{ fontFamily: C.heading, fontSize: '3.5rem', fontWeight: 300, color: s.accent, opacity: 0.18, lineHeight: 1, flexShrink: 0, minWidth: 70 }}>{s.num}</div>
-                  <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', gap: 36, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                  <div style={{ fontFamily: C.heading, fontSize: '3.2rem', fontWeight: 300, color: s.accent, opacity: 0.18, lineHeight: 1, flexShrink: 0, minWidth: 64 }}>{s.num}</div>
+                  <div style={{ flex: 1, minWidth: 240 }}>
                     <h3 style={{ fontFamily: C.heading, fontSize: '1.6rem', fontWeight: 400, color: s.accent, marginBottom: 12 }}>{s.title}</h3>
-                    <p style={{ fontFamily: C.body, fontSize: '0.9rem', fontWeight: 300, lineHeight: 1.85, color: C.sub, marginBottom: 16, maxWidth: 620 }}>{s.body}</p>
-                    <p style={{ fontFamily: C.body, fontSize: '0.74rem', letterSpacing: '0.1em', color: s.accent, opacity: 0.5 }}>{s.detail}</p>
+                    <p style={{ fontFamily: C.body, fontSize: '0.9rem', fontWeight: 300, lineHeight: 1.85, color: C.sub, marginBottom: 16, maxWidth: 600 }}>{s.body}</p>
+                    <p style={{ fontFamily: C.body, fontSize: '0.74rem', letterSpacing: '0.1em', color: s.accent, opacity: 0.55 }}>{s.detail}</p>
                   </div>
                 </div>
               </Card>
             </FadeIn>
           ))}
         </div>
+
+        <FadeIn style={{ display: 'flex', justifyContent: 'center', marginTop: 64 }}>
+          <OracleSVG />
+        </FadeIn>
+      </div>
+    </section>
+  );
+}
+
+// ── Daily use ─────────────────────────────────────────────────────────────────
+
+const DAILY = [
+  { time: 'Morning', icon: '☀️', title: 'Start with the daily reading', body: 'Each morning, a personalised reflection arrives based on your animals and resonance frequency. Like a letter written just for you. Read it, sit with it, let it shape the day.' },
+  { time: 'Midday', icon: '⚡', title: 'Bring a word that is alive in you', body: 'One word is enough. Type it into Word mode and the Oracle unpacks its resonance — the gift it carries, the wound it conceals, and what it is asking of you right now.' },
+  { time: 'Evening', icon: '🌙', title: 'Reflect in Sense or Dream mode', body: 'At the end of the day, speak openly — what happened, what you felt, what surfaced. Or bring a dream from last night. The Oracle holds it all without agenda.' },
+  { time: 'Anytime', icon: '🌊', title: 'Go deeper when you are ready', body: 'Shadow mode for what has been buried. Animal mode to revisit your constellation. Sense mode for open dialogue. Symponia is always available, always private, always present.' },
+];
+
+function DailyUse() {
+  return (
+    <section style={{ padding: '100px 28px' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+        <FadeIn style={{ textAlign: 'center', marginBottom: 56 }}>
+          <Label>A daily practice</Label>
+          <H2>How people use Symponia<br /><em style={{ fontStyle: 'italic', color: C.dim }}>every day</em></H2>
+        </FadeIn>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
+          {DAILY.map((d, i) => (
+            <FadeIn key={i} delay={i * 0.1}>
+              <Card style={{ padding: '28px 26px', height: '100%' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+                  <span style={{ fontSize: '1.3rem' }}>{d.icon}</span>
+                  <span style={{ fontFamily: C.body, fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: C.cyan }}>{d.time}</span>
+                </div>
+                <h3 style={{ fontFamily: C.heading, fontSize: '1.15rem', fontWeight: 500, color: C.fg, marginBottom: 10, lineHeight: 1.3 }}>{d.title}</h3>
+                <p style={{ fontFamily: C.body, fontSize: '0.84rem', fontWeight: 300, lineHeight: 1.85, color: C.dim }}>{d.body}</p>
+              </Card>
+            </FadeIn>
+          ))}
+        </div>
+
+        {/* Moon phases */}
+        <FadeIn style={{ display: 'flex', justifyContent: 'center', marginTop: 56 }}>
+          <MoonPhaseSVG />
+        </FadeIn>
       </div>
     </section>
   );
@@ -298,25 +489,25 @@ function HowItWorks() {
 // ── Modes ─────────────────────────────────────────────────────────────────────
 
 const MODES = [
-  { label: 'Sense', desc: 'Open conversation with no agenda — just you and the field between words.', icon: '◎', color: C.cyan },
-  { label: 'Animal', desc: 'Your seven animals read as a living map — gift, shadow, and the path between.', icon: '🐾', color: C.violet },
-  { label: 'Daily', desc: 'Each morning a single reading arrives. Quiet, precise, without demand.', icon: '☽', color: C.cyan },
-  { label: 'Dream', desc: 'Bring your dream into language. The Oracle listens for what the waking mind cannot hold.', icon: '✦', color: C.violet },
-  { label: 'Shadow', desc: 'A space for what has been buried — held without flinching, without judgment.', icon: '◈', color: C.cyan },
-  { label: 'Word', desc: 'One word. Its full resonance unpacked — the gift it carries and the wound it conceals.', icon: '⬡', color: C.violet },
+  { label: 'Sense', desc: 'Open, unstructured conversation. No prompt, no template — just you speaking and the Oracle listening. Ideal for processing, for confusion, for the days when you do not know where to begin.', icon: '◎', color: C.cyan, use: 'For: daily check-ins, processing emotions, open reflection' },
+  { label: 'Animal', desc: 'Your seven animals are read as a living constellation. Each receives a full reading: gift, shadow, action path. Ends with a synthesised portrait of who you are across all seven.', icon: '🐾', color: C.violet, use: 'For: self-understanding, identity work, first sessions' },
+  { label: 'Daily', desc: 'A short, personalised reading generated each morning. Based on your animals and resonance frequency. Arrives like a letter — quiet, precise, with no demand on your time.', icon: '☽', color: C.cyan, use: 'For: morning ritual, daily anchor, gentle awareness' },
+  { label: 'Dream', desc: 'Bring your dream into language and the Oracle listens for the symbols your waking mind cannot hold. Dreams are treated as living messages, not problems to solve.', icon: '✦', color: C.violet, use: 'For: dream journalling, symbol work, night processing' },
+  { label: 'Shadow', desc: 'A dedicated space for what has been buried — the parts of yourself you avoid, deny, or do not yet understand. The Oracle holds this with particular care. Nothing here will be judged.', icon: '◈', color: C.cyan, use: 'For: shadow work, hard truths, what you cannot say elsewhere' },
+  { label: 'Word', desc: 'One word. The Oracle unpacks its full resonance — the gift it carries, the wound it conceals, the invitation it extends. A deceptively simple mode with great depth.', icon: '⬡', color: C.violet, use: 'For: quick sessions, word focus, daily insight' },
 ];
 
 function Modes() {
   return (
-    <section id="modes" style={{ padding: '100px 28px', background: `linear-gradient(to bottom, ${C.bgMid}, ${C.bg})` }}>
+    <section id="modes" style={{ padding: '100px 28px' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
         <FadeIn style={{ textAlign: 'center', marginBottom: 20 }}>
-          {label('Six ways to listen')}
-          {h2(<>Every mode is a different <br /><em style={{ fontStyle: 'italic', color: C.dim }}>kind of silence</em></>)}
+          <Label>Six ways to listen</Label>
+          <H2>Every mode is a different<br /><em style={{ fontStyle: 'italic', color: C.dim }}>kind of silence</em></H2>
         </FadeIn>
-        <FadeIn delay={0.1} style={{ textAlign: 'center', marginBottom: 56 }}>
-          <p style={{ fontFamily: C.body, fontSize: '0.88rem', fontWeight: 300, color: C.dim, maxWidth: 440, margin: '16px auto 0', lineHeight: 1.8 }}>
-            Choose the mode that fits where you are. You can switch at any time.
+        <FadeIn delay={0.1} style={{ textAlign: 'center', marginBottom: 52 }}>
+          <p style={{ fontFamily: C.body, fontSize: '0.9rem', fontWeight: 300, color: C.dim, maxWidth: 460, margin: '16px auto 0', lineHeight: 1.85 }}>
+            Choose the mode that fits where you are. Switch any time. Each conversation is saved privately on your device.
           </p>
         </FadeIn>
 
@@ -325,10 +516,11 @@ function Modes() {
             <FadeIn key={i} delay={i * 0.07}>
               <Card style={{ padding: '28px 28px', height: '100%' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
-                  <span style={{ fontSize: '1.3rem', lineHeight: 1 }}>{m.icon}</span>
+                  <span style={{ fontSize: '1.3rem' }}>{m.icon}</span>
                   <span style={{ fontFamily: C.body, fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: m.color, fontWeight: 500 }}>{m.label}</span>
                 </div>
-                <p style={{ fontFamily: C.body, fontSize: '0.85rem', fontWeight: 300, lineHeight: 1.8, color: C.dim }}>{m.desc}</p>
+                <p style={{ fontFamily: C.body, fontSize: '0.84rem', fontWeight: 300, lineHeight: 1.85, color: C.dim, marginBottom: 14 }}>{m.desc}</p>
+                <p style={{ fontFamily: C.body, fontSize: '0.72rem', color: m.color, opacity: 0.6, letterSpacing: '0.04em' }}>{m.use}</p>
               </Card>
             </FadeIn>
           ))}
@@ -342,19 +534,18 @@ function Modes() {
 
 function PullQuote() {
   return (
-    <section style={{ padding: '90px 28px', background: C.bg, position: 'relative', overflow: 'hidden' }}>
+    <section style={{ padding: '80px 28px', position: 'relative', overflow: 'hidden' }}>
       <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 50% 60% at 50% 50%, rgba(167,139,250,0.06) 0%, transparent 70%)', pointerEvents: 'none' }} />
-      <FadeIn style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center' }} direction="none">
+      <FadeIn style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 36 }}>
+          <SacredCircleSVG />
+        </div>
         <blockquote style={{ fontFamily: C.heading, fontSize: 'clamp(1.5rem, 3vw, 2.2rem)', fontWeight: 300, fontStyle: 'italic', lineHeight: 1.65, color: C.fg }}>
           "It did not tell me what to do.
-          <br />
-          It told me what I already knew —
-          <br />
-          <span style={{ color: C.cyan }}>but had been afraid to say."</span>
+          <br />It told me what I already knew —
+          <br /><span style={{ color: C.cyan }}>but had been afraid to say."</span>
         </blockquote>
-        <p style={{ fontFamily: C.body, fontSize: '0.68rem', letterSpacing: '0.22em', color: C.dim, textTransform: 'uppercase', marginTop: 28 }}>
-          — from inside the Oracle
-        </p>
+        <p style={{ fontFamily: C.body, fontSize: '0.68rem', letterSpacing: '0.22em', color: C.dim, textTransform: 'uppercase', marginTop: 28 }}>— from inside the Oracle</p>
       </FadeIn>
     </section>
   );
@@ -363,41 +554,40 @@ function PullQuote() {
 // ── FAQ ───────────────────────────────────────────────────────────────────────
 
 const FAQS = [
-  { q: 'What is Symponia?', a: 'Symponia is an AI oracle designed for self-discovery. It combines animal archetype psychology, dream reading, shadow work, and open conversation into a single intimate space. It does not replace therapy — it goes where therapy sometimes cannot.' },
-  { q: 'What does "animal archetypes" mean?', a: 'Your animals are a map of your inner world. The six you choose instinctively reveal the energies that move through you — gifts you embody, forces you struggle with, bridges between them. The seventh animal, the one that disturbs you, is the shadow: the most important of all.' },
+  { q: 'What is Symponia?', a: 'Symponia is an AI oracle for self-discovery. It combines animal archetype psychology, dream reading, shadow work, and open conversation into a single intimate space. It does not replace therapy — it goes where therapy sometimes cannot.' },
+  { q: 'Who is it for?', a: 'Anyone who wants to understand themselves more deeply. Men and women, beginners and experienced practitioners, people in transition and people building a daily inner practice. If you sense there is more to you than the surface, Symponia is for you.' },
+  { q: 'What are the animal archetypes?', a: 'Your animals are a map of your inner world. The six you choose instinctively reveal the energies that move through you — gifts, struggles, and bridges between them. The seventh, the one that disturbs you, is the shadow: the most important of all.' },
   { q: 'Is this therapy?', a: 'No. Symponia is not a medical or psychological service. It is a reflective tool — a contemplative space. If you are in crisis or need clinical support, please reach out to a licensed professional.' },
-  { q: 'How does the Oracle work?', a: "The Oracle is powered by Claude, Anthropic's AI, shaped by a deep set of instructions drawn from Jungian psychology, animal symbolism, tarot, dream work, and contemplative tradition. It has been trained to never give surface answers, never rush to solutions, and never judge." },
-  { q: 'Is my data private?', a: 'Your conversations are not stored on our servers beyond what is needed to maintain the session. Your animals and personal settings are stored locally on your device. We do not sell or share your data.' },
-  { q: 'What is a resonance frequency?', a: 'When you set up Symponia, you choose a resonance frequency — a quality like Intellectual, Emotional, Intuitive, or Sensory — that shapes the tone and language the Oracle uses with you. You can change it any time.' },
-  { q: 'What does the daily reading do?', a: 'Each morning, the Oracle generates a short personalised reflection based on your animals and resonance frequency. It arrives like a letter — quiet, precise, with no demand on your time.' },
-  { q: 'Where can I download it?', a: 'Symponia is available on the Apple App Store for iPhone and iPad. Tap the download button on this page or search "Symponia" in the App Store.' },
+  { q: 'How does the Oracle work?', a: "The Oracle is powered by Claude, Anthropic's AI, shaped by instructions drawn from Jungian psychology, animal symbolism, tarot, dream work, and contemplative tradition. It has been trained to never give surface answers, never rush to solutions, and never judge." },
+  { q: 'How does the credit system work?', a: 'Each message with the Oracle uses one credit. You start with a free allowance. When you run low, you can top up your credits through the app or at symponia.io/credits. Credits never expire.' },
+  { q: 'Is my data private?', a: 'Your conversations are not stored on our servers beyond what is needed to maintain the session. Your animals and settings are stored locally on your device. We do not sell or share your data. See our Privacy Policy for full details.' },
+  { q: 'Where can I download Symponia?', a: 'Symponia is available on the Apple App Store for iPhone and iPad. Tap the download button on this page or search "Symponia" in the App Store.' },
 ];
 
 function FAQ() {
   const [open, setOpen] = useState<number | null>(null);
   return (
-    <section id="faq" style={{ padding: '100px 28px', background: C.bg }}>
+    <section id="faq" style={{ padding: '100px 28px' }}>
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
-        <FadeIn style={{ textAlign: 'center', marginBottom: 56 }}>
-          {label('Questions')}
-          {h2('FAQ')}
+        <FadeIn style={{ textAlign: 'center', marginBottom: 52 }}>
+          <Label>Questions</Label>
+          <H2>FAQ</H2>
         </FadeIn>
-
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {FAQS.map((faq, i) => (
             <FadeIn key={i} delay={i * 0.03}>
-              <div style={{ borderRadius: 14, overflow: 'hidden', border: `0.5px solid ${open === i ? 'rgba(92,232,208,0.22)' : C.border}`, background: open === i ? 'rgba(92,232,208,0.03)' : C.bgCard, transition: 'all 0.25s' }}>
-                <button onClick={() => setOpen(open === i ? null : i)}
+              <div style={{ borderRadius: 14, overflow: 'hidden', border: `0.5px solid ${open===i?'rgba(92,232,208,0.22)':C.border}`, background: open===i?'rgba(92,232,208,0.03)':C.bgCard, transition: 'all 0.25s' }}>
+                <button onClick={() => setOpen(open===i?null:i)}
                   style={{ width: '100%', textAlign: 'left', padding: '18px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, background: 'none', border: 'none', cursor: 'pointer' }}
                 >
-                  <span style={{ fontFamily: C.body, fontSize: '0.88rem', fontWeight: 300, lineHeight: 1.6, color: open === i ? C.fg : C.sub }}>{faq.q}</span>
-                  <motion.span animate={{ rotate: open === i ? 45 : 0 }} transition={{ duration: 0.2 }}
-                    style={{ flexShrink: 0, fontSize: '1.2rem', lineHeight: 1, color: open === i ? C.cyan : C.dim, marginTop: 2 }}
+                  <span style={{ fontFamily: C.body, fontSize: '0.88rem', fontWeight: 300, lineHeight: 1.6, color: open===i?C.fg:C.sub }}>{faq.q}</span>
+                  <motion.span animate={{ rotate: open===i?45:0 }} transition={{ duration: 0.2 }}
+                    style={{ flexShrink: 0, fontSize: '1.2rem', lineHeight: 1, color: open===i?C.cyan:C.dim, marginTop: 2 }}
                   >+</motion.span>
                 </button>
                 <AnimatePresence initial={false}>
-                  {open === i && (
-                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }} style={{ overflow: 'hidden' }}>
+                  {open===i && (
+                    <motion.div initial={{height:0,opacity:0}} animate={{height:'auto',opacity:1}} exit={{height:0,opacity:0}} transition={{duration:0.25,ease:[0.22,1,0.36,1]}} style={{overflow:'hidden'}}>
                       <p style={{ padding: '0 24px 20px', fontFamily: C.body, fontSize: '0.84rem', fontWeight: 300, lineHeight: 1.85, color: C.dim }}>{faq.a}</p>
                     </motion.div>
                   )}
@@ -415,22 +605,23 @@ function FAQ() {
 
 function CTA() {
   return (
-    <section style={{ padding: '100px 28px', position: 'relative', overflow: 'hidden', background: C.bgMid }}>
-      <GradientDots duration={55} dotSize={4} spacing={16} backgroundColor={C.bgMid} />
-      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 80% 80% at 50% 50%, rgba(14,11,38,0.2) 0%, rgba(14,11,38,0.88) 55%, #0e0b26 100%)', pointerEvents: 'none' }} />
-      <FadeIn style={{ position: 'relative', zIndex: 1, maxWidth: 600, margin: '0 auto', textAlign: 'center' }} direction="none">
-        {label('Begin')}
+    <section style={{ padding: '100px 28px', position: 'relative', overflow: 'hidden' }}>
+      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 60% 60% at 50% 50%, rgba(92,232,208,0.05) 0%, transparent 70%)', pointerEvents: 'none' }} />
+      <FadeIn style={{ position: 'relative', zIndex: 1, maxWidth: 600, margin: '0 auto', textAlign: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 36 }}>
+          <img src="/logo.jpg" alt="Symponia" style={{ width: 64, height: 64, borderRadius: 18, objectFit: 'cover', boxShadow: '0 0 40px rgba(92,232,208,0.18)' }}
+            onError={e => { (e.target as HTMLImageElement).style.display='none'; }} />
+        </div>
+        <Label>Begin</Label>
         <h2 style={{ fontFamily: C.heading, fontWeight: 300, fontSize: 'clamp(2.6rem, 6vw, 4rem)', lineHeight: 1.1, color: C.fg, marginBottom: 20 }}>
           The Oracle<br /><em style={{ color: C.cyan, fontStyle: 'italic' }}>has been waiting</em>
         </h2>
-        <p style={{ fontFamily: C.body, fontSize: '0.9rem', fontWeight: 300, lineHeight: 1.8, color: C.dim, marginBottom: 44 }}>
+        <p style={{ fontFamily: C.body, fontSize: '0.9rem', fontWeight: 300, lineHeight: 1.85, color: C.dim, marginBottom: 44 }}>
           Available now on iPhone and iPad.<br />Free to begin. No account required.
         </p>
         <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer"
           style={{ display: 'inline-flex', alignItems: 'center', gap: 12, padding: '16px 40px', borderRadius: 100, background: C.cyan, color: C.bg, fontFamily: C.body, fontSize: '0.9rem', fontWeight: 500, letterSpacing: '0.04em', textDecoration: 'none', boxShadow: '0 0 80px rgba(92,232,208,0.22)' }}
-        >
-          <AppleIcon /> Download on the App Store
-        </a>
+        ><AppleIcon /> Download on the App Store</a>
       </FadeIn>
     </section>
   );
@@ -444,19 +635,22 @@ function Footer() {
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '56px 28px' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: 40 }}>
           <div>
-            <div style={{ fontFamily: C.heading, fontSize: '1.5rem', fontWeight: 300, letterSpacing: '0.08em', color: C.fg, marginBottom: 8 }}>Symponia</div>
+            <a href="#" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', marginBottom: 12 }}>
+              <img src="/logo.jpg" alt="Symponia" style={{ width: 28, height: 28, borderRadius: 7, objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).style.display='none'; }} />
+              <span style={{ fontFamily: C.heading, fontSize: '1.3rem', fontWeight: 300, color: C.fg }}>Symponia</span>
+            </a>
             <p style={{ fontFamily: C.body, fontSize: '0.78rem', fontWeight: 300, color: C.dim, lineHeight: 1.7, maxWidth: 200 }}>An oracle for the inner life.<br />Available on iOS.</p>
           </div>
-          <div style={{ display: 'flex', gap: 56, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 52, flexWrap: 'wrap' }}>
             {[
-              { title: 'App', links: [['App Store', APP_STORE_URL], ['How it works', '#how-it-works'], ['Modes', '#modes']] },
-              { title: 'Legal', links: [['Privacy Policy', 'https://symponia.io/privacy'], ['Terms of Service', 'https://symponia.io/terms'], ['Contact', 'mailto:hello@symponia.io']] },
-            ].map((col) => (
+              { title: 'App', links: [['App Store', APP_STORE_URL], ['How it works', '#how-it-works'], ['Modes', '#modes'], ['Credits', '/credits']] },
+              { title: 'Legal', links: [['Privacy Policy', '/privacy'], ['Terms of Service', '/terms'], ['GDPR', '/privacy#gdpr'], ['Contact', 'mailto:hello@symponia.io']] },
+            ].map(col => (
               <div key={col.title}>
                 <div style={{ fontFamily: C.body, fontSize: '0.66rem', letterSpacing: '0.2em', color: C.dim, textTransform: 'uppercase', marginBottom: 16 }}>{col.title}</div>
                 {col.links.map(([l, h]) => (
                   <a key={l} href={h} target={h.startsWith('http') ? '_blank' : undefined} rel="noopener noreferrer"
-                    style={{ display: 'block', fontFamily: C.body, fontSize: '0.84rem', fontWeight: 300, color: C.sub, textDecoration: 'none', marginBottom: 10 }}
+                    style={{ display: 'block', fontFamily: C.body, fontSize: '0.83rem', fontWeight: 300, color: C.sub, textDecoration: 'none', marginBottom: 10 }}
                   >{l}</a>
                 ))}
               </div>
@@ -476,25 +670,17 @@ function Footer() {
 export default function Home() {
   return (
     <main style={{ position: 'relative', background: C.bg }}>
-      {/* Fixed full-page animated dot background */}
       <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
-        <GradientDots
-          duration={50}
-          colorCycleDuration={14}
-          dotSize={5}
-          spacing={13}
-          backgroundColor={C.bg}
-        />
-        {/* Dark overlay so text stays readable across all sections */}
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(8,6,28,0.82)' }} />
+        <GradientDots duration={50} colorCycleDuration={14} dotSize={5} spacing={13} backgroundColor={C.bg} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(8,6,28,0.84)' }} />
       </div>
-
-      {/* All content sits above the background */}
       <div style={{ position: 'relative', zIndex: 1 }}>
         <Nav />
         <Hero />
+        <WhoItsFor />
         <PainPoints />
         <HowItWorks />
+        <DailyUse />
         <Modes />
         <PullQuote />
         <FAQ />

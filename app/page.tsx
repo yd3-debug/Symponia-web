@@ -23,7 +23,7 @@ const C = {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function FadeIn({ children, delay = 0, style = {} }: { children: React.ReactNode; delay?: number; style?: React.CSSProperties }) {
+function FadeIn({ children, delay = 0, style = {}, direction = 'up' }: { children: React.ReactNode; delay?: number; style?: React.CSSProperties; direction?: string }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-40px' });
   return (

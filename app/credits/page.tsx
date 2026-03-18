@@ -61,7 +61,7 @@ const PACKS = [
   },
 ];
 
-function CreditCard({ pack, loading, onBuy }: { pack: typeof PACKS[0]; loading: boolean; onBuy: (priceId: string) => void }) {
+function CreditCard({ pack }: { pack: typeof PACKS[0]; loading?: boolean; onBuy?: (priceId: string) => void }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -104,28 +104,10 @@ function CreditCard({ pack, loading, onBuy }: { pack: typeof PACKS[0]; loading: 
         <p style={{ fontFamily: C.body, fontSize: '0.82rem', fontWeight: 300, color: C.sub, marginTop: 14, lineHeight: 1.7 }}>{pack.desc}</p>
       </div>
 
-      <button
-        onClick={() => onBuy(pack.priceId)}
-        disabled={loading}
-        style={{
-          width: '100%',
-          padding: '14px',
-          borderRadius: 100,
-          border: `0.5px solid ${pack.popular ? 'transparent' : C.borderStrong}`,
-          background: pack.popular ? pack.accent : 'rgba(255,255,255,0.04)',
-          color: pack.popular ? C.bg : C.sub,
-          fontFamily: C.body,
-          fontSize: '0.84rem',
-          fontWeight: 500,
-          letterSpacing: '0.04em',
-          cursor: loading ? 'wait' : 'pointer',
-          opacity: loading ? 0.6 : 1,
-          transition: 'all 0.2s',
-          marginTop: 'auto',
-        }}
-      >
-        {loading ? 'Redirecting...' : `Get ${pack.credits} credits`}
-      </button>
+      {/* TODO: Enable when Stripe is configured */}
+      <div style={{ width: '100%', padding: '14px', borderRadius: 100, border: `0.5px solid ${C.border}`, background: 'rgba(255,255,255,0.02)', color: C.dim, fontFamily: C.body, fontSize: '0.82rem', fontWeight: 300, letterSpacing: '0.08em', textAlign: 'center', marginTop: 'auto' }}>
+        Coming soon
+      </div>
     </motion.div>
   );
 }

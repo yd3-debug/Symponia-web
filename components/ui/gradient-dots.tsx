@@ -7,13 +7,15 @@ type GradientDotsProps = React.ComponentProps<typeof motion.div> & {
   dotSize?: number;
   spacing?: number;
   duration?: number;
+  colorCycleDuration?: number;
   backgroundColor?: string;
 };
 
 export function GradientDots({
-  dotSize = 6,
-  spacing = 14,
-  duration = 40,
+  dotSize = 8,
+  spacing = 10,
+  duration = 30,
+  colorCycleDuration = 6,
   backgroundColor = 'var(--background)',
   className,
   ...props
@@ -28,39 +30,42 @@ export function GradientDots({
         backgroundImage: `
           radial-gradient(circle at 50% 50%, transparent 1.5px, ${backgroundColor} 0 ${dotSize}px, transparent ${dotSize}px),
           radial-gradient(circle at 50% 50%, transparent 1.5px, ${backgroundColor} 0 ${dotSize}px, transparent ${dotSize}px),
-          radial-gradient(ellipse at 20% 30%, rgba(92,232,208,0.55), transparent 55%),
-          radial-gradient(ellipse at 80% 70%, rgba(167,139,250,0.45), transparent 55%),
-          radial-gradient(ellipse at 60% 20%, rgba(92,232,208,0.3), transparent 50%),
-          radial-gradient(ellipse at 30% 80%, rgba(100,120,255,0.35), transparent 50%)
+          radial-gradient(circle at 50% 50%, #f00, transparent 60%),
+          radial-gradient(circle at 50% 50%, #ff0, transparent 60%),
+          radial-gradient(circle at 50% 50%, #0f0, transparent 60%),
+          radial-gradient(ellipse at 50% 50%, #00f, transparent 60%)
         `,
         backgroundSize: `
           ${spacing}px ${hexSpacing}px,
           ${spacing}px ${hexSpacing}px,
           200% 200%,
           200% 200%,
-          180% 180%,
-          180% 180%
+          200% 200%,
+          200% ${hexSpacing}px
         `,
         backgroundPosition: `
-          0px 0px,
-          ${spacing / 2}px ${hexSpacing / 2}px,
+          0px 0px, ${spacing / 2}px ${hexSpacing / 2}px,
           0% 0%,
-          100% 100%,
-          60% 0%,
-          30% 100%
+          0% 0%,
+          0% 0px
         `,
       }}
       animate={{
         backgroundPosition: [
-          `0px 0px, ${spacing / 2}px ${hexSpacing / 2}px, 0% 0%, 100% 100%, 60% 0%, 30% 100%`,
-          `0px 0px, ${spacing / 2}px ${hexSpacing / 2}px, 30% 20%, 70% 80%, 40% 30%, 60% 70%`,
-          `0px 0px, ${spacing / 2}px ${hexSpacing / 2}px, 0% 0%, 100% 100%, 60% 0%, 30% 100%`,
+          `0px 0px, ${spacing / 2}px ${hexSpacing / 2}px, 800% 400%, 1000% -400%, -1200% -600%, 400% ${hexSpacing}px`,
+          `0px 0px, ${spacing / 2}px ${hexSpacing / 2}px, 0% 0%, 0% 0%, 0% 0%, 0% 0%`,
         ],
+        filter: ['hue-rotate(0deg)', 'hue-rotate(360deg)'],
       }}
       transition={{
         backgroundPosition: {
           duration,
-          ease: 'easeInOut',
+          ease: 'linear',
+          repeat: Infinity,
+        },
+        filter: {
+          duration: colorCycleDuration,
+          ease: 'linear',
           repeat: Infinity,
         },
       }}

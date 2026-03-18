@@ -23,7 +23,7 @@ const C = {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function FadeIn({ children, delay = 0, style = {}, direction = 'up' }: { children: React.ReactNode; delay?: number; style?: React.CSSProperties; direction?: string }) {
+function FadeIn({ children, delay = 0, style = {} }: { children: React.ReactNode; delay?: number; style?: React.CSSProperties; direction?: string }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-40px' });
   return (
@@ -475,16 +475,32 @@ function Footer() {
 
 export default function Home() {
   return (
-    <main>
-      <Nav />
-      <Hero />
-      <PainPoints />
-      <HowItWorks />
-      <Modes />
-      <PullQuote />
-      <FAQ />
-      <CTA />
-      <Footer />
+    <main style={{ position: 'relative', background: C.bg }}>
+      {/* Fixed full-page animated dot background */}
+      <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
+        <GradientDots
+          duration={50}
+          colorCycleDuration={14}
+          dotSize={5}
+          spacing={13}
+          backgroundColor={C.bg}
+        />
+        {/* Dark overlay so text stays readable across all sections */}
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(8,6,28,0.82)' }} />
+      </div>
+
+      {/* All content sits above the background */}
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <Nav />
+        <Hero />
+        <PainPoints />
+        <HowItWorks />
+        <Modes />
+        <PullQuote />
+        <FAQ />
+        <CTA />
+        <Footer />
+      </div>
     </main>
   );
 }

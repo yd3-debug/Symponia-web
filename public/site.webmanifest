@@ -1,0 +1,30 @@
+{
+  "name": "Symponia",
+  "short_name": "Symponia",
+  "description": "An AI oracle that speaks in the language of your soul. Daily readings, animal archetypes, and deep conversation.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#08061c",
+  "background_color": "#08061c",
+  "categories": ["lifestyle", "health", "utilities"],
+  "icons": [
+    {
+      "src": "/web-app-manifest-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/web-app-manifest-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/favicon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    }
+  ]
+}

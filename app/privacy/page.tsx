@@ -24,7 +24,7 @@ export default function PrivacyPage() {
       <div style={{ maxWidth: 760, margin: '0 auto', padding: '80px 28px 120px' }}>
         <p style={{ fontFamily: C.body, fontSize: '0.7rem', letterSpacing: '0.22em', color: C.cyan, textTransform: 'uppercase', marginBottom: 16 }}>Legal</p>
         <h1 style={{ fontFamily: C.heading, fontWeight: 300, fontSize: 'clamp(2.4rem, 5vw, 3.6rem)', color: C.fg, marginBottom: 12, lineHeight: 1.1 }}>Privacy Policy</h1>
-        <p style={{ fontFamily: C.body, fontSize: '0.82rem', fontWeight: 300, color: C.dim, marginBottom: 56 }}>Last updated: March 2026</p>
+        <p style={{ fontFamily: C.body, fontSize: '0.82rem', fontWeight: 300, color: C.dim, marginBottom: 56 }}>Last updated: April 2026</p>
 
         <Section title="Who we are">
           <p>Symponia is a self-discovery application developed and operated by Symponia Ltd ("we", "us", "our"). We are committed to protecting your personal information and your right to privacy.</p>
@@ -38,7 +38,7 @@ export default function PrivacyPage() {
             <li>Your name and gender (if provided during onboarding)</li>
             <li>Your resonance frequency preference</li>
             <li>Conversation history per Oracle mode</li>
-            <li>Token/credit balance</li>
+            <li>Token balance</li>
             <li>Notification preferences</li>
           </ul>
           <p style={{ marginTop: 16 }}><strong style={{ color: C.fg, fontWeight: 400 }}>Data transmitted during a session:</strong></p>
@@ -54,7 +54,7 @@ export default function PrivacyPage() {
             <li>To generate personalised Oracle responses</li>
             <li>To deliver your daily reading</li>
             <li>To maintain your session during a conversation</li>
-            <li>To process credit purchases (via Stripe)</li>
+            <li>To process token and subscription purchases (via Stripe)</li>
             <li>To send optional push notifications (if you have enabled them)</li>
           </ul>
           <p style={{ marginTop: 12 }}>We do not use your data for advertising, profiling, or any purpose beyond the operation of Symponia.</p>
@@ -65,7 +65,7 @@ export default function PrivacyPage() {
           <ul style={{ marginTop: 10, paddingLeft: 20, lineHeight: 2 }}>
             <li><strong style={{ color: C.fg, fontWeight: 400 }}>Anthropic (Claude API)</strong> — AI response generation. Anthropic's privacy policy applies to data processed through their API.</li>
             <li><strong style={{ color: C.fg, fontWeight: 400 }}>Supabase</strong> — Secure backend and edge function hosting.</li>
-            <li><strong style={{ color: C.fg, fontWeight: 400 }}>Stripe</strong> — Payment processing for credit purchases. We never see or store your payment card details.</li>
+            <li><strong style={{ color: C.fg, fontWeight: 400 }}>Stripe</strong> — Payment processing for token and subscription purchases. We never see or store your payment card details.</li>
             <li><strong style={{ color: C.fg, fontWeight: 400 }}>Apple</strong> — App Store distribution and push notification delivery.</li>
           </ul>
         </Section>

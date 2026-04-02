@@ -24,7 +24,7 @@ export default function TermsPage() {
       <div style={{ maxWidth: 760, margin: '0 auto', padding: '80px 28px 120px' }}>
         <p style={{ fontFamily: C.body, fontSize: '0.7rem', letterSpacing: '0.22em', color: C.cyan, textTransform: 'uppercase', marginBottom: 16 }}>Legal</p>
         <h1 style={{ fontFamily: C.heading, fontWeight: 300, fontSize: 'clamp(2.4rem, 5vw, 3.6rem)', color: C.fg, marginBottom: 12, lineHeight: 1.1 }}>Terms of Service</h1>
-        <p style={{ fontFamily: C.body, fontSize: '0.82rem', fontWeight: 300, color: C.dim, marginBottom: 56 }}>Last updated: March 2026</p>
+        <p style={{ fontFamily: C.body, fontSize: '0.82rem', fontWeight: 300, color: C.dim, marginBottom: 56 }}>Last updated: April 2026</p>
 
         <Section title="Acceptance">
           <p>By downloading or using Symponia, you agree to these Terms of Service. If you do not agree, please do not use the app. These terms form a binding legal agreement between you and Symponia Ltd.</p>
@@ -36,7 +36,7 @@ export default function TermsPage() {
             <li>Oracle conversation modes (Sense, Animal, Daily, Dream, Shadow, Word)</li>
             <li>Animal archetype readings and synthesis</li>
             <li>Daily personalised reflections</li>
-            <li>Credit-based access to Oracle sessions</li>
+            <li>Token-based access to Oracle readings</li>
           </ul>
         </Section>
 
@@ -45,12 +45,13 @@ export default function TermsPage() {
           <p style={{ marginTop: 12 }}>If you are experiencing a mental health crisis, please contact a licensed professional or emergency services immediately. Symponia is a contemplative tool, not a substitute for professional care.</p>
         </Section>
 
-        <Section title="Credits and payments">
-          <p>Symponia uses a credit system for Oracle sessions. Credits can be purchased through the app or at symponia.io/credits. The following applies:</p>
+        <Section title="Tokens and payments" id="tokens">
+          <p>Symponia uses a token system for Oracle readings. Each conversation exchange uses 1 token. New users receive 10 free readings. Additional tokens and monthly subscriptions are available for purchase within the app. The following applies:</p>
           <ul style={{ marginTop: 10, paddingLeft: 20, lineHeight: 2 }}>
-            <li>Credits are non-refundable once used.</li>
-            <li>Unused credits do not expire.</li>
-            <li>Prices are displayed in the app and on this website and are subject to change.</li>
+            <li>Tokens are non-refundable once used.</li>
+            <li>Unused tokens do not expire.</li>
+            <li>Monthly subscriptions renew automatically and can be cancelled at any time. Access continues until the end of the current billing period.</li>
+            <li>Prices are displayed within the app and are subject to change.</li>
             <li>Payment is processed securely by Stripe. We do not store your payment details.</li>
             <li>All purchases are final. Refunds are considered on a case-by-case basis — contact <a href="mailto:hello@symponia.io" style={{ color: C.cyan, textDecoration: 'none' }}>hello@symponia.io</a>.</li>
           </ul>
@@ -78,7 +79,7 @@ export default function TermsPage() {
         </Section>
 
         <Section title="Limitation of liability">
-          <p>To the fullest extent permitted by law, Symponia Ltd shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the app. Our total liability to you for any claim arising from use of Symponia shall not exceed the amount you paid for credits in the preceding 30 days.</p>
+          <p>To the fullest extent permitted by law, Symponia Ltd shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the app. Our total liability to you for any claim arising from use of Symponia shall not exceed the amount you paid for tokens or subscriptions in the preceding 30 days.</p>
         </Section>
 
         <Section title="Changes to these terms">

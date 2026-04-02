@@ -2,7 +2,7 @@
 
 import { PageShell } from '@/components/PageShell';
 import { motion } from 'framer-motion';
-import React, { useState } from 'react';
+import React from 'react';
 
 const C = {
   bg: '#08061c', bgCard: 'rgba(255,255,255,0.03)',
@@ -16,52 +16,38 @@ const C = {
 
 const PACKS = [
   {
-    id: 'starter',
-    name: 'Seeker',
-    credits: 50,
-    price: '€2.99',
-    priceId: 'price_starter', // Replace with real Stripe price ID
-    desc: 'A gentle beginning.',
-    perCredit: '€0.06 per session',
+    id: 'free',
+    name: 'New arrivals',
+    tokens: 10,
+    price: 'Free',
+    desc: 'Experience the oracle.',
+    detail: '10 free readings to begin',
     accent: C.dim,
     popular: false,
   },
   {
-    id: 'explorer',
-    name: 'Explorer',
-    credits: 150,
-    price: '€7.99',
-    priceId: 'price_explorer', // Replace with real Stripe price ID
-    desc: 'For the curious and the committed.',
-    perCredit: '€0.053 per session',
+    id: 'starter',
+    name: 'Tokens',
+    tokens: 50,
+    price: '£4.99',
+    desc: 'Yours to keep, forever.',
+    detail: '~100 messages · never expire',
     accent: C.cyan,
     popular: true,
   },
   {
-    id: 'seeker',
-    name: 'Initiate',
-    credits: 350,
-    price: '€14.99',
-    priceId: 'price_seeker', // Replace with real Stripe price ID
-    desc: 'A deeper practice.',
-    perCredit: '€0.043 per session',
+    id: 'monthly',
+    name: 'Monthly',
+    tokens: null,
+    price: '£7.99',
+    desc: 'Access as long as it\'s active.',
+    detail: 'per month · cancel anytime',
     accent: C.violet,
-    popular: false,
-  },
-  {
-    id: 'oracle',
-    name: 'Oracle',
-    credits: 800,
-    price: '€29.99',
-    priceId: 'price_oracle', // Replace with real Stripe price ID
-    desc: 'Unlimited depth. The full journey.',
-    perCredit: '€0.037 per session',
-    accent: C.cyan,
     popular: false,
   },
 ];
 
-function CreditCard({ pack }: { pack: typeof PACKS[0]; loading?: boolean; onBuy?: (priceId: string) => void }) {
+function PricingCard({ pack }: { pack: typeof PACKS[0] }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -93,83 +79,60 @@ function CreditCard({ pack }: { pack: typeof PACKS[0]; loading?: boolean; onBuy?
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 6 }}>
           <span style={{ fontFamily: C.heading, fontSize: '3rem', fontWeight: 300, color: C.fg, lineHeight: 1 }}>{pack.price}</span>
         </div>
-        <p style={{ fontFamily: C.body, fontSize: '0.78rem', fontWeight: 300, color: C.dim }}>{pack.perCredit}</p>
+        <p style={{ fontFamily: C.body, fontSize: '0.78rem', fontWeight: 300, color: C.dim }}>{pack.detail}</p>
       </div>
 
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 0', borderTop: `0.5px solid ${C.border}`, borderBottom: `0.5px solid ${C.border}` }}>
-          <span style={{ fontFamily: C.heading, fontSize: '2rem', fontWeight: 300, color: pack.accent }}>{pack.credits}</span>
-          <span style={{ fontFamily: C.body, fontSize: '0.75rem', fontWeight: 300, color: C.dim, letterSpacing: '0.08em' }}>Oracle sessions</span>
+          {pack.tokens !== null ? (
+            <>
+              <span style={{ fontFamily: C.heading, fontSize: '2rem', fontWeight: 300, color: pack.accent }}>{pack.tokens}</span>
+              <span style={{ fontFamily: C.body, fontSize: '0.75rem', fontWeight: 300, color: C.dim, letterSpacing: '0.08em' }}>tokens</span>
+            </>
+          ) : (
+            <span style={{ fontFamily: C.body, fontSize: '0.75rem', fontWeight: 300, color: C.dim, letterSpacing: '0.08em' }}>Unlimited readings</span>
+          )}
         </div>
         <p style={{ fontFamily: C.body, fontSize: '0.82rem', fontWeight: 300, color: C.sub, marginTop: 14, lineHeight: 1.7 }}>{pack.desc}</p>
       </div>
 
-      {/* TODO: Enable when Stripe is configured */}
       <div style={{ width: '100%', padding: '14px', borderRadius: 100, border: `0.5px solid ${C.border}`, background: 'rgba(255,255,255,0.02)', color: C.dim, fontFamily: C.body, fontSize: '0.82rem', fontWeight: 300, letterSpacing: '0.08em', textAlign: 'center', marginTop: 'auto' }}>
-        Coming soon
+        Available in the app
       </div>
     </motion.div>
   );
 }
 
 export default function CreditsPage() {
-  const [loadingId, setLoadingId] = useState<string | null>(null);
-
-  async function handleBuy(priceId: string, packId: string) {
-    setLoadingId(packId);
-    try {
-      const res = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ priceId }),
-      });
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        alert('Something went wrong. Please try again.');
-        setLoadingId(null);
-      }
-    } catch {
-      alert('Something went wrong. Please try again.');
-      setLoadingId(null);
-    }
-  }
-
   return (
     <PageShell>
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '80px 28px 120px' }}>
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: 72 }}>
-          <p style={{ fontFamily: C.body, fontSize: '0.7rem', letterSpacing: '0.22em', color: C.cyan, textTransform: 'uppercase', marginBottom: 16 }}>Credits</p>
+          <p style={{ fontFamily: C.body, fontSize: '0.7rem', letterSpacing: '0.22em', color: C.cyan, textTransform: 'uppercase', marginBottom: 16 }}>Pricing</p>
           <h1 style={{ fontFamily: C.heading, fontWeight: 300, fontSize: 'clamp(2.4rem, 5vw, 3.8rem)', color: C.fg, marginBottom: 20, lineHeight: 1.1 }}>
             Choose your depth
           </h1>
           <p style={{ fontFamily: C.body, fontSize: '0.95rem', fontWeight: 300, color: C.sub, maxWidth: 480, margin: '0 auto', lineHeight: 1.85 }}>
-            Each Oracle session uses one credit. Credits never expire and work across all modes — Sense, Animal, Daily, Dream, Shadow, and Word.
+            New to Symponia? You get 10 free readings to experience the oracle. When you're ready to go deeper, top up with tokens or subscribe — all from within the app.
           </p>
         </div>
 
         {/* Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 18, marginBottom: 80 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 18, marginBottom: 80, maxWidth: 900, margin: '0 auto 80px' }}>
           {PACKS.map(pack => (
-            <CreditCard
-              key={pack.id}
-              pack={pack}
-              loading={loadingId === pack.id}
-              onBuy={(priceId) => handleBuy(priceId, pack.id)}
-            />
+            <PricingCard key={pack.id} pack={pack} />
           ))}
         </div>
 
-        {/* How credits work */}
+        {/* How readings work */}
         <div style={{ maxWidth: 640, margin: '0 auto' }}>
-          <h2 style={{ fontFamily: C.heading, fontSize: '1.8rem', fontWeight: 300, color: C.fg, marginBottom: 32, textAlign: 'center' }}>How credits work</h2>
+          <h2 style={{ fontFamily: C.heading, fontSize: '1.8rem', fontWeight: 300, color: C.fg, marginBottom: 32, textAlign: 'center' }}>How readings work</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {[
-              { icon: '◎', title: 'One credit per session', body: 'Every message exchange with the Oracle uses one credit, regardless of the mode. Daily readings use one credit each morning.' },
-              { icon: '∞', title: 'Credits never expire', body: 'Your credits stay in your account indefinitely. There are no monthly fees, no subscriptions — just credits when you need them.' },
-              { icon: '📱', title: 'Used inside the app', body: 'Credits are consumed inside the Symponia iOS app. Your balance is stored locally on your device and synced after purchase.' },
+              { icon: '◎', title: 'One token per exchange', body: 'Each conversation exchange uses 1 token — roughly 2 messages back and forth with the Oracle, regardless of mode.' },
+              { icon: '∞', title: 'Tokens never expire', body: 'Your tokens stay in your account indefinitely. No resets, no monthly fees — just tokens when you need them.' },
+              { icon: '📱', title: 'Purchase inside the app', body: 'Tokens and subscriptions are purchased directly within the Symponia iOS app. Your balance is stored on your device.' },
               { icon: '🔒', title: 'Secure payment via Stripe', body: 'All payments are processed by Stripe, the world\'s leading payment platform. We never see or store your card details.' },
             ].map((item, i) => (
               <div key={i} style={{ display: 'flex', gap: 18, padding: '20px 24px', borderRadius: 16, border: `0.5px solid ${C.border}`, background: C.bgCard }}>
@@ -183,9 +146,9 @@ export default function CreditsPage() {
           </div>
 
           <p style={{ fontFamily: C.body, fontSize: '0.78rem', fontWeight: 300, color: C.dim, textAlign: 'center', marginTop: 40, lineHeight: 1.8 }}>
-            Questions about credits or billing? Contact us at{' '}
+            Questions about tokens or billing? Contact us at{' '}
             <a href="mailto:hello@symponia.io" style={{ color: C.cyan, textDecoration: 'none' }}>hello@symponia.io</a>
-            <br />See our <a href="/terms#credits" style={{ color: C.cyan, textDecoration: 'none' }}>Terms of Service</a> for full details.
+            <br />See our <a href="/terms#tokens" style={{ color: C.cyan, textDecoration: 'none' }}>Terms of Service</a> for full details.
           </p>
         </div>
       </div>

@@ -45,7 +45,7 @@ export default function TermsPage() {
           <p style={{ marginTop: 12 }}>If you are experiencing a mental health crisis, please contact a licensed professional or emergency services immediately. Symponia is a contemplative tool, not a substitute for professional care.</p>
         </Section>
 
-        <Section title="Tokens and payments" id="tokens">
+        <div id="tokens"><Section title="Tokens and payments">
           <p>Symponia uses a token system for Oracle readings. Each conversation exchange uses 1 token. New users receive 10 free readings. Additional tokens and monthly subscriptions are available for purchase within the app. The following applies:</p>
           <ul style={{ marginTop: 10, paddingLeft: 20, lineHeight: 2 }}>
             <li>Tokens are non-refundable once used.</li>
@@ -55,7 +55,7 @@ export default function TermsPage() {
             <li>Payment is processed securely by Stripe. We do not store your payment details.</li>
             <li>All purchases are final. Refunds are considered on a case-by-case basis — contact <a href="mailto:hello@symponia.io" style={{ color: C.cyan, textDecoration: 'none' }}>hello@symponia.io</a>.</li>
           </ul>
-        </Section>
+        </Section></div>
 
         <Section title="Acceptable use">
           <p>You agree not to:</p>

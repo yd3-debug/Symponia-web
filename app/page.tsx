@@ -576,7 +576,7 @@ function FAQ() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {FAQS.map((faq, i) => (
             <FadeIn key={i} delay={i * 0.03}>
-              <div style={{ borderRadius: 14, overflow: 'hidden', border: `0.5px solid ${open===i?'rgba(92,232,208,0.22)':C.border}`, background: open===i?'rgba(92,232,208,0.03)':C.bgCard, transition: 'all 0.25s' }}>
+              <div style={{ borderRadius: 14, overflow: 'hidden', border: `0.5px solid ${open===i?'rgba(92,232,208,0.22)':C.border}`, background: open===i?'rgba(92,232,208,0.05)':'rgba(255,255,255,0.04)', backdropFilter: 'blur(12px)', transition: 'all 0.25s' }}>
                 <button onClick={() => setOpen(open===i?null:i)}
                   style={{ width: '100%', textAlign: 'left', padding: '18px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, background: 'none', border: 'none', cursor: 'pointer' }}
                 >

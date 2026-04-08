@@ -644,7 +644,7 @@ function Footer() {
           <div style={{ display: 'flex', gap: 52, flexWrap: 'wrap' }}>
             {[
               { title: 'App', links: [['App Store', APP_STORE_URL], ['How it works', '#how-it-works'], ['Modes', '#modes'], ['Pricing', '/credits']] },
-              { title: 'Legal', links: [['Privacy Policy', '/privacy'], ['Terms of Service', '/terms'], ['GDPR', '/privacy#gdpr'], ['Contact', 'mailto:hello@symponia.io']] },
+              { title: 'Legal', links: [['Privacy Policy', '/privacy'], ['Terms of Service', '/terms'], ['EULA', '/eula'], ['GDPR', '/privacy#gdpr'], ['Contact', 'mailto:hello@symponia.io']] },
             ].map(col => (
               <div key={col.title}>
                 <div style={{ fontFamily: C.body, fontSize: '0.66rem', letterSpacing: '0.2em', color: C.dim, textTransform: 'uppercase', marginBottom: 16 }}>{col.title}</div>

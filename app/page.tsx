@@ -9,7 +9,7 @@ const APP_STORE_URL = 'https://apps.apple.com/app/symponia/id6744058607';
 const C = {
   bg: '#08061c', bgMid: '#0e0b26',
   bgCard: 'rgba(255,255,255,0.03)',
-  fg: '#eae6f8', sub: '#b8b0d8', dim: '#7c70a8',
+  fg: '#eae6f8', sub: '#cac4e0', dim: '#a89ec8',
   cyan: '#5ce8d0', violet: '#a78bfa',
   border: 'rgba(255,255,255,0.07)',
   borderStrong: 'rgba(255,255,255,0.13)',
@@ -559,7 +559,7 @@ const FAQS = [
   { q: 'What are the animal archetypes?', a: 'Your animals are a map of your inner world. The six you choose instinctively reveal the energies that move through you — gifts, struggles, and bridges between them. The seventh, the one that disturbs you, is the shadow: the most important of all.' },
   { q: 'Is this therapy?', a: 'No. Symponia is not a medical or psychological service. It is a reflective tool — a contemplative space. If you are in crisis or need clinical support, please reach out to a licensed professional.' },
   { q: 'How does the Oracle work?', a: "The Oracle is powered by Claude, Anthropic's AI, shaped by instructions drawn from Jungian psychology, animal symbolism, tarot, dream work, and contemplative tradition. It has been trained to never give surface answers, never rush to solutions, and never judge." },
-  { q: 'How do tokens work?', a: 'Each conversation exchange uses 1 token — roughly 2 messages back and forth. New users start with 10 free readings. When you\'re ready to go deeper, you can top up with tokens or subscribe monthly, all from within the app. Tokens never expire.' },
+  { q: 'How do tokens work?', a: 'Each conversation exchange uses 1 token — roughly 2 messages back and forth. New users start with 10 free readings. Top up with 50 tokens for £4.99, 150 tokens for £9.99, or subscribe monthly for £12.99 — all from within the app. Tokens never expire.' },
   { q: 'Is my data private?', a: 'Your conversations are not stored on our servers beyond what is needed to maintain the session. Your animals and settings are stored locally on your device. We do not sell or share your data. See our Privacy Policy for full details.' },
   { q: 'Where can I download Symponia?', a: 'Symponia is available on the Apple App Store for iPhone and iPad. Tap the download button on this page or search "Symponia" in the App Store.' },
 ];
@@ -657,8 +657,9 @@ function Footer() {
             ))}
           </div>
         </div>
-        <div style={{ borderTop: `0.5px solid ${C.border}`, marginTop: 48, paddingTop: 24 }}>
+        <div style={{ borderTop: `0.5px solid ${C.border}`, marginTop: 48, paddingTop: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <p style={{ fontFamily: C.body, fontSize: '0.7rem', fontWeight: 300, color: C.dim, opacity: 0.5 }}>© {new Date().getFullYear()} Symponia. All rights reserved.</p>
+          <a href="/dashboard" style={{ fontFamily: C.body, fontSize: '0.75rem', color: C.dim, opacity: 0.18, textDecoration: 'none', lineHeight: 1, userSelect: 'none' }}>›</a>
         </div>
       </div>
     </footer>

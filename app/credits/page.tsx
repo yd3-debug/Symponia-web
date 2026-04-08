@@ -6,7 +6,7 @@ import React from 'react';
 
 const C = {
   bg: '#08061c', bgCard: 'rgba(255,255,255,0.03)',
-  fg: '#eae6f8', sub: '#b8b0d8', dim: '#7c70a8',
+  fg: '#eae6f8', sub: '#cac4e0', dim: '#a89ec8',
   cyan: '#5ce8d0', violet: '#a78bfa',
   border: 'rgba(255,255,255,0.07)',
   borderStrong: 'rgba(255,255,255,0.13)',
@@ -33,13 +33,23 @@ const PACKS = [
     desc: 'Yours to keep, forever.',
     detail: '~100 messages · never expire',
     accent: C.cyan,
+    popular: false,
+  },
+  {
+    id: 'deeper',
+    name: 'Tokens',
+    tokens: 150,
+    price: '£9.99',
+    desc: 'Yours to keep, forever.',
+    detail: '~300 messages · never expire',
+    accent: C.cyan,
     popular: true,
   },
   {
     id: 'monthly',
     name: 'Monthly',
     tokens: null,
-    price: '£7.99',
+    price: '£12.99',
     desc: 'Access as long as it\'s active.',
     detail: 'per month · cancel anytime',
     accent: C.violet,
@@ -119,7 +129,7 @@ export default function CreditsPage() {
         </div>
 
         {/* Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 18, marginBottom: 80, maxWidth: 900, margin: '0 auto 80px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 18, marginBottom: 80, maxWidth: 1000, margin: '0 auto 80px' }}>
           {PACKS.map(pack => (
             <PricingCard key={pack.id} pack={pack} />
           ))}

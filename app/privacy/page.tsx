@@ -1,7 +1,7 @@
 import { PageShell } from '@/components/PageShell';
 
 const C = {
-  fg: '#eae6f8', sub: '#b8b0d8', dim: '#7c70a8', cyan: '#5ce8d0',
+  fg: '#eae6f8', sub: '#cac4e0', dim: '#a89ec8', cyan: '#5ce8d0',
   border: 'rgba(255,255,255,0.07)',
   heading: "var(--font-cormorant), 'Georgia', serif",
   body: "var(--font-inter), 'Helvetica Neue', sans-serif",

@@ -120,7 +120,7 @@ export default function Dashboard() {
   const [genTopic, setGenTopic] = useState('');
   const [genRunning, setGenRunning] = useState(false);
   const [toast,    setToast]    = useState<{ msg: string; type?: string } | null>(null);
-  const toastTimer = useRef<ReturnType<typeof setTimeout>>();
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // ── Toast ──────────────────────────────────────────────────────────────────
   const showToast = useCallback((msg: string, type = '') => {

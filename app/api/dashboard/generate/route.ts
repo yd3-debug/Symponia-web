@@ -4,8 +4,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
-const DASHBOARD_PASS  = process.env.DASHBOARD_PASSWORD;
-const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL;
+const DASHBOARD_PASS   = process.env.DASHBOARD_PASSWORD;
+const N8N_WEBHOOK_URL  = process.env.N8N_WEBHOOK_URL;
+const N8N_SCHEDULE_URL = process.env.N8N_SCHEDULE_URL;
 
 function checkAuth(req: NextRequest): boolean {
   if (!DASHBOARD_PASS) return true;
@@ -22,7 +23,7 @@ export async function POST(req: NextRequest) {
   // If n8n is configured → forward to n8n webhook (non-blocking)
   if (N8N_WEBHOOK_URL) {
     try {
-      fetch(`${N8N_WEBHOOK_URL}/generate`, {
+      fetch(N8N_WEBHOOK_URL, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ platform, type, topic }),
@@ -54,9 +55,10 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: 'recordId and scheduledAt required' }, { status: 400 });
   }
 
-  if (N8N_WEBHOOK_URL) {
+  const scheduleUrl = N8N_SCHEDULE_URL || N8N_WEBHOOK_URL;
+  if (scheduleUrl) {
     try {
-      const res = await fetch(`${N8N_WEBHOOK_URL}/schedule`, {
+      const res = await fetch(scheduleUrl, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ recordId, scheduledAt }),

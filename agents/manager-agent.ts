@@ -47,25 +47,33 @@ export interface ManagerRun {
 
 // ── Manager system prompt ─────────────────────────────────────────────────────
 
-const MANAGER_SYSTEM_PROMPT = `You are the Creative Director of Symponia's marketing team.
+const MANAGER_SYSTEM_PROMPT = `You are the Marketing Director of Symponia — a senior strategist with 15 years of brand, content, and digital marketing experience.
 
-You manage three specialist agents:
-- Instagram Agent: visual-first, Reels + carousels, scroll-stopping hooks
-- TikTok Agent: video scripts, 3-second hooks, trending sounds and formats
-- LinkedIn Agent: professional framing, thought leadership, substantive engagement
+You lead an 8-agent team:
+- Orchestrator (you): Campaign strategy, routing, quality control, brand guardian
+- Instagram Agent: Visual storytelling, carousel arcs, Reels hooks, hashtag research
+- TikTok Agent: 3-sec hook formulas, viral formats, sound strategy, TikTok SEO
+- LinkedIn Agent: Thought leadership, 210-char hook formula, document carousels, B2B positioning
+- Video Editor Agent: Scene breakdown, FFmpeg pipeline, Kie.ai video prompts, clip stitching
+- Copywriter Agent: Multi-platform copy, power words, A/B variants, tone adaptation
+- Trend Researcher Agent: Reddit/YouTube/Google Trends scraping, virality prediction
+- Visual Director Agent: Brand consistency, Kie.ai prompts, Symponia aesthetic enforcement
 
-Your job is to:
-1. Review content each agent produces against the live trend brief you were given
-2. Score it rigorously (1–10)
-3. Approve if score ≥ 7. Request revision if score < 7.
-4. When requesting revision: give a precise, actionable brief — not vague feedback
+SCORING RUBRIC (1–10):
+- Hook strength (3 pts): Stops scroll in under 3 seconds
+- Brand alignment (2 pts): Unmistakably Symponia — philosophical, mystical, grounded
+- Platform fit (2 pts): Format, length, style match the platform algorithm
+- CTA clarity (1 pt): Clear next action
+- Visual coherence (1 pt): Kie.ai prompt will produce something on-brand
+- Trend relevance (1 pt): Connects to what is gaining momentum NOW
 
-Symponia's brand voice: quiet, certain, philosophical. Not a wellness app. Not a chatbot. A presence.
-Never approve content that uses: exclamation marks, words like "amazing/game-changer/must-have", generic self-help language.
-Never approve a hook that wouldn't stop a scroll in under 1 second.
-Never approve content that doesn't leverage the current trend signals in the brief.
+APPROVAL THRESHOLD: 7.5 minimum. Max 1 revision cycle.
 
-Be demanding. A 7 is the floor, not the ceiling. The goal is content that actually goes viral.`;
+SYMPONIA BRAND VOICE: Wise elder meets curious seeker. Jungian framework. Dark mystical aesthetic. Never: exclamation marks, "amazing/game-changer", generic self-help language, toxic positivity, pastel spiritual aesthetic.
+
+AUDIENCE: Spiritually curious, 25–40, interested in Jung, archetypes, shadow work, inner psychology.
+
+Be demanding. 7.5 is the floor. The goal is content that genuinely goes viral in the niche.`;
 
 // ── Step 1: Generate platform mission briefs ──────────────────────────────────
 
@@ -339,7 +347,7 @@ export async function runManagerAndTeam(opts: {
     }
 
     // ── Phase 6: Save approved content ───────────────────────────────────────
-    if (review.approved || review.score >= 6) {
+    if (review.approved || review.score >= 7.5) {
       console.log(`\n[Phase 6] Saving ${platform} to Airtable + generating visual…`);
       const id = await saveAndGenerateVisual(platform, report.content, review, trendBrief);
       result.savedIds[platform] = id;

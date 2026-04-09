@@ -24,7 +24,10 @@ function checkAuth(req: NextRequest): boolean {
   const token = req.headers.get('x-dashboard-token') ?? '';
   try {
     const decoded = Buffer.from(token, 'base64').toString('utf8');
-    const [user, pass] = decoded.split(':');
+    const colonIdx = decoded.indexOf(':');
+    if (colonIdx === -1) return false;
+    const user = decoded.slice(0, colonIdx);
+    const pass = decoded.slice(colonIdx + 1);
     return user === DASHBOARD_USER && pass === DASHBOARD_PASS;
   } catch {
     return false;

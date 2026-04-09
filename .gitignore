@@ -1,3 +1,10 @@
+<<<<<<< HEAD
 node_modules/
 .env
+=======
+node_modules
+.next
+.env
+.env.local
+>>>>>>> c25ed21d3436f63c34ee642858b257194e01922d
 .DS_Store

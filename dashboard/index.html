@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Symponia — Marketing Dashboard</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400;500;600&display=swap');
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg:           #0E0B1A;
+  --bg-mid:       #14102A;
+  --bg-card:      rgba(120, 90, 220, 0.06);
+  --glass-border: rgba(140, 110, 230, 0.20);
+  --glass-strong: rgba(140, 110, 230, 0.40);
+  --accent:       #9B7FE8;
+  --violet:       #C084FC;
+  --teal:         #5B8DF0;
+  --text:         rgba(235, 228, 255, 0.90);
+  --text-sub:     rgba(235, 228, 255, 0.52);
+  --text-dim:     rgba(235, 228, 255, 0.28);
+  --green:        rgba(80, 190, 110, 0.85);
+  --red:          rgba(210, 75, 75, 0.80);
+  --orange:       rgba(220, 150, 60, 0.85);
+  --font-ui:      'Inter', -apple-system, sans-serif;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+}
+
+html, body { height: 100%; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ── Layout ───────────────────────────────────────────────────────────────── */
+
+.app { display: flex; height: 100vh; }
+
+/* Sidebar */
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: rgba(14, 11, 26, 0.95);
+  border-right: 1px solid var(--glass-border);
+  display: flex;
+  flex-direction: column;
+  padding: 28px 0;
+}
+
+.sidebar-logo {
+  padding: 0 24px 28px;
+  border-bottom: 1px solid var(--glass-border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sidebar-glyph { font-size: 22px; color: var(--accent); }
+.sidebar-name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+.sidebar-sub { font-size: 11px; color: var(--text-dim); letter-spacing: 0.10em; text-transform: uppercase; }
+
+.sidebar-nav { padding: 20px 0; flex: 1; }
+.nav-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  padding: 12px 24px 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 24px;
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  transition: all 0.15s;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-sub);
+}
+.nav-item:hover { background: rgba(155, 127, 232, 0.06); color: var(--text); }
+.nav-item.active {
+  border-left-color: var(--accent);
+  background: rgba(155, 127, 232, 0.10);
+  color: var(--text);
+  font-weight: 500;
+}
+.nav-badge {
+  margin-left: auto;
+  background: rgba(155, 127, 232, 0.25);
+  color: var(--accent);
+  border-radius: 10px;
+  padding: 1px 7px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.nav-badge.red { background: rgba(210, 75, 75, 0.18); color: var(--red); }
+
+/* Generate button in sidebar */
+.generate-btn {
+  margin: 0 16px 16px;
+  padding: 12px;
+  background: linear-gradient(135deg, rgba(155, 127, 232, 0.20), rgba(192, 132, 252, 0.16));
+  border: 1px solid rgba(155, 127, 232, 0.38);
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(235, 228, 255, 0.85);
+  letter-spacing: 0.04em;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.generate-btn:hover {
+  background: linear-gradient(135deg, rgba(155, 127, 232, 0.28), rgba(192, 132, 252, 0.22));
+  box-shadow: 0 0 20px rgba(155, 127, 232, 0.20);
+}
+
+/* Main content */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+/* Top bar */
+.topbar {
+  height: 60px;
+  border-bottom: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  flex-shrink: 0;
+}
+.topbar-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text);
+}
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+
+/* Platform filter tabs */
+.platform-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  background: rgba(120, 90, 220, 0.06);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+}
+.platform-tab {
+  padding: 5px 14px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--text-sub);
+  transition: all 0.15s;
+  border: 1px solid transparent;
+}
+.platform-tab:hover { color: var(--text); }
+.platform-tab.active {
+  background: rgba(155, 127, 232, 0.18);
+  border-color: rgba(155, 127, 232, 0.38);
+  color: var(--accent);
+}
+.platform-tab.ig.active  { background: rgba(192, 132, 252, 0.14); border-color: rgba(192, 132, 252, 0.35); color: var(--violet); }
+.platform-tab.tt.active  { background: rgba(80, 190, 110, 0.12);  border-color: rgba(80, 190, 110, 0.30);  color: var(--green); }
+.platform-tab.li.active  { background: rgba(91, 141, 240, 0.12);  border-color: rgba(91, 141, 240, 0.30);  color: var(--teal); }
+
+/* Refresh btn */
+.refresh-btn {
+  padding: 6px 14px;
+  background: rgba(120, 90, 220, 0.08);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  color: var(--text-sub);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.refresh-btn:hover { color: var(--text); border-color: var(--glass-strong); }
+
+/* Content area */
+.content-area { flex: 1; overflow-y: auto; padding: 24px 28px; }
+
+/* Status pipeline */
+.pipeline {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 28px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.pipeline-stage {
+  flex-shrink: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 14px 18px;
+  min-width: 120px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.pipeline-stage:hover { border-color: var(--glass-strong); }
+.pipeline-stage.active { border-color: var(--accent); background: rgba(155, 127, 232, 0.10); }
+.pipeline-count {
+  font-size: 28px;
+  font-weight: 600;
+  font-family: var(--font-display);
+  color: var(--accent);
+  line-height: 1;
+}
+.pipeline-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+/* Content grid */
+.content-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 20px;
+}
+
+/* Content card */
+.content-card {
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.15s;
+  display: flex;
+  flex-direction: column;
+}
+.content-card:hover { border-color: var(--glass-strong); box-shadow: 0 4px 24px rgba(0,0,0,0.3); }
+
+.card-image {
+  width: 100%;
+  height: 200px;
+  background: var(--bg-mid);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.card-image img { width: 100%; height: 100%; object-fit: cover; }
+.card-image-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-dim);
+}
+.card-image-placeholder .icon { font-size: 32px; }
+.card-image-placeholder span { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+
+.card-platform-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+}
+.badge-instagram { background: rgba(192, 132, 252, 0.25); border: 1px solid rgba(192, 132, 252, 0.40); color: var(--violet); }
+.badge-tiktok    { background: rgba(80, 190, 110, 0.20);  border: 1px solid rgba(80, 190, 110, 0.35);  color: var(--green); }
+.badge-linkedin  { background: rgba(91, 141, 240, 0.20);  border: 1px solid rgba(91, 141, 240, 0.35);  color: var(--teal); }
+
+.card-type-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(235, 228, 255, 0.70);
+  backdrop-filter: blur(8px);
+}
+
+.viral-score {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  backdrop-filter: blur(8px);
+}
+.score-high   { background: rgba(80, 190, 110, 0.30); border: 1.5px solid rgba(80, 190, 110, 0.50); color: var(--green); }
+.score-medium { background: rgba(220, 150, 60, 0.25); border: 1.5px solid rgba(220, 150, 60, 0.45); color: var(--orange); }
+.score-low    { background: rgba(155, 127, 232, 0.20); border: 1.5px solid var(--glass-strong); color: var(--accent); }
+
+.card-body { padding: 18px 18px 14px; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+
+.card-hook {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.card-caption {
+  font-size: 12px;
+  color: var(--text-sub);
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+.meta-tag {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  background: rgba(120, 90, 220, 0.08);
+  border: 1px solid var(--glass-border);
+  border-radius: 6px;
+  padding: 2px 8px;
+}
+
+.card-actions {
+  padding: 12px 18px 16px;
+  display: flex;
+  gap: 8px;
+  border-top: 1px solid var(--glass-border);
+}
+.action-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+  border: 1px solid;
+}
+.btn-approve {
+  background: rgba(80, 190, 110, 0.12);
+  border-color: rgba(80, 190, 110, 0.35);
+  color: var(--green);
+}
+.btn-approve:hover { background: rgba(80, 190, 110, 0.20); }
+.btn-reject {
+  background: rgba(210, 75, 75, 0.10);
+  border-color: rgba(210, 75, 75, 0.28);
+  color: var(--red);
+}
+.btn-reject:hover { background: rgba(210, 75, 75, 0.18); }
+.btn-schedule {
+  background: rgba(155, 127, 232, 0.12);
+  border-color: rgba(155, 127, 232, 0.35);
+  color: var(--accent);
+}
+.btn-schedule:hover { background: rgba(155, 127, 232, 0.20); }
+.btn-view {
+  background: rgba(120, 90, 220, 0.06);
+  border-color: var(--glass-border);
+  color: var(--text-sub);
+}
+.btn-view:hover { color: var(--text); border-color: var(--glass-strong); }
+
+/* Status chip on card */
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 20px;
+  padding: 3px 10px;
+}
+.status-dot { width: 6px; height: 6px; border-radius: 50%; }
+.status-review    { background: rgba(220, 150, 60, 0.18); color: var(--orange); }
+.status-review .status-dot { background: var(--orange); }
+.status-approved  { background: rgba(80, 190, 110, 0.14); color: var(--green); }
+.status-approved .status-dot { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.status-scheduled { background: rgba(91, 141, 240, 0.14); color: var(--teal); }
+.status-scheduled .status-dot { background: var(--teal); }
+.status-posted    { background: rgba(155, 127, 232, 0.14); color: var(--accent); }
+.status-posted .status-dot { background: var(--accent); }
+.status-draft     { background: rgba(120, 90, 220, 0.08); color: var(--text-dim); }
+.status-draft .status-dot { background: var(--text-dim); }
+.status-generating { background: rgba(155, 127, 232, 0.10); color: var(--accent); animation: pulse 1.5s infinite; }
+.status-generating .status-dot { background: var(--accent); animation: pulse-dot 1.5s infinite; }
+@keyframes pulse { 0%,100%{ opacity:0.7 } 50%{ opacity:1 } }
+@keyframes pulse-dot { 0%,100%{ box-shadow:0 0 4px var(--accent) } 50%{ box-shadow:0 0 10px var(--accent) } }
+
+/* Generate modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.70);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal {
+  background: #14102A;
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 32px;
+  width: 500px;
+  max-width: 90vw;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 300;
+  color: var(--text);
+}
+.modal-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+.modal-select, .modal-input {
+  width: 100%;
+  padding: 10px 14px;
+  background: rgba(120, 90, 220, 0.06);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 13px;
+  font-family: var(--font-ui);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.modal-select:focus, .modal-input:focus { border-color: var(--accent); }
+.modal-select option { background: #14102A; }
+.modal-platform-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.modal-platform-btn {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--glass-border);
+  background: var(--bg-card);
+  color: var(--text-sub);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+}
+.modal-platform-btn:hover { border-color: var(--glass-strong); color: var(--text); }
+.modal-platform-btn.selected-ig { border-color: rgba(192, 132, 252, 0.50); background: rgba(192, 132, 252, 0.12); color: var(--violet); }
+.modal-platform-btn.selected-tt { border-color: rgba(80, 190, 110, 0.45); background: rgba(80, 190, 110, 0.10); color: var(--green); }
+.modal-platform-btn.selected-li { border-color: rgba(91, 141, 240, 0.45); background: rgba(91, 141, 240, 0.10); color: var(--teal); }
+.modal-platform-btn.selected-all { border-color: rgba(155, 127, 232, 0.50); background: rgba(155, 127, 232, 0.12); color: var(--accent); }
+.modal-footer { display: flex; gap: 10px; }
+.modal-cancel {
+  flex: 1;
+  padding: 11px;
+  border-radius: 10px;
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  color: var(--text-sub);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.modal-cancel:hover { border-color: var(--glass-strong); color: var(--text); }
+.modal-run {
+  flex: 2;
+  padding: 11px;
+  border-radius: 10px;
+  border: 1px solid rgba(155, 127, 232, 0.45);
+  background: linear-gradient(135deg, rgba(155, 127, 232, 0.22), rgba(192, 132, 252, 0.18));
+  color: rgba(235, 228, 255, 0.90);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.modal-run:hover { box-shadow: 0 0 20px rgba(155, 127, 232, 0.25); }
+
+/* Detail panel (slide-out) */
+.detail-panel {
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 500px;
+  background: #14102A;
+  border-left: 1px solid var(--glass-border);
+  z-index: 50;
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.detail-panel.open { transform: translateX(0); }
+.detail-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.detail-close {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: rgba(120, 90, 220, 0.08);
+  border: 1px solid var(--glass-border);
+  color: var(--text-sub);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  transition: all 0.15s;
+}
+.detail-close:hover { color: var(--text); border-color: var(--glass-strong); }
+.detail-body { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+.detail-image { width: 100%; border-radius: 12px; overflow: hidden; background: var(--bg); min-height: 200px; display: flex; align-items: center; justify-content: center; }
+.detail-image img { width: 100%; }
+.detail-section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px; }
+.detail-text { font-size: 13px; color: var(--text-sub); line-height: 1.65; white-space: pre-wrap; }
+.detail-text.hook { font-size: 15px; color: var(--text); font-weight: 500; }
+.detail-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.detail-tag { font-size: 11px; color: var(--accent); }
+.detail-actions { padding: 16px 24px; border-top: 1px solid var(--glass-border); display: flex; gap: 8px; }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  padding: 12px 20px;
+  background: #14102A;
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  font-size: 13px;
+  color: var(--text);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  z-index: 200;
+  transform: translateY(20px);
+  opacity: 0;
+  transition: all 0.2s;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { border-color: rgba(80, 190, 110, 0.40); }
+.toast.error   { border-color: rgba(210, 75, 75, 0.40); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(155, 127, 232, 0.25); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(155, 127, 232, 0.40); }
+
+/* Empty state */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 80px 40px;
+  color: var(--text-dim);
+  text-align: center;
+}
+.empty-glyph { font-size: 48px; font-family: var(--font-display); color: rgba(155, 127, 232, 0.30); }
+.empty-title { font-size: 18px; font-family: var(--font-display); font-weight: 300; color: var(--text-sub); }
+.empty-sub { font-size: 13px; max-width: 300px; line-height: 1.6; }
+
+/* Loading spinner */
+.spinner {
+  width: 20px; height: 20px;
+  border: 2px solid rgba(155, 127, 232, 0.20);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-glyph">◈</div>
+      <div class="sidebar-name">Symponia</div>
+      <div class="sidebar-sub">Marketing Team</div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Queue</div>
+      <div class="nav-item active" data-filter="review" onclick="setFilter('review',this)">
+        <span>⟡</span> For Review
+        <span class="nav-badge red" id="badge-review">0</span>
+      </div>
+      <div class="nav-item" data-filter="approved" onclick="setFilter('approved',this)">
+        <span>✓</span> Approved
+        <span class="nav-badge" id="badge-approved">0</span>
+      </div>
+      <div class="nav-item" data-filter="scheduled" onclick="setFilter('scheduled',this)">
+        <span>◎</span> Scheduled
+        <span class="nav-badge" id="badge-scheduled">0</span>
+      </div>
+      <div class="nav-item" data-filter="posted" onclick="setFilter('posted',this)">
+        <span>◈</span> Posted
+        <span class="nav-badge" id="badge-posted">0</span>
+      </div>
+
+      <div class="nav-section-label">Content</div>
+      <div class="nav-item" data-filter="all" onclick="setFilter('all',this)">
+        <span>≡</span> All Content
+      </div>
+      <div class="nav-item" data-filter="draft" onclick="setFilter('draft',this)">
+        <span>·</span> Drafts
+      </div>
+      <div class="nav-item" data-filter="rejected" onclick="setFilter('rejected',this)">
+        <span>✕</span> Rejected
+      </div>
+    </nav>
+
+    <button class="generate-btn" onclick="openGenerateModal()">
+      <span>◈</span> Generate Content
+    </button>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">For Review</div>
+      <div class="topbar-right">
+        <div class="platform-tabs">
+          <div class="platform-tab active" onclick="setPlatform('all',this)">All</div>
+          <div class="platform-tab ig" onclick="setPlatform('instagram',this)">Instagram</div>
+          <div class="platform-tab tt" onclick="setPlatform('tiktok',this)">TikTok</div>
+          <div class="platform-tab li" onclick="setPlatform('linkedin',this)">LinkedIn</div>
+        </div>
+        <button class="refresh-btn" onclick="loadContent()">↻ Refresh</button>
+      </div>
+    </div>
+
+    <!-- Content area -->
+    <div class="content-area">
+
+      <!-- Pipeline -->
+      <div class="pipeline" id="pipeline">
+        <div class="pipeline-stage active" onclick="setFilter('review', document.querySelector('[data-filter=review]'))">
+          <div class="pipeline-count" id="count-review">0</div>
+          <div class="pipeline-label">Review</div>
+        </div>
+        <div class="pipeline-stage" onclick="setFilter('approved', document.querySelector('[data-filter=approved]'))">
+          <div class="pipeline-count" id="count-approved">0</div>
+          <div class="pipeline-label">Approved</div>
+        </div>
+        <div class="pipeline-stage" onclick="setFilter('scheduled', document.querySelector('[data-filter=scheduled]'))">
+          <div class="pipeline-count" id="count-scheduled">0</div>
+          <div class="pipeline-label">Scheduled</div>
+        </div>
+        <div class="pipeline-stage" onclick="setFilter('posted', document.querySelector('[data-filter=posted]'))">
+          <div class="pipeline-count" id="count-posted">0</div>
+          <div class="pipeline-label">Posted</div>
+        </div>
+        <div class="pipeline-stage" onclick="setFilter('generating', document.querySelector('[data-filter=generating]'))">
+          <div class="pipeline-count" id="count-generating">0</div>
+          <div class="pipeline-label">Generating</div>
+        </div>
+      </div>
+
+      <!-- Grid -->
+      <div class="content-grid" id="content-grid">
+        <div class="empty-state">
+          <div class="spinner"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Generate Modal -->
+<div class="modal-overlay" id="generate-modal">
+  <div class="modal">
+    <div class="modal-title">Generate Content</div>
+
+    <div>
+      <div class="modal-label">Platform</div>
+      <div class="modal-platform-grid">
+        <div class="modal-platform-btn selected-all" id="plat-all"   onclick="selectPlatform('all')">All 3</div>
+        <div class="modal-platform-btn" id="plat-ig"    onclick="selectPlatform('instagram')">Instagram</div>
+        <div class="modal-platform-btn" id="plat-tt"    onclick="selectPlatform('tiktok')">TikTok</div>
+        <div class="modal-platform-btn" id="plat-li"    onclick="selectPlatform('linkedin')">LinkedIn</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="modal-label">Content Type</div>
+      <select class="modal-select" id="gen-type">
+        <option value="auto">Auto (agent decides)</option>
+        <option value="reel">Reel / Video</option>
+        <option value="carousel">Carousel</option>
+        <option value="static">Static Post</option>
+        <option value="short-post">Short Post</option>
+        <option value="document-carousel">Document Carousel</option>
+        <option value="series">Series (Part 1)</option>
+      </select>
+    </div>
+
+    <div>
+      <div class="modal-label">Topic / Focus (optional)</div>
+      <input class="modal-input" id="gen-topic" type="text"
+        placeholder="e.g. wolf shadow archetype, shadow work for leaders…">
+    </div>
+
+    <div class="modal-footer">
+      <button class="modal-cancel" onclick="closeGenerateModal()">Cancel</button>
+      <button class="modal-run" onclick="runGeneration()">◈ Run Agent Team</button>
+    </div>
+  </div>
+</div>
+
+<!-- Detail Panel -->
+<div class="detail-panel" id="detail-panel">
+  <div class="detail-header">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <div id="detail-platform-badge" class="card-platform-badge badge-instagram">Instagram</div>
+      <div id="detail-status" class="status-chip status-review"><div class="status-dot"></div>Review</div>
+    </div>
+    <button class="detail-close" onclick="closeDetail()">✕</button>
+  </div>
+  <div class="detail-body">
+    <div class="detail-image" id="detail-image">
+      <div class="card-image-placeholder"><div class="icon">◈</div><span>No visual yet</span></div>
+    </div>
+    <div>
+      <div class="detail-section-label">Hook</div>
+      <div class="detail-text hook" id="detail-hook"></div>
+    </div>
+    <div>
+      <div class="detail-section-label">Caption</div>
+      <div class="detail-text" id="detail-caption"></div>
+    </div>
+    <div id="detail-script-section" style="display:none">
+      <div class="detail-section-label">Script</div>
+      <div class="detail-text" id="detail-script"></div>
+    </div>
+    <div id="detail-slides-section" style="display:none">
+      <div class="detail-section-label">Slides</div>
+      <div id="detail-slides"></div>
+    </div>
+    <div>
+      <div class="detail-section-label">Visual Prompt (Kie.ai)</div>
+      <div class="detail-text" id="detail-visual-prompt" style="font-size:11px;font-style:italic;"></div>
+    </div>
+    <div>
+      <div class="detail-section-label">Trend · Viral Score</div>
+      <div class="detail-text" id="detail-trend"></div>
+    </div>
+    <div id="detail-notes-section">
+      <div class="detail-section-label">Agent Notes</div>
+      <div class="detail-text" id="detail-notes" style="font-size:12px;"></div>
+    </div>
+    <div>
+      <div class="detail-section-label">Hashtags</div>
+      <div class="detail-tags" id="detail-hashtags"></div>
+    </div>
+    <div id="detail-first-comment-section" style="display:none">
+      <div class="detail-section-label">First Comment (LinkedIn)</div>
+      <div class="detail-text" id="detail-first-comment" style="font-size:12px;"></div>
+    </div>
+  </div>
+  <div class="detail-actions" id="detail-actions"></div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Config ────────────────────────────────────────────────────────────────────
+// Point these at your Airtable base and the n8n webhook for generation
+const AIRTABLE_API_KEY = localStorage.getItem('air_key') || prompt('Enter your Airtable API key:') || '';
+const AIRTABLE_BASE_ID = localStorage.getItem('air_base') || prompt('Enter your Airtable base ID (appXXX...):') || '';
+const TABLE_NAME       = localStorage.getItem('air_table') || 'Marketing Queue';
+const N8N_WEBHOOK_URL  = localStorage.getItem('n8n_webhook') || ''; // Set in localStorage or prompt
+
+if (AIRTABLE_API_KEY) localStorage.setItem('air_key', AIRTABLE_API_KEY);
+if (AIRTABLE_BASE_ID) localStorage.setItem('air_base', AIRTABLE_BASE_ID);
+
+const AIR_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(TABLE_NAME)}`;
+const FIELD = {
+  platform:      'Platform',
+  contentType:   'Content Type',
+  agent:         'Agent',
+  hook:          'Hook',
+  caption:       'Caption',
+  hashtags:      'Hashtags',
+  script:        'Script',
+  slides:        'Slides (JSON)',
+  visualPrompt:  'Visual Prompt',
+  imageUrl:      'Image URL',
+  videoUrl:      'Video URL',
+  kieJobId:      'Kie Job ID',
+  status:        'Status',
+  scheduledAt:   'Scheduled At',
+  blotPostId:    'Blotato Post ID',
+  trendReference:'Trend Reference',
+  viralScore:    'Viral Score',
+  notes:         'Notes',
+  generatedAt:   'Generated At',
+  firstComment:  'First Comment',
+};
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let currentFilter   = 'review';
+let currentPlatform = 'all';
+let allRecords      = [];
+let selectedRecord  = null;
+let genPlatform     = 'all';
+
+// ── Airtable API ──────────────────────────────────────────────────────────────
+async function airFetch(path, method = 'GET', body) {
+  const res = await fetch(`${AIR_URL}${path}`, {
+    method,
+    headers: {
+      'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!res.ok) throw new Error(`Airtable error ${res.status}`);
+  return method === 'DELETE' ? null : res.json();
+}
+
+async function loadContent() {
+  try {
+    let formula = '';
+    if (currentFilter !== 'all') {
+      formula = `{${FIELD.status}} = "${currentFilter}"`;
+    }
+    if (currentPlatform !== 'all') {
+      const platF = `{${FIELD.platform}} = "${currentPlatform}"`;
+      formula = formula ? `AND(${formula}, ${platF})` : platF;
+    }
+
+    const query = formula
+      ? `?filterByFormula=${encodeURIComponent(formula)}&sort[0][field]=${encodeURIComponent(FIELD.generatedAt)}&sort[0][direction]=desc&maxRecords=100`
+      : `?sort[0][field]=${encodeURIComponent(FIELD.generatedAt)}&sort[0][direction]=desc&maxRecords=100`;
+
+    const data = await airFetch(query);
+    allRecords = data.records ?? [];
+    renderGrid(allRecords);
+    updateCounts();
+  } catch (err) {
+    showToast('Failed to load from Airtable: ' + err.message, 'error');
+    renderEmpty('Could not connect to Airtable. Check your API key and base ID.');
+  }
+}
+
+async function updateCounts() {
+  // Load counts for all statuses
+  const statuses = ['review', 'approved', 'scheduled', 'posted', 'generating', 'draft'];
+  for (const s of statuses) {
+    try {
+      const f = encodeURIComponent(`{${FIELD.status}} = "${s}"`);
+      const data = await airFetch(`?filterByFormula=${f}&fields[]=${encodeURIComponent(FIELD.status)}`);
+      const count = (data.records ?? []).length;
+      const el = document.getElementById(`count-${s}`);
+      const badge = document.getElementById(`badge-${s}`);
+      if (el) el.textContent = count;
+      if (badge) badge.textContent = count;
+    } catch {}
+  }
+}
+
+async function updateRecordStatus(id, status, extra = {}) {
+  const fields = { [FIELD.status]: status, ...extra };
+  await airFetch(`/${id}`, 'PATCH', { fields });
+  await loadContent();
+}
+
+// ── Render ─────────────────────────────────────────────────────────────────────
+function renderGrid(records) {
+  const grid = document.getElementById('content-grid');
+  if (!records.length) {
+    renderEmpty('No content here yet. Run the agents to generate some.');
+    return;
+  }
+
+  grid.innerHTML = records.map(r => {
+    const f = r.fields;
+    const platform    = f[FIELD.platform] || 'unknown';
+    const contentType = f[FIELD.contentType] || '';
+    const hook        = f[FIELD.hook] || '—';
+    const caption     = f[FIELD.caption] || '';
+    const imageUrl    = f[FIELD.imageUrl] || f[FIELD.videoUrl] || '';
+    const status      = f[FIELD.status] || 'draft';
+    const viralScore  = f[FIELD.viralScore] || 0;
+    const agent       = f[FIELD.agent] || '';
+
+    const platformClass = `badge-${platform}`;
+    const scoreClass = viralScore >= 8 ? 'score-high' : viralScore >= 6 ? 'score-medium' : 'score-low';
+
+    const actions = getCardActions(r.id, status);
+
+    return `
+    <div class="content-card" >
+      <div class="card-image">
+        ${imageUrl
+          ? `<img src="${imageUrl}" alt="Generated visual" loading="lazy">`
+          : `<div class="card-image-placeholder"><div class="icon">◈</div><span>${status === 'generating' ? 'Generating…' : 'No visual yet'}</span></div>`
+        }
+        <div class="card-platform-badge ${platformClass}">${platform}</div>
+        <div class="card-type-badge">${contentType}</div>
+        ${viralScore ? `<div class="viral-score ${scoreClass}">${viralScore}</div>` : ''}
+      </div>
+      <div class="card-body" onclick="openDetail('${r.id}')" style="cursor:pointer">
+        <div class="card-hook">${escHtml(hook)}</div>
+        <div class="card-caption">${escHtml(caption)}</div>
+        <div class="card-meta">
+          <div class="status-chip status-${status}"><div class="status-dot"></div>${status}</div>
+          ${agent ? `<div class="meta-tag">${agent}</div>` : ''}
+        </div>
+      </div>
+      <div class="card-actions">${actions}</div>
+    </div>`;
+  }).join('');
+}
+
+function getCardActions(id, status) {
+  switch (status) {
+    case 'review':
+      return `
+        <button class="action-btn btn-approve"  onclick="approve('${id}')">✓ Approve</button>
+        <button class="action-btn btn-reject"   onclick="reject('${id}')">✕ Reject</button>
+        <button class="action-btn btn-view"     onclick="openDetail('${id}')">View</button>`;
+    case 'approved':
+      return `
+        <button class="action-btn btn-schedule" onclick="schedulePost('${id}')">◎ Schedule</button>
+        <button class="action-btn btn-reject"   onclick="reject('${id}')">✕ Reject</button>
+        <button class="action-btn btn-view"     onclick="openDetail('${id}')">View</button>`;
+    case 'scheduled':
+      return `
+        <button class="action-btn btn-view"     onclick="openDetail('${id}')">View Details</button>`;
+    case 'posted':
+      return `
+        <button class="action-btn btn-view"     onclick="openDetail('${id}')">View Post</button>`;
+    case 'generating':
+      return `
+        <button class="action-btn btn-view"     onclick="openDetail('${id}')" disabled>Generating…</button>`;
+    default:
+      return `
+        <button class="action-btn btn-approve"  onclick="approve('${id}')">✓ Approve</button>
+        <button class="action-btn btn-view"     onclick="openDetail('${id}')">View</button>`;
+  }
+}
+
+function renderEmpty(msg) {
+  document.getElementById('content-grid').innerHTML = `
+    <div class="empty-state">
+      <div class="empty-glyph">◈</div>
+      <div class="empty-title">Nothing here yet</div>
+      <div class="empty-sub">${msg}</div>
+    </div>`;
+}
+
+// ── Actions ────────────────────────────────────────────────────────────────────
+async function approve(id) {
+  try {
+    await updateRecordStatus(id, 'approved', { 'Approved At': new Date().toISOString() });
+    showToast('Content approved ✓', 'success');
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function reject(id) {
+  try {
+    await updateRecordStatus(id, 'rejected');
+    showToast('Content rejected', '');
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function schedulePost(id) {
+  const scheduledAt = prompt('Schedule date/time (ISO format):\ne.g. 2026-04-10T09:00:00Z');
+  if (!scheduledAt) return;
+  try {
+    await updateRecordStatus(id, 'scheduled', { [FIELD.scheduledAt]: scheduledAt });
+    showToast('Scheduled for ' + scheduledAt, 'success');
+    // If n8n webhook is configured, trigger the scheduling workflow
+    if (N8N_WEBHOOK_URL) {
+      await fetch(N8N_WEBHOOK_URL + '/schedule', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recordId: id, scheduledAt }),
+      }).catch(() => {});
+    }
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+// ── Generate modal ────────────────────────────────────────────────────────────
+function openGenerateModal() {
+  document.getElementById('generate-modal').classList.add('open');
+}
+function closeGenerateModal() {
+  document.getElementById('generate-modal').classList.remove('open');
+}
+
+function selectPlatform(p) {
+  genPlatform = p;
+  ['all','ig','tt','li'].forEach(k => {
+    document.getElementById('plat-' + k).className = 'modal-platform-btn';
+  });
+  const classMap = { all: 'selected-all', instagram: 'selected-ig', tiktok: 'selected-tt', linkedin: 'selected-li' };
+  const idMap    = { all: 'plat-all', instagram: 'plat-ig', tiktok: 'plat-tt', linkedin: 'plat-li' };
+  document.getElementById(idMap[p]).classList.add(classMap[p]);
+}
+
+async function runGeneration() {
+  const type  = document.getElementById('gen-type').value;
+  const topic = document.getElementById('gen-topic').value;
+  closeGenerateModal();
+  showToast('Running agent team… check back in a moment ◈');
+
+  if (N8N_WEBHOOK_URL) {
+    try {
+      await fetch(N8N_WEBHOOK_URL + '/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ platform: genPlatform, type, topic }),
+      });
+      showToast('Agents triggered via n8n ◈', 'success');
+    } catch {
+      showToast('n8n webhook failed — run agents manually via CLI', 'error');
+    }
+  } else {
+    showToast('Set N8N_WEBHOOK_URL in localStorage to trigger agents from here', 'error');
+  }
+
+  setTimeout(loadContent, 5000);
+}
+
+// ── Detail panel ───────────────────────────────────────────────────────────────
+function openDetail(id) {
+  const record = allRecords.find(r => r.id === id);
+  if (!record) return;
+  selectedRecord = record;
+  const f = record.fields;
+
+  const platform    = f[FIELD.platform] || 'instagram';
+  const status      = f[FIELD.status] || 'draft';
+  const imageUrl    = f[FIELD.imageUrl] || f[FIELD.videoUrl];
+  const hashtags    = f[FIELD.hashtags] || '';
+  const slides      = f[FIELD.slides];
+
+  document.getElementById('detail-platform-badge').className = `card-platform-badge badge-${platform}`;
+  document.getElementById('detail-platform-badge').textContent = platform;
+  document.getElementById('detail-status').className = `status-chip status-${status}`;
+  document.getElementById('detail-status').innerHTML = `<div class="status-dot"></div>${status}`;
+
+  document.getElementById('detail-image').innerHTML = imageUrl
+    ? `<img src="${imageUrl}" alt="">`
+    : `<div class="card-image-placeholder" style="padding:40px"><div class="icon">◈</div><span>No visual generated</span></div>`;
+
+  document.getElementById('detail-hook').textContent    = f[FIELD.hook] || '—';
+  document.getElementById('detail-caption').textContent = f[FIELD.caption] || '—';
+  document.getElementById('detail-visual-prompt').textContent = f[FIELD.visualPrompt] || '—';
+  document.getElementById('detail-trend').textContent   = `${f[FIELD.trendReference] || '—'} · Score: ${f[FIELD.viralScore] || '?'}/10`;
+  document.getElementById('detail-notes').textContent   = f[FIELD.notes] || '—';
+
+  const scriptSection = document.getElementById('detail-script-section');
+  const script = f[FIELD.script];
+  if (script) {
+    scriptSection.style.display = '';
+    document.getElementById('detail-script').textContent = script;
+  } else {
+    scriptSection.style.display = 'none';
+  }
+
+  const slidesSection = document.getElementById('detail-slides-section');
+  if (slides) {
+    slidesSection.style.display = '';
+    try {
+      const parsed = JSON.parse(slides);
+      document.getElementById('detail-slides').innerHTML = parsed.map((s, i) =>
+        `<div style="margin-bottom:8px"><span style="color:var(--accent);font-size:10px;text-transform:uppercase;letter-spacing:0.1em">Slide ${i+1}</span><div style="font-size:13px;color:var(--text-sub);margin-top:4px">${escHtml(s)}</div></div>`
+      ).join('');
+    } catch {
+      document.getElementById('detail-slides').textContent = slides;
+    }
+  } else {
+    slidesSection.style.display = 'none';
+  }
+
+  const htags = hashtags.split(/\s+/).filter(h => h.startsWith('#'));
+  document.getElementById('detail-hashtags').innerHTML = htags.map(h =>
+    `<span class="detail-tag">${h}</span>`
+  ).join('');
+
+  const firstComment = f[FIELD.firstComment];
+  const fcSection = document.getElementById('detail-first-comment-section');
+  if (firstComment) {
+    fcSection.style.display = '';
+    document.getElementById('detail-first-comment').textContent = firstComment;
+  } else {
+    fcSection.style.display = 'none';
+  }
+
+  // Detail actions
+  document.getElementById('detail-actions').innerHTML = getDetailActions(id, status);
+
+  document.getElementById('detail-panel').classList.add('open');
+}
+
+function getDetailActions(id, status) {
+  if (status === 'review') return `
+    <button class="action-btn btn-approve" onclick="approve('${id}');closeDetail()">✓ Approve</button>
+    <button class="action-btn btn-reject"  onclick="reject('${id}');closeDetail()">✕ Reject</button>`;
+  if (status === 'approved') return `
+    <button class="action-btn btn-schedule" onclick="schedulePost('${id}')">◎ Schedule via Blotato</button>`;
+  return `<div style="color:var(--text-dim);font-size:12px">Status: ${status}</div>`;
+}
+
+function closeDetail() {
+  document.getElementById('detail-panel').classList.remove('open');
+}
+
+// ── Filter & platform ─────────────────────────────────────────────────────────
+function setFilter(filter, el) {
+  currentFilter = filter;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (el) el.classList.add('active');
+  document.querySelectorAll('.pipeline-stage').forEach(s => s.classList.remove('active'));
+  const titles = { review:'For Review', approved:'Approved', scheduled:'Scheduled', posted:'Posted', all:'All Content', draft:'Drafts', rejected:'Rejected', generating:'Generating' };
+  document.getElementById('topbar-title').textContent = titles[filter] || filter;
+  loadContent();
+}
+
+function setPlatform(platform, el) {
+  currentPlatform = platform;
+  document.querySelectorAll('.platform-tab').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  loadContent();
+}
+
+// ── Utilities ─────────────────────────────────────────────────────────────────
+function escHtml(str) {
+  return String(str || '')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+
+let toastTimer;
+function showToast(msg, type = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast${type ? ' ' + type : ''} show`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3500);
+}
+
+// ── Keyboard shortcuts ────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeDetail(); closeGenerateModal(); }
+  if (e.key === 'g' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); openGenerateModal(); }
+});
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+loadContent();
+setInterval(loadContent, 30000); // auto-refresh every 30s
+</script>
+</body>
+</html>

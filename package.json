@@ -1,0 +1,27 @@
+{
+  "name": "symponia-marketing",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "daily": "ts-node scripts/generate-content.ts --type daily",
+    "animal": "ts-node scripts/generate-content.ts --type animal --animal",
+    "shadow": "ts-node scripts/generate-content.ts --type shadow --animal",
+    "screenshots": "node screenshots/capture.js",
+    "manager": "ts-node agents/manager-agent.ts",
+    "team": "ts-node agents/team-runner.ts",
+    "instagram": "ts-node agents/instagram-agent.ts",
+    "tiktok": "ts-node agents/tiktok-agent.ts",
+    "linkedin": "ts-node agents/linkedin-agent.ts",
+    "trends": "ts-node -e \"require('./agents/trend-researcher').compileTrendBrief().then(b => console.log(JSON.stringify(b.global, null, 2)))\""
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "dotenv": "^16.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "puppeteer": "^22.15.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  }
+}

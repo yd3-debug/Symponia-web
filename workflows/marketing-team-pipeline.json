@@ -1,0 +1,356 @@
+{
+  "name": "Symponia Marketing Team Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [{ "field": "cronExpression", "expression": "0 8 * * 1,3,5" }] }
+      },
+      "name": "Schedule Trigger (Mon/Wed/Fri 8am)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [260, 300],
+      "id": "schedule-trigger"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generate",
+        "responseMode": "responseNode"
+      },
+      "name": "Webhook: Generate (from Dashboard)",
+      "type": "n8n-nodes-base.webhook",
+      "position": [260, 480],
+      "id": "webhook-generate"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "schedule",
+        "responseMode": "responseNode"
+      },
+      "name": "Webhook: Schedule Post (from Dashboard)",
+      "type": "n8n-nodes-base.webhook",
+      "position": [260, 660],
+      "id": "webhook-schedule"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Determine which platform(s) to run\nconst input = $input.first().json;\nconst platform = input.platform || 'all';\nconst type     = input.type    || 'auto';\nconst topic    = input.topic   || '';\n\nconst platforms = platform === 'all'\n  ? ['instagram', 'tiktok', 'linkedin']\n  : [platform];\n\nreturn platforms.map(p => ({ json: { platform: p, type, topic } }));"
+      },
+      "name": "Determine Platforms",
+      "type": "n8n-nodes-base.code",
+      "position": [500, 390],
+      "id": "determine-platforms"
+    },
+    {
+      "parameters": {
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "x-api-key", "value": "={{ $credentials.anthropicApiKey }}" },
+            { "name": "anthropic-version", "value": "2023-06-01" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "=",
+              "value": "={{ JSON.stringify({\n  model: 'claude-sonnet-4-6',\n  max_tokens: 4096,\n  system: $node['Load Prompt'].json.systemPrompt,\n  messages: [{ role: 'user', content: $node['Build Prompt'].json.userMessage }]\n}) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Claude: Generate Content",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [980, 390],
+      "id": "claude-generate"
+    },
+    {
+      "parameters": {
+        "jsCode": "const platform = $input.first().json.platform;\nconst type     = $input.first().json.type || 'auto';\nconst topic    = $input.first().json.topic || '';\n\n// Load prompt templates (in production, read from files or store in n8n variables)\nconst prompts = {\n  instagram: `You are Symponia's Instagram specialist with deep platform expertise. Generate viral Instagram content for Symponia philosophical AI app. Return ONLY valid JSON with these fields: platform, contentType, hook, caption, hashtags, script (if reel), slides (array if carousel), visualPrompt, trendReference, viralScore (1-10), notes.`,\n  tiktok:    `You are Symponia's TikTok specialist with deep platform expertise. Generate viral TikTok content for Symponia philosophical AI app. Return ONLY valid JSON with these fields: platform, contentType, hook, caption, hashtags, script (timestamped), soundSuggestion, textOverlays (array), visualPrompt, trendReference, seriesPotential (bool), viralScore (1-10), notes.`,\n  linkedin:  `You are Symponia's LinkedIn specialist with deep platform expertise. Generate professional LinkedIn content for Symponia philosophical AI app. Return ONLY valid JSON with these fields: platform, contentType, hook, post (full post text), caption, hashtags, firstComment (for app link), slides (array if document), visualPrompt, postingNote, trendReference, viralScore (1-10), notes.`\n};\n\nconst userMessages = {\n  auto:      `Generate the highest-impact ${platform} content for Symponia right now. Choose the best format for current trends.`,\n  reel:      `Generate a Reel/video concept for Symponia on ${platform}. Hook in first 3 seconds. Full script.`,\n  carousel:  `Generate a carousel post for Symponia on ${platform}. 7-10 slides. Hook on slide 1. CTA on last slide.`,\n  'short-post': `Generate a short ${platform} post for Symponia. Maximum impact, minimum words.`,\n  'document-carousel': `Generate a LinkedIn document carousel for Symponia. 10-12 slides with position labels.`,\n  series:    `Generate Part 1 of a TikTok series for Symponia. End with a cliffhanger.`,\n};\n\nconst systemPrompt = prompts[platform];\nconst baseMessage  = userMessages[type] || userMessages.auto;\nconst userMessage  = topic\n  ? `${baseMessage}\\n\\nFocus on this topic: ${topic}`\n  : baseMessage;\n\nreturn [{ json: { systemPrompt, userMessage, platform } }];"
+      },
+      "name": "Build Prompt",
+      "type": "n8n-nodes-base.code",
+      "position": [740, 390],
+      "id": "build-prompt"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.content[0].text;\nconst platform = $node['Build Prompt'].json.platform;\n\n// Extract JSON from Claude's response\nconst match = raw.match(/```(?:json)?\\s*([\\s\\S]*?)```/) || raw.match(/(\\{[\\s\\S]*\\})/);\nconst jsonStr = match ? match[1].trim() : raw.trim();\n\nlet content;\ntry {\n  content = JSON.parse(jsonStr);\n} catch(e) {\n  throw new Error('Failed to parse Claude output: ' + e.message);\n}\n\nreturn [{ json: { ...content, platform, rawOutput: raw } }];"
+      },
+      "name": "Parse Claude Output",
+      "type": "n8n-nodes-base.code",
+      "position": [1220, 390],
+      "id": "parse-output"
+    },
+    {
+      "parameters": {
+        "url": "https://api.airtable.com/v0/={{ $env.AIRTABLE_BASE_ID }}/Marketing%20Queue",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer {{ $env.AIRTABLE_API_KEY }}" }
+          ]
+        },
+        "sendBody": true,
+        "bodyContentType": "json",
+        "jsonBody": "={{ JSON.stringify({\n  fields: {\n    'Platform':       $json.platform,\n    'Content Type':   $json.contentType || 'auto',\n    'Agent':          ($json.platform.charAt(0).toUpperCase() + $json.platform.slice(1)) + ' Agent',\n    'Hook':           $json.hook,\n    'Caption':        $json.post || $json.caption || '',\n    'Hashtags':       $json.hashtags || '',\n    'Script':         $json.script || '',\n    'Slides (JSON)':  $json.slides ? JSON.stringify($json.slides) : '',\n    'Visual Prompt':  $json.visualPrompt || '',\n    'First Comment':  $json.firstComment || '',\n    'Trend Reference':$json.trendReference || '',\n    'Viral Score':    $json.viralScore || 0,\n    'Notes':          $json.notes || '',\n    'Status':         'generating',\n    'Generated At':   new Date().toISOString()\n  }\n}) }}",
+        "options": {}
+      },
+      "name": "Save to Airtable",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1460, 390],
+      "id": "save-airtable"
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.KIE_BASE_URL }}/images/generate",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer {{ $env.KIE_API_KEY }}" }
+          ]
+        },
+        "sendBody": true,
+        "bodyContentType": "json",
+        "jsonBody": "={{ JSON.stringify({\n  prompt: $node['Parse Claude Output'].json.visualPrompt,\n  negative_prompt: 'bright colors, cheerful, cute, cartoon, stock photo, generic, watermark, text, busy background, neon',\n  aspect_ratio: $node['Parse Claude Output'].json.platform === 'linkedin' ? '4:5' : '9:16',\n  model: 'flux-pro',\n  num_images: 1\n}) }}",
+        "options": {}
+      },
+      "name": "Kie.ai: Generate Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1700, 390],
+      "id": "kie-generate"
+    },
+    {
+      "parameters": {
+        "amount": 8,
+        "unit": "seconds"
+      },
+      "name": "Wait for Kie.ai",
+      "type": "n8n-nodes-base.wait",
+      "position": [1940, 390],
+      "id": "wait-kie"
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.KIE_BASE_URL }}/images/jobs/={{ $node['Kie.ai: Generate Image'].json.job_id || $node['Kie.ai: Generate Image'].json.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer {{ $env.KIE_API_KEY }}" }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Poll Kie.ai Job",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [2180, 390],
+      "id": "poll-kie"
+    },
+    {
+      "parameters": {
+        "url": "https://api.airtable.com/v0/={{ $env.AIRTABLE_BASE_ID }}/Marketing%20Queue/={{ $node['Save to Airtable'].json.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "method": "PATCH",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer {{ $env.AIRTABLE_API_KEY }}" }
+          ]
+        },
+        "sendBody": true,
+        "bodyContentType": "json",
+        "jsonBody": "={{ JSON.stringify({\n  fields: {\n    'Image URL': ($json.image_urls && $json.image_urls[0]) || ($json.images && $json.images[0]) || '',\n    'Kie Job ID': $node['Kie.ai: Generate Image'].json.job_id || '',\n    'Status': 'review'\n  }\n}) }}",
+        "options": {}
+      },
+      "name": "Update Airtable: Ready for Review",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [2420, 390],
+      "id": "update-airtable-review"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.status }}",
+              "value2": "completed"
+            }
+          ]
+        }
+      },
+      "name": "Image Ready?",
+      "type": "n8n-nodes-base.if",
+      "position": [2180, 560],
+      "id": "image-ready-check"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Handle the schedule webhook — extract record ID and scheduled time\nconst data = $input.first().json;\nreturn [{ json: { recordId: data.recordId, scheduledAt: data.scheduledAt } }];"
+      },
+      "name": "Extract Schedule Data",
+      "type": "n8n-nodes-base.code",
+      "position": [500, 660],
+      "id": "extract-schedule"
+    },
+    {
+      "parameters": {
+        "url": "https://api.airtable.com/v0/={{ $env.AIRTABLE_BASE_ID }}/Marketing%20Queue/={{ $json.recordId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer {{ $env.AIRTABLE_API_KEY }}" }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Get Record from Airtable",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [740, 660],
+      "id": "get-record"
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.BLOTATO_BASE_URL }}/posts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer {{ $env.BLOTATO_API_KEY }}" }
+          ]
+        },
+        "sendBody": true,
+        "bodyContentType": "json",
+        "jsonBody": "={{ JSON.stringify({\n  account_id: {\n    instagram: $env.BLOTATO_INSTAGRAM_ACCOUNT_ID,\n    tiktok:    $env.BLOTATO_TIKTOK_ACCOUNT_ID,\n    linkedin:  $env.BLOTATO_LINKEDIN_ACCOUNT_ID\n  }[$node['Get Record from Airtable'].json.fields['Platform']],\n  platform:     $node['Get Record from Airtable'].json.fields['Platform'],\n  caption:      $node['Get Record from Airtable'].json.fields['Caption'],\n  media_urls:   [$node['Get Record from Airtable'].json.fields['Image URL'] || $node['Get Record from Airtable'].json.fields['Video URL']].filter(Boolean),\n  media_type:   $node['Get Record from Airtable'].json.fields['Content Type'],\n  scheduled_at: $node['Extract Schedule Data'].json.scheduledAt,\n  first_comment: $node['Get Record from Airtable'].json.fields['First Comment'] || ''\n}) }}",
+        "options": {}
+      },
+      "name": "Blotato: Schedule Post",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [980, 660],
+      "id": "blotato-schedule"
+    },
+    {
+      "parameters": {
+        "url": "https://api.airtable.com/v0/={{ $env.AIRTABLE_BASE_ID }}/Marketing%20Queue/={{ $node['Extract Schedule Data'].json.recordId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "method": "PATCH",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer {{ $env.AIRTABLE_API_KEY }}" }
+          ]
+        },
+        "sendBody": true,
+        "bodyContentType": "json",
+        "jsonBody": "={{ JSON.stringify({\n  fields: {\n    'Status':         'scheduled',\n    'Blotato Post ID': $json.id,\n    'Scheduled At':   $node['Extract Schedule Data'].json.scheduledAt\n  }\n}) }}",
+        "options": {}
+      },
+      "name": "Update Airtable: Scheduled",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1220, 660],
+      "id": "update-airtable-scheduled"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: true, message: 'Generation triggered' }) }}"
+      },
+      "name": "Respond to Generate Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [500, 540],
+      "id": "respond-generate"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: true, message: 'Scheduled successfully' }) }}"
+      },
+      "name": "Respond to Schedule Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [1460, 660],
+      "id": "respond-schedule"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger (Mon/Wed/Fri 8am)": {
+      "main": [[{ "node": "Determine Platforms", "type": "main", "index": 0 }]]
+    },
+    "Webhook: Generate (from Dashboard)": {
+      "main": [
+        [{ "node": "Respond to Generate Webhook", "type": "main", "index": 0 }],
+        [{ "node": "Determine Platforms", "type": "main", "index": 0 }]
+      ]
+    },
+    "Webhook: Schedule Post (from Dashboard)": {
+      "main": [[{ "node": "Extract Schedule Data", "type": "main", "index": 0 }]]
+    },
+    "Determine Platforms": {
+      "main": [[{ "node": "Build Prompt", "type": "main", "index": 0 }]]
+    },
+    "Build Prompt": {
+      "main": [[{ "node": "Claude: Generate Content", "type": "main", "index": 0 }]]
+    },
+    "Claude: Generate Content": {
+      "main": [[{ "node": "Parse Claude Output", "type": "main", "index": 0 }]]
+    },
+    "Parse Claude Output": {
+      "main": [[{ "node": "Save to Airtable", "type": "main", "index": 0 }]]
+    },
+    "Save to Airtable": {
+      "main": [[{ "node": "Kie.ai: Generate Image", "type": "main", "index": 0 }]]
+    },
+    "Kie.ai: Generate Image": {
+      "main": [[{ "node": "Wait for Kie.ai", "type": "main", "index": 0 }]]
+    },
+    "Wait for Kie.ai": {
+      "main": [[{ "node": "Poll Kie.ai Job", "type": "main", "index": 0 }]]
+    },
+    "Poll Kie.ai Job": {
+      "main": [[{ "node": "Update Airtable: Ready for Review", "type": "main", "index": 0 }]]
+    },
+    "Update Airtable: Ready for Review": {
+      "main": []
+    },
+    "Extract Schedule Data": {
+      "main": [[{ "node": "Get Record from Airtable", "type": "main", "index": 0 }]]
+    },
+    "Get Record from Airtable": {
+      "main": [[{ "node": "Blotato: Schedule Post", "type": "main", "index": 0 }]]
+    },
+    "Blotato: Schedule Post": {
+      "main": [[{ "node": "Update Airtable: Scheduled", "type": "main", "index": 0 }]]
+    },
+    "Update Airtable: Scheduled": {
+      "main": [[{ "node": "Respond to Schedule Webhook", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "last",
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "tags": ["symponia", "marketing", "social-media"],
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": "symponia-marketing-team"
+  }
+}

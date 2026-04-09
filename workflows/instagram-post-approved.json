@@ -1,0 +1,72 @@
+{
+  "name": "Symponia · Post Approved Content to Instagram",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "airtable-approved",
+        "responseMode": "onReceived"
+      },
+      "name": "Airtable Webhook (status → approved)",
+      "type": "n8n-nodes-base.webhook",
+      "position": [240, 300],
+      "notes": "Set up Airtable automation: when Status changes to 'approved', trigger this webhook"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v19.0/{{ $env.META_INSTAGRAM_ACCOUNT_ID }}/media",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "caption", "value": "={{ $json.fields.Caption }}\\n\\n{{ $json.fields.Hashtags }}" },
+            { "name": "image_url", "value": "={{ $json.fields['Image URL'] }}" },
+            { "name": "access_token", "value": "={{ $env.META_ACCESS_TOKEN }}" }
+          ]
+        }
+      },
+      "name": "Create Instagram Container",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v19.0/{{ $env.META_INSTAGRAM_ACCOUNT_ID }}/media_publish",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "creation_id", "value": "={{ $json.id }}" },
+            { "name": "access_token", "value": "={{ $env.META_ACCESS_TOKEN }}" }
+          ]
+        }
+      },
+      "name": "Publish to Instagram",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "application": "={{ $env.AIRTABLE_BASE_ID }}",
+        "table": "Content Queue",
+        "id": "={{ $('Airtable Webhook (status → approved)').item.json.record_id }}",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Status": "posted",
+            "Posted At": "={{ new Date().toISOString() }}"
+          }
+        }
+      },
+      "name": "Mark as Posted",
+      "type": "n8n-nodes-base.airtable",
+      "position": [900, 300]
+    }
+  ],
+  "connections": {
+    "Airtable Webhook (status → approved)": { "main": [[{ "node": "Create Instagram Container", "type": "main", "index": 0 }]] },
+    "Create Instagram Container": { "main": [[{ "node": "Publish to Instagram", "type": "main", "index": 0 }]] },
+    "Publish to Instagram": { "main": [[{ "node": "Mark as Posted", "type": "main", "index": 0 }]] }
+  }
+}

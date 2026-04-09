@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap');
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  width: 1290px;
+  height: 2796px;
+  background: #0E0B1A;
+  overflow: hidden;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+}
+
+.bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── Status bar ───────────────────────────────────────────────────────────── */
+.status-bar {
+  width: 100%;
+  height: 100px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 72px 18px;
+}
+.status-time {
+  font-family: -apple-system, sans-serif;
+  font-size: 34px;
+  font-weight: 600;
+  color: rgba(235, 228, 255, 0.85);
+  letter-spacing: -0.5px;
+}
+.status-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* ── Header ───────────────────────────────────────────────────────────────── */
+.header-section {
+  margin-top: 80px;
+  padding: 0 80px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+}
+.label-tag {
+  font-family: -apple-system, sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: 0.20em;
+  color: #9B7FE8;
+  text-transform: uppercase;
+}
+.page-headline {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 148px;
+  font-weight: 300;
+  line-height: 1.0;
+  color: rgba(235, 228, 255, 0.95);
+}
+.page-headline-sub {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 148px;
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.0;
+  color: #C084FC;
+  filter: drop-shadow(0 0 30px rgba(192, 132, 252, 0.35));
+}
+.page-body {
+  font-family: -apple-system, sans-serif;
+  font-size: 34px;
+  font-weight: 300;
+  color: rgba(235, 228, 255, 0.45);
+  margin-top: 8px;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+}
+
+/* ── Animal grid ──────────────────────────────────────────────────────────── */
+.grid-section {
+  margin-top: 64px;
+  padding: 0 56px;
+  width: 100%;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.animal-cell {
+  background: rgba(120, 90, 220, 0.06);
+  border: 1px solid rgba(140, 110, 230, 0.16);
+  border-radius: 22px;
+  padding: 32px 16px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+}
+.animal-cell.selected-1 {
+  background: rgba(155, 127, 232, 0.18);
+  border-color: rgba(155, 127, 232, 0.55);
+  box-shadow: 0 0 30px rgba(155, 127, 232, 0.20), inset 0 0 20px rgba(155, 127, 232, 0.06);
+}
+.animal-cell.selected-2 {
+  background: rgba(155, 127, 232, 0.14);
+  border-color: rgba(155, 127, 232, 0.44);
+  box-shadow: 0 0 24px rgba(155, 127, 232, 0.16);
+}
+.animal-cell.selected-3 {
+  background: rgba(155, 127, 232, 0.10);
+  border-color: rgba(155, 127, 232, 0.36);
+  box-shadow: 0 0 20px rgba(155, 127, 232, 0.12);
+}
+
+.animal-emoji {
+  font-size: 64px;
+  line-height: 1;
+}
+.animal-name {
+  font-family: -apple-system, sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  color: rgba(235, 228, 255, 0.65);
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+.animal-cell.selected-1 .animal-name,
+.animal-cell.selected-2 .animal-name,
+.animal-cell.selected-3 .animal-name {
+  color: rgba(235, 228, 255, 0.90);
+}
+
+.selection-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #9B7FE8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: -apple-system, sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: #0E0B1A;
+  box-shadow: 0 0 16px rgba(155, 127, 232, 0.50);
+}
+
+/* ── Progress indicator ───────────────────────────────────────────────────── */
+.progress-section {
+  margin-top: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+.progress-dots {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.progress-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: rgba(140, 110, 230, 0.20);
+  border: 1.5px solid rgba(140, 110, 230, 0.30);
+}
+.progress-dot.filled {
+  background: #9B7FE8;
+  border-color: #9B7FE8;
+  box-shadow: 0 0 12px rgba(155, 127, 232, 0.55);
+}
+.progress-dot.shadow-dot {
+  background: rgba(192, 132, 252, 0.15);
+  border-color: rgba(192, 132, 252, 0.35);
+}
+.progress-label {
+  font-family: -apple-system, sans-serif;
+  font-size: 26px;
+  font-weight: 300;
+  color: rgba(235, 228, 255, 0.35);
+  letter-spacing: 0.08em;
+}
+
+/* ── Position key ─────────────────────────────────────────────────────────── */
+.key-section {
+  margin-top: 60px;
+  padding: 0 80px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+.key-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.key-number {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 52px;
+  font-weight: 300;
+  color: #9B7FE8;
+}
+.key-label {
+  font-family: -apple-system, sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: rgba(235, 228, 255, 0.40);
+  text-align: center;
+}
+.key-dot {
+  width: 40px;
+  height: 1px;
+  background: rgba(155, 127, 232, 0.30);
+}
+
+/* ── Instruction card ─────────────────────────────────────────────────────── */
+.instruction-card {
+  margin-top: auto;
+  margin-bottom: 32px;
+  width: calc(100% - 112px);
+  background: rgba(120, 90, 220, 0.08);
+  border: 1px solid rgba(140, 110, 230, 0.22);
+  border-radius: 28px;
+  padding: 50px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.instruction-line {
+  font-family: -apple-system, sans-serif;
+  font-size: 30px;
+  font-weight: 300;
+  color: rgba(235, 228, 255, 0.50);
+  line-height: 1.5;
+}
+.instruction-line strong {
+  color: rgba(235, 228, 255, 0.80);
+  font-weight: 400;
+}
+
+/* ── Home indicator ───────────────────────────────────────────────────────── */
+.home-indicator {
+  width: 190px;
+  height: 6px;
+  background: rgba(235, 228, 255, 0.22);
+  border-radius: 3px;
+  margin-bottom: 28px;
+  flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+
+<svg class="bg" xmlns="http://www.w3.org/2000/svg" width="1290" height="2796">
+  <defs>
+    <radialGradient id="b1" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#3D1E8A" stop-opacity="0.55"/>
+      <stop offset="70%"  stop-color="#3D1E8A" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#3D1E8A" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="b2" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#1A2A7A" stop-opacity="0.55"/>
+      <stop offset="70%"  stop-color="#1A2A7A" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#1A2A7A" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="b3" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#5A1E8A" stop-opacity="0.55"/>
+      <stop offset="70%"  stop-color="#5A1E8A" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#5A1E8A" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="645"  cy="500"  rx="900" ry="650" fill="url(#b1)"/>
+  <ellipse cx="200"  cy="1400" rx="650" ry="700" fill="url(#b2)"/>
+  <ellipse cx="1100" cy="2100" rx="700" ry="650" fill="url(#b3)"/>
+</svg>
+
+<div class="content">
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span class="status-time">9:41</span>
+    <div class="status-right">
+      <svg width="22" height="18" viewBox="0 0 22 18" fill="none">
+        <rect x="0"  y="10" width="4" height="8"  rx="1" fill="rgba(235,228,255,0.75)"/>
+        <rect x="6"  y="7"  width="4" height="11" rx="1" fill="rgba(235,228,255,0.75)"/>
+        <rect x="12" y="4"  width="4" height="14" rx="1" fill="rgba(235,228,255,0.75)"/>
+        <rect x="18" y="0"  width="4" height="18" rx="1" fill="rgba(235,228,255,0.75)"/>
+      </svg>
+      <svg width="24" height="20" viewBox="0 0 24 20" fill="none">
+        <circle cx="12" cy="17" r="2" fill="rgba(235,228,255,0.75)"/>
+        <path d="M5.5 11.5A9 9 0 0 1 18.5 11.5" stroke="rgba(235,228,255,0.75)" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M2 8A13 13 0 0 1 22 8" stroke="rgba(235,228,255,0.75)" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </svg>
+      <svg width="32" height="16" viewBox="0 0 32 16">
+        <rect x="0.75" y="0.75" width="27.5" height="14.5" rx="4" stroke="rgba(235,228,255,0.55)" stroke-width="1.5" fill="none"/>
+        <rect x="2.5"  y="2.5"  width="22"   height="11"   rx="2.5" fill="rgba(235,228,255,0.80)"/>
+        <path d="M29.5 5.5v5" stroke="rgba(235,228,255,0.55)" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="header-section">
+    <div class="label-tag">◈ Animal Reading</div>
+    <div class="page-headline">Your soul's</div>
+    <div class="page-headline-sub">fingerprint.</div>
+    <div class="page-body">Choose 7 animals in order.<br>The first is who you are. The seventh, who you fear.</div>
+  </div>
+
+  <!-- Animal grid -->
+  <div class="grid-section">
+    <div class="grid">
+      <!-- Row 1 -->
+      <div class="animal-cell selected-1">
+        <div class="selection-badge">1</div>
+        <div class="animal-emoji">🦁</div>
+        <div class="animal-name">Lion</div>
+      </div>
+      <div class="animal-cell">
+        <div class="animal-emoji">🐅</div>
+        <div class="animal-name">Tiger</div>
+      </div>
+      <div class="animal-cell">
+        <div class="animal-emoji">🐆</div>
+        <div class="animal-name">Leopard</div>
+      </div>
+      <div class="animal-cell">
+        <div class="animal-emoji">🐈‍⬛</div>
+        <div class="animal-name">Panther</div>
+      </div>
+      <!-- Row 2 -->
+      <div class="animal-cell selected-2">
+        <div class="selection-badge">2</div>
+        <div class="animal-emoji">🐺</div>
+        <div class="animal-name">Wolf</div>
+      </div>
+      <div class="animal-cell">
+        <div class="animal-emoji">🦊</div>
+        <div class="animal-name">Fox</div>
+      </div>
+      <div class="animal-cell">
+        <div class="animal-emoji">🐕</div>
+        <div class="animal-name">Dog</div>
+      </div>
+      <div class="animal-cell">
+        <div class="animal-emoji">🐈</div>
+        <div class="animal-name">Cat</div>
+      </div>
+      <!-- Row 3 -->
+      <div class="animal-cell">
+        <div class="animal-emoji">🐻</div>
+        <div class="animal-name">Bear</div>
+      </div>
+      <div class="animal-cell">
+        <div class="animal-emoji">🐼</div>
+        <div class="animal-name">Panda</div>
+      </div>
+      <div class="animal-cell selected-3">
+        <div class="selection-badge">3</div>
+        <div class="animal-emoji">🐨</div>
+        <div class="animal-name">Koala</div>
+      </div>
+      <div class="animal-cell">
+        <div class="animal-emoji">🦍</div>
+        <div class="animal-name">Gorilla</div>
+      </div>
+      <!-- Row 4 -->
+      <div class="animal-cell">
+        <div class="animal-emoji">🐎</div>
+        <div class="animal-name">Horse</div>
+      </div>
+      <div class="animal-cell">
+        <div class="animal-emoji">🦅</div>
+        <div class="animal-name">Eagle</div>
+      </div>
+      <div class="animal-cell">
+        <div class="animal-emoji">🦉</div>
+        <div class="animal-name">Owl</div>
+      </div>
+      <div class="animal-cell">
+        <div class="animal-emoji">🦚</div>
+        <div class="animal-name">Peacock</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-section">
+    <div class="progress-dots">
+      <div class="progress-dot filled"></div>
+      <div class="progress-dot filled"></div>
+      <div class="progress-dot filled"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot shadow-dot"></div>
+    </div>
+    <div class="progress-label">3 of 7 chosen</div>
+  </div>
+
+  <!-- Instruction card -->
+  <div class="instruction-card">
+    <div class="instruction-line"><strong>First animal</strong> — your dominant soul. Who you are.</div>
+    <div class="instruction-line"><strong>Seventh animal</strong> — your shadow. Who you fear.</div>
+  </div>
+
+  <!-- Home indicator -->
+  <div class="home-indicator"></div>
+
+</div>
+</body>
+</html>

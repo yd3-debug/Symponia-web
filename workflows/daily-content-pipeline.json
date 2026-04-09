@@ -1,0 +1,86 @@
+{
+  "name": "Symponia · Daily Content Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [{ "field": "cronExpression", "expression": "0 9 * * *" }] }
+      },
+      "name": "Every day at 9am",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "x-api-key", "value": "={{ $env.ANTHROPIC_API_KEY }}" },
+            { "name": "anthropic-version", "value": "2023-06-01" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "claude-sonnet-4-6"
+            },
+            {
+              "name": "max_tokens",
+              "value": "500"
+            },
+            {
+              "name": "system",
+              "value": "You are the voice of Symponia — a philosophical AI presence rooted in Biodynamic Presence and Jungian archetypes. You write content for TikTok and Instagram that sounds like the app itself: quiet, certain, unhurried. No hype. No exclamation marks. Short sentences. White space is intentional."
+            },
+            {
+              "name": "messages",
+              "value": "[{\"role\":\"user\",\"content\":\"Generate a daily philosophical quote for Symponia social media.\\n\\nRequirements:\\n- 1-3 sentences maximum\\n- Speaks to the inner life: shadow, soul, presence\\n- Feels like a journal entry, not a motivational poster\\n- No exclamation marks\\n\\nOutput:\\nQUOTE: [the quote]\\nCAPTION: [2-3 lines + symponia.io]\\nHASHTAGS: [8-10 hashtags]\\nVISUAL_PROMPT: [dark bg, minimal visual description]\"}]"
+            }
+          ]
+        }
+      },
+      "name": "Generate with Claude",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $input.item.json.content[0].text;\nconst lines = text.split('\\n');\nconst get = (key) => {\n  const line = lines.find(l => l.startsWith(key + ':'));\n  return line ? line.replace(key + ':', '').trim() : '';\n};\nreturn [{\n  json: {\n    quote: get('QUOTE'),\n    caption: get('CAPTION'),\n    hashtags: get('HASHTAGS'),\n    visual_prompt: get('VISUAL_PROMPT'),\n    generated_at: new Date().toISOString(),\n    status: 'draft'\n  }\n}];"
+      },
+      "name": "Parse Content",
+      "type": "n8n-nodes-base.code",
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "application": "={{ $env.AIRTABLE_BASE_ID }}",
+        "table": "Content Queue",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Quote": "={{ $json.quote }}",
+            "Caption": "={{ $json.caption }}",
+            "Hashtags": "={{ $json.hashtags }}",
+            "Visual Prompt": "={{ $json.visual_prompt }}",
+            "Status": "draft",
+            "Type": "daily-quote",
+            "Generated At": "={{ $json.generated_at }}"
+          }
+        }
+      },
+      "name": "Save to Airtable",
+      "type": "n8n-nodes-base.airtable",
+      "position": [900, 300]
+    }
+  ],
+  "connections": {
+    "Every day at 9am": { "main": [[{ "node": "Generate with Claude", "type": "main", "index": 0 }]] },
+    "Generate with Claude": { "main": [[{ "node": "Parse Content", "type": "main", "index": 0 }]] },
+    "Parse Content": { "main": [[{ "node": "Save to Airtable", "type": "main", "index": 0 }]] }
+  }
+}

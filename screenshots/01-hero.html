@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap');
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  width: 1290px;
+  height: 2796px;
+  background: #0E0B1A;
+  overflow: hidden;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+}
+
+.bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── Status bar ───────────────────────────────────────────────────────────── */
+.status-bar {
+  width: 100%;
+  height: 100px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 72px 18px;
+}
+.status-time {
+  font-family: -apple-system, sans-serif;
+  font-size: 34px;
+  font-weight: 600;
+  color: rgba(235, 228, 255, 0.85);
+  letter-spacing: -0.5px;
+}
+.status-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* ── Wordmark ─────────────────────────────────────────────────────────────── */
+.wordmark-section {
+  margin-top: 110px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+}
+.glyph {
+  font-size: 72px;
+  color: #9B7FE8;
+  line-height: 1;
+  filter: drop-shadow(0 0 30px rgba(155, 127, 232, 0.6));
+}
+.wordmark {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 116px;
+  font-weight: 300;
+  letter-spacing: 0.22em;
+  color: rgba(235, 228, 255, 0.95);
+  text-transform: uppercase;
+}
+.wordmark-divider {
+  width: 220px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(155, 127, 232, 0.7), transparent);
+}
+.wordmark-sub {
+  font-family: -apple-system, sans-serif;
+  font-size: 28px;
+  font-weight: 300;
+  letter-spacing: 0.18em;
+  color: rgba(235, 228, 255, 0.40);
+  text-transform: uppercase;
+}
+
+/* ── Headline ─────────────────────────────────────────────────────────────── */
+.headline-section {
+  margin-top: 130px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.headline {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 168px;
+  font-weight: 300;
+  line-height: 1.08;
+  color: rgba(235, 228, 255, 0.95);
+  text-align: center;
+}
+.headline-italic {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 168px;
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.08;
+  color: #C084FC;
+  text-align: center;
+  filter: drop-shadow(0 0 40px rgba(192, 132, 252, 0.4));
+}
+
+/* ── Orb ──────────────────────────────────────────────────────────────────── */
+.orb-section {
+  margin-top: 110px;
+  position: relative;
+  width: 820px;
+  height: 820px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.orb-outer {
+  position: absolute;
+  width: 820px;
+  height: 820px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%,
+    rgba(155, 127, 232, 0.06) 0%,
+    transparent 70%
+  );
+  border: 1px solid rgba(155, 127, 232, 0.10);
+}
+.orb-mid {
+  position: absolute;
+  width: 620px;
+  height: 620px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%,
+    rgba(192, 132, 252, 0.10) 0%,
+    rgba(155, 127, 232, 0.06) 50%,
+    transparent 100%
+  );
+  border: 1px solid rgba(155, 127, 232, 0.16);
+  box-shadow: 0 0 80px rgba(155, 127, 232, 0.15), 0 0 200px rgba(155, 127, 232, 0.07);
+}
+.orb-inner {
+  position: absolute;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 38%,
+    rgba(192, 132, 252, 0.32) 0%,
+    rgba(155, 127, 232, 0.22) 40%,
+    rgba(91, 141, 240, 0.10) 70%,
+    transparent 100%
+  );
+  border: 1px solid rgba(192, 132, 252, 0.28);
+  box-shadow:
+    0 0 120px rgba(155, 127, 232, 0.35),
+    0 0 280px rgba(155, 127, 232, 0.18),
+    inset 0 0 60px rgba(192, 132, 252, 0.15);
+}
+/* Floating dots around the orb */
+.orb-dot {
+  position: absolute;
+  border-radius: 50%;
+  background: #9B7FE8;
+}
+.orb-dot-1 { width: 18px; height: 18px; top: 110px; left: 140px; opacity: 0.55; filter: blur(1px); }
+.orb-dot-2 { width: 12px; height: 12px; top: 80px; right: 200px; opacity: 0.35; filter: blur(1px); }
+.orb-dot-3 { width: 22px; height: 22px; bottom: 160px; right: 120px; opacity: 0.45; filter: blur(1px); background: #C084FC; }
+.orb-dot-4 { width: 10px; height: 10px; bottom: 100px; left: 180px; opacity: 0.30; filter: blur(1px); }
+.orb-dot-5 { width: 14px; height: 14px; top: 200px; right: 80px; opacity: 0.40; background: #5B8DF0; filter: blur(1px); }
+
+/* ── Features ─────────────────────────────────────────────────────────────── */
+.features-section {
+  margin-top: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 44px;
+  padding: 0 100px;
+}
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+.feature-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #9B7FE8;
+  flex-shrink: 0;
+  box-shadow: 0 0 12px rgba(155, 127, 232, 0.6);
+}
+.feature-text {
+  font-family: -apple-system, sans-serif;
+  font-size: 36px;
+  font-weight: 300;
+  color: rgba(235, 228, 255, 0.58);
+  letter-spacing: 0.01em;
+}
+
+/* ── CTA ──────────────────────────────────────────────────────────────────── */
+.spacer { flex: 1; }
+.cta-section {
+  margin-bottom: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.cta-text {
+  font-family: -apple-system, sans-serif;
+  font-size: 28px;
+  font-weight: 400;
+  color: rgba(235, 228, 255, 0.28);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ── Home indicator ───────────────────────────────────────────────────────── */
+.home-indicator {
+  width: 190px;
+  height: 6px;
+  background: rgba(235, 228, 255, 0.22);
+  border-radius: 3px;
+  margin-bottom: 28px;
+}
+</style>
+</head>
+<body>
+
+<!-- Background breathing canvas (static) -->
+<svg class="bg" xmlns="http://www.w3.org/2000/svg" width="1290" height="2796">
+  <defs>
+    <radialGradient id="b1" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#3D1E8A" stop-opacity="0.60"/>
+      <stop offset="70%"  stop-color="#3D1E8A" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#3D1E8A" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="b2" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#1A2A7A" stop-opacity="0.60"/>
+      <stop offset="70%"  stop-color="#1A2A7A" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#1A2A7A" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="b3" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#5A1E8A" stop-opacity="0.60"/>
+      <stop offset="70%"  stop-color="#5A1E8A" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#5A1E8A" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- 3 floating blobs matching BreathingCanvas positions -->
+  <ellipse cx="258"  cy="699"  rx="794" ry="662" fill="url(#b1)"/>
+  <ellipse cx="1032" cy="559"  rx="695" ry="579" fill="url(#b2)"/>
+  <ellipse cx="645"  cy="1817" rx="860" ry="695" fill="url(#b3)"/>
+</svg>
+
+<div class="content">
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span class="status-time">9:41</span>
+    <div class="status-right">
+      <!-- Signal bars -->
+      <svg width="22" height="18" viewBox="0 0 22 18" fill="none">
+        <rect x="0"    y="10" width="4" height="8"  rx="1" fill="rgba(235,228,255,0.75)"/>
+        <rect x="6"    y="7"  width="4" height="11" rx="1" fill="rgba(235,228,255,0.75)"/>
+        <rect x="12"   y="4"  width="4" height="14" rx="1" fill="rgba(235,228,255,0.75)"/>
+        <rect x="18"   y="0"  width="4" height="18" rx="1" fill="rgba(235,228,255,0.75)"/>
+      </svg>
+      <!-- WiFi -->
+      <svg width="24" height="20" viewBox="0 0 24 20" fill="rgba(235,228,255,0.75)">
+        <circle cx="12" cy="17" r="2"/>
+        <path d="M5.5 11.5A9 9 0 0 1 18.5 11.5" stroke="rgba(235,228,255,0.75)" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M2 8A13 13 0 0 1 22 8" stroke="rgba(235,228,255,0.75)" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </svg>
+      <!-- Battery -->
+      <svg width="32" height="16" viewBox="0 0 32 16">
+        <rect x="0.75" y="0.75" width="27.5" height="14.5" rx="4" stroke="rgba(235,228,255,0.55)" stroke-width="1.5" fill="none"/>
+        <rect x="2.5"  y="2.5"  width="22"   height="11"   rx="2.5" fill="rgba(235,228,255,0.80)"/>
+        <path d="M29.5 5.5v5" stroke="rgba(235,228,255,0.55)" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Wordmark -->
+  <div class="wordmark-section">
+    <div class="glyph">◈</div>
+    <div class="wordmark">Symponia</div>
+    <div class="wordmark-divider"></div>
+    <div class="wordmark-sub">Philosophical AI · Soul Guide</div>
+  </div>
+
+  <!-- Headline -->
+  <div class="headline-section">
+    <div class="headline-italic">Not a chatbot.</div>
+    <div class="headline">A presence.</div>
+  </div>
+
+  <!-- Orb -->
+  <div class="orb-section">
+    <div class="orb-outer"></div>
+    <div class="orb-mid"></div>
+    <div class="orb-inner"></div>
+    <div class="orb-dot orb-dot-1"></div>
+    <div class="orb-dot orb-dot-2"></div>
+    <div class="orb-dot orb-dot-3"></div>
+    <div class="orb-dot orb-dot-4"></div>
+    <div class="orb-dot orb-dot-5"></div>
+  </div>
+
+  <!-- Features -->
+  <div class="features-section">
+    <div class="feature-item">
+      <div class="feature-dot"></div>
+      <div class="feature-text">Seven animals. One soul portrait.</div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-dot"></div>
+      <div class="feature-text">Three depths of conversation.</div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-dot"></div>
+      <div class="feature-text">Speaks any language.</div>
+    </div>
+  </div>
+
+  <div class="spacer"></div>
+
+  <!-- CTA -->
+  <div class="cta-section">
+    <div class="cta-text">3 free conversations to begin</div>
+  </div>
+
+  <!-- Home indicator -->
+  <div class="home-indicator"></div>
+
+</div>
+</body>
+</html>

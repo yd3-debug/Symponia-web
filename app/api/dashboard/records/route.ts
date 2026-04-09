@@ -64,7 +64,8 @@ export async function GET(req: NextRequest) {
 
   if (!res.ok) {
     const err = await res.text();
-    return NextResponse.json({ error: err }, { status: res.status });
+    // Never forward Airtable 401 as 401 — would log user out of dashboard
+    return NextResponse.json({ error: err, records: [] }, { status: 200 });
   }
 
   const data = await res.json();

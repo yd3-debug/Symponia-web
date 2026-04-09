@@ -52,9 +52,10 @@ type Platform = 'all' | 'instagram' | 'tiktok' | 'linkedin';
 interface AirtableRecord { id: string; fields: Record<string, any>; }
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
-const PASS_KEY = 'sym_dashboard_token';
-function getToken() { return typeof window !== 'undefined' ? localStorage.getItem(PASS_KEY) ?? '' : ''; }
-function saveToken(t: string) { localStorage.setItem(PASS_KEY, t); }
+const TOKEN_KEY = 'sym_dashboard_token';
+function getToken() { return typeof window !== 'undefined' ? localStorage.getItem(TOKEN_KEY) ?? '' : ''; }
+function saveToken(t: string) { localStorage.setItem(TOKEN_KEY, t); }
+function clearToken() { localStorage.removeItem(TOKEN_KEY); }
 
 // ── API helpers ───────────────────────────────────────────────────────────────
 async function apiGet(path: string): Promise<any> {
@@ -106,8 +107,10 @@ const PLATFORM_COLOR: Record<string, string> = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function Dashboard() {
-  const [authed,   setAuthed]   = useState(false);
-  const [passInput, setPassInput] = useState('');
+  const [authed,    setAuthed]    = useState(false);
+  const [username,  setUsername]  = useState('');
+  const [password,  setPassword]  = useState('');
+  const [loginErr,  setLoginErr]  = useState('');
   const [records,  setRecords]  = useState<AirtableRecord[]>([]);
   const [counts,   setCounts]   = useState<Record<string, number>>({});
   const [loading,  setLoading]  = useState(false);
@@ -135,9 +138,25 @@ export default function Dashboard() {
     if (token) { setAuthed(true); }
   }, []);
 
-  const handleLogin = () => {
-    saveToken(passInput);
-    setAuthed(true);
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginErr('');
+    try {
+      const res = await fetch('/api/dashboard/login', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ username, password }),
+      });
+      const data = await res.json();
+      if (data.ok && data.token) {
+        saveToken(data.token);
+        setAuthed(true);
+      } else {
+        setLoginErr('Invalid username or password');
+      }
+    } catch {
+      setLoginErr('Login failed — please try again');
+    }
   };
 
   // ── Load records ───────────────────────────────────────────────────────────
@@ -238,28 +257,46 @@ export default function Dashboard() {
 
   // ── Login screen ───────────────────────────────────────────────────────────
   if (!authed) {
+    const inputStyle: React.CSSProperties = {
+      width: '100%', padding: '11px 16px', background: 'rgba(255,255,255,0.04)',
+      border: `0.5px solid ${C.border}`, borderRadius: 10, color: C.fg,
+      fontFamily: C.body, fontSize: '0.9rem', outline: 'none', marginBottom: 12,
+      boxSizing: 'border-box',
+    };
     return (
       <div style={{ minHeight: '100vh', background: C.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: C.body }}>
-        <div style={{ width: 360, padding: '48px 40px', background: C.bgCard, border: `0.5px solid ${C.borderStrong}`, borderRadius: 20 }}>
+        <div style={{ width: 380, padding: '48px 40px', background: C.bgCard, border: `0.5px solid ${C.borderStrong}`, borderRadius: 20 }}>
           <div style={{ fontFamily: C.heading, fontSize: '2rem', fontWeight: 300, color: C.fg, marginBottom: 8 }}>◈ Symponia</div>
           <div style={{ fontSize: '0.75rem', color: C.dim, letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 36 }}>Marketing Dashboard</div>
-          <input
-            type="password"
-            placeholder="Access code"
-            value={passInput}
-            onChange={e => setPassInput(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleLogin()}
-            style={{ width: '100%', padding: '11px 16px', background: 'rgba(255,255,255,0.04)', border: `0.5px solid ${C.border}`, borderRadius: 10, color: C.fg, fontFamily: C.body, fontSize: '0.9rem', outline: 'none', marginBottom: 12 }}
-          />
-          <button
-            onClick={handleLogin}
-            style={{ width: '100%', padding: '11px', background: `rgba(167,139,250,0.14)`, border: `0.5px solid rgba(167,139,250,0.4)`, borderRadius: 10, color: C.fg, fontFamily: C.body, fontSize: '0.85rem', cursor: 'pointer' }}
-          >
-            Enter
-          </button>
-          <p style={{ marginTop: 20, fontSize: '0.72rem', color: C.dim, opacity: 0.6, lineHeight: 1.6 }}>
-            Set <code style={{ fontFamily: 'monospace', background: 'rgba(255,255,255,0.04)', padding: '1px 5px', borderRadius: 4 }}>DASHBOARD_PASSWORD</code> in your environment to enable access control.
-          </p>
+          <form onSubmit={handleLogin}>
+            <div style={{ fontSize: '0.7rem', color: C.dim, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6 }}>Username</div>
+            <input
+              type="text"
+              placeholder="Username"
+              value={username}
+              autoComplete="username"
+              onChange={e => setUsername(e.target.value)}
+              style={inputStyle}
+            />
+            <div style={{ fontSize: '0.7rem', color: C.dim, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6 }}>Password</div>
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              autoComplete="current-password"
+              onChange={e => setPassword(e.target.value)}
+              style={{ ...inputStyle, marginBottom: 20 }}
+            />
+            {loginErr && (
+              <div style={{ fontSize: '0.8rem', color: C.red, marginBottom: 14, textAlign: 'center' }}>{loginErr}</div>
+            )}
+            <button
+              type="submit"
+              style={{ width: '100%', padding: '12px', background: 'rgba(167,139,250,0.14)', border: `0.5px solid rgba(167,139,250,0.4)`, borderRadius: 10, color: C.fg, fontFamily: C.body, fontSize: '0.85rem', cursor: 'pointer', letterSpacing: '0.08em' }}
+            >
+              Sign in
+            </button>
+          </form>
         </div>
       </div>
     );
@@ -291,6 +328,10 @@ export default function Dashboard() {
             <span style={{ fontFamily: C.heading, fontSize: '1.2rem', fontWeight: 300, color: C.fg }}>◈ Symponia</span>
           </a>
           <div style={{ fontSize: '0.65rem', color: C.dim, letterSpacing: '0.18em', textTransform: 'uppercase' }}>Marketing Dashboard</div>
+          <button
+            onClick={() => { clearToken(); setAuthed(false); }}
+            style={{ marginTop: 10, fontSize: '0.65rem', color: C.dim, background: 'none', border: 'none', cursor: 'pointer', padding: 0, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.5 }}
+          >Sign out</button>
         </div>
 
         {/* Nav */}

@@ -4,14 +4,21 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
+const DASHBOARD_USER   = process.env.DASHBOARD_USERNAME ?? 'admin';
 const DASHBOARD_PASS   = process.env.DASHBOARD_PASSWORD;
 const N8N_WEBHOOK_URL  = process.env.N8N_WEBHOOK_URL;
 const N8N_SCHEDULE_URL = process.env.N8N_SCHEDULE_URL;
 
 function checkAuth(req: NextRequest): boolean {
   if (!DASHBOARD_PASS) return true;
-  const token = req.headers.get('x-dashboard-token');
-  return token === DASHBOARD_PASS;
+  const token = req.headers.get('x-dashboard-token') ?? '';
+  try {
+    const decoded = Buffer.from(token, 'base64').toString('utf8');
+    const [user, pass] = decoded.split(':');
+    return user === DASHBOARD_USER && pass === DASHBOARD_PASS;
+  } catch {
+    return false;
+  }
 }
 
 export async function POST(req: NextRequest) {

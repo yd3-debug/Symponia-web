@@ -9,6 +9,7 @@ const API_KEY    = process.env.AIRTABLE_API_KEY!;
 const TABLE_NAME = process.env.AIRTABLE_TABLE ?? 'Marketing Queue';
 const AIR_BASE   = `https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(TABLE_NAME)}`;
 
+const DASHBOARD_USER = process.env.DASHBOARD_USERNAME ?? 'admin';
 const DASHBOARD_PASS = process.env.DASHBOARD_PASSWORD;
 
 function airHeaders() {
@@ -19,9 +20,15 @@ function airHeaders() {
 }
 
 function checkAuth(req: NextRequest): boolean {
-  if (!DASHBOARD_PASS) return true; // no password configured → open (dev mode)
-  const token = req.headers.get('x-dashboard-token');
-  return token === DASHBOARD_PASS;
+  if (!DASHBOARD_PASS) return true;
+  const token = req.headers.get('x-dashboard-token') ?? '';
+  try {
+    const decoded = Buffer.from(token, 'base64').toString('utf8');
+    const [user, pass] = decoded.split(':');
+    return user === DASHBOARD_USER && pass === DASHBOARD_PASS;
+  } catch {
+    return false;
+  }
 }
 
 // ── GET: list records, optionally filtered by status and/or platform ───────────

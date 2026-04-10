@@ -10,6 +10,5 @@ export default function robots(): MetadataRoute.Robots {
       },
     ],
     sitemap: 'https://symponia.io/sitemap.xml',
-    host: 'https://symponia.io',
   };
 }

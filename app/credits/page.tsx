@@ -50,7 +50,7 @@ const PACKS = [
     name: 'Monthly',
     tokens: 350,
     price: '£12.99',
-    desc: 'Tokens refresh every month at renewal.',
+    desc: '350 tokens per month. Unused tokens reset at renewal.',
     detail: 'per month · cancel anytime',
     accent: C.violet,
     popular: false,
@@ -139,7 +139,7 @@ export default function CreditsPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {[
               { icon: '◎', title: 'One token per exchange', body: 'Each conversation exchange uses 1 token — roughly 2 messages back and forth with the Oracle, regardless of mode.' },
-              { icon: '∞', title: 'Tokens never expire', body: 'Your tokens stay in your account indefinitely. No resets, no monthly fees — just tokens when you need them.' },
+              { icon: '∞', title: 'Token packs never expire', body: 'Purchased token packs stay in your account indefinitely and carry over forever. Subscription tokens (350/month) reset at each renewal.' },
               { icon: '📱', title: 'Purchase inside the app', body: 'Tokens and subscriptions are purchased directly within the Symponia iOS app. Your balance is stored on your device.' },
               { icon: '🔒', title: 'Secure payment via Stripe', body: 'All payments are processed by Stripe, the world\'s leading payment platform. We never see or store your card details.' },
             ].map((item, i) => (

@@ -55,7 +55,7 @@ export async function GET(req: NextRequest) {
 
   const query = [
     formula ? `filterByFormula=${encodeURIComponent(formula)}` : '',
-    'sort[0][field]=Generated%20At',
+    'sort[0][field]=Topic',
     'sort[0][direction]=desc',
     'maxRecords=100',
   ].filter(Boolean).join('&');

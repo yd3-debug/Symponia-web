@@ -1,6 +1,6 @@
 // ── /api/dashboard/generate ───────────────────────────────────────────────────
-// Triggers the marketing team agent run (via n8n webhook or directly).
-// Called by the dashboard "Generate" button.
+// Triggers the marketing team agent run via n8n webhook.
+// Returns { message, agents[] } so the Brief Orchestrator can show "Routed to:" tags.
 
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -24,39 +24,79 @@ function checkAuth(req: NextRequest): boolean {
   }
 }
 
+// Determine which agents are activated based on platform selection
+function resolveAgents(platform: string): string[] {
+  const always  = ['orchestrator', 'trends', 'copywriter', 'visual'];
+  const byPlat: Record<string, string[]> = {
+    instagram: ['instagram'],
+    tiktok:    ['tiktok', 'video'],
+    linkedin:  ['linkedin'],
+    all:       ['instagram', 'tiktok', 'linkedin', 'video'],
+  };
+  return [...always, ...(byPlat[platform] ?? byPlat['all'])];
+}
+
+// Human-readable message from the Orchestrator
+function orchestratorMessage(platform: string, command: string, topic: string): string {
+  const plat = platform === 'all' ? 'all platforms' : platform.charAt(0).toUpperCase() + platform.slice(1);
+  const subject = topic || command || 'the requested topic';
+  const agents = resolveAgents(platform);
+
+  const agentList = agents
+    .filter(a => !['orchestrator', 'trends', 'copywriter', 'visual'].includes(a))
+    .map(a => a.charAt(0).toUpperCase() + a.slice(1))
+    .join(', ');
+
+  return [
+    `Briefing the team for ${plat}.`,
+    `Trend Researcher is scanning for live signals around "${subject}".`,
+    `Routing to: ${agentList || plat} Specialist${agents.length > 1 ? 's' : ''}.`,
+    `Copywriter and Visual Director will refine the output before it reaches your queue.`,
+    `Manager will score everything — minimum 6.0/10 to approve. Content will appear in your queue shortly.`,
+  ].join(' ');
+}
+
+// ── POST: trigger agent team ──────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
   if (!checkAuth(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const body = await req.json();
-  const { platform = 'all', type = 'auto', topic = '' } = body;
+  const command  = (body.command  ?? '').trim();
+  const platform = (body.platform ?? 'all').trim();
+  const type     = (body.type     ?? 'auto').trim();
 
-  // If n8n is configured → forward to n8n webhook (non-blocking)
+  // Extract topic from command if not provided explicitly
+  const topic = (body.topic ?? command).trim();
+
+  const agents = resolveAgents(platform);
+
   if (N8N_WEBHOOK_URL) {
-    try {
-      fetch(N8N_WEBHOOK_URL, {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ platform, type, topic }),
-      }).catch(() => {});
+    // Fire n8n — non-blocking so dashboard doesn't wait for the full pipeline
+    fetch(N8N_WEBHOOK_URL, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ platform, type, topic, command }),
+    }).catch(() => {});
 
-      return NextResponse.json({ ok: true, method: 'n8n', message: 'Agent team triggered via n8n' });
-    } catch {
-      // Fall through to direct message if n8n fails
-    }
+    return NextResponse.json({
+      ok:      true,
+      method:  'n8n',
+      message: orchestratorMessage(platform, command, topic),
+      agents,
+    });
   }
 
-  // No n8n → return instructions for CLI
+  // n8n not configured
   return NextResponse.json({
-    ok: false,
-    method: 'cli',
-    message: 'n8n not configured. Run agents via CLI:',
+    ok:      false,
+    method:  'cli',
+    message: 'n8n not configured — run agents via CLI.',
+    agents:  [],
     command: `npm run manager -- --platform=${platform} --type=${type}${topic ? ` --topic="${topic}"` : ''}`,
   });
 }
 
-// ── /api/dashboard/generate/schedule (POST) ────────────────────────────────────
-// Schedules an approved post via Blotato through n8n
-
+// ── PUT: schedule an approved post via Blotato through n8n ────────────────────
 export async function PUT(req: NextRequest) {
   if (!checkAuth(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -66,19 +106,19 @@ export async function PUT(req: NextRequest) {
   }
 
   const scheduleUrl = N8N_SCHEDULE_URL || N8N_WEBHOOK_URL;
-  if (scheduleUrl) {
-    try {
-      const res = await fetch(scheduleUrl, {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ recordId, scheduledAt }),
-      });
-      const data = await res.json();
-      return NextResponse.json({ ok: true, ...data });
-    } catch (err) {
-      return NextResponse.json({ error: 'n8n schedule failed' }, { status: 502 });
-    }
+  if (!scheduleUrl) {
+    return NextResponse.json({ ok: false, message: 'n8n not configured' });
   }
 
-  return NextResponse.json({ ok: false, message: 'n8n not configured' });
+  try {
+    const res  = await fetch(scheduleUrl, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ recordId, scheduledAt }),
+    });
+    const data = await res.json();
+    return NextResponse.json({ ok: true, ...data });
+  } catch {
+    return NextResponse.json({ error: 'n8n schedule failed' }, { status: 502 });
+  }
 }

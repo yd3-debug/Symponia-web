@@ -111,12 +111,21 @@ const PLATFORM_ICON: Record<string, string> = {
 };
 
 const F = {
-  platform: 'Platform', contentType: 'Content Type', hook: 'Hook',
-  caption: 'Caption', hashtags: 'Hashtags', script: 'Script',
-  slides: 'Slides (JSON)', visualPrompt: 'Visual Prompt', imageUrl: 'Image URL',
-  videoUrl: 'Video URL', status: 'Status', scheduledAt: 'Scheduled At',
-  viralScore: 'Viral Score', notes: 'Notes', generatedAt: 'Generated At',
-  topic: 'Topic',
+  platform:     'Platform',
+  contentType:  'Content Type',
+  hook:         'Hook',
+  caption:      'Caption',
+  hashtags:     'Hashtags',
+  script:       'Script',
+  slides:       'Slides',
+  visualPrompt: 'Visual Prompt',
+  visualUrl:    'Visual URL',
+  status:       'Status',
+  scheduledAt:  'Scheduled At',
+  viralScore:   'Viral Score',
+  managerScore: 'Manager Score',
+  notes:        'Manager Notes',
+  topic:        'Topic',
 };
 
 type Tab      = 'queue' | 'brief' | 'agents' | 'calendar';

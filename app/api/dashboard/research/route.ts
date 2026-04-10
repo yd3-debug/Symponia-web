@@ -41,12 +41,23 @@ export async function POST(req: NextRequest) {
       signal:  AbortSignal.timeout(25000),   // 25s max
     });
 
+    const text = await res.text();
+
     if (!res.ok) {
-      const err = await res.text();
-      return NextResponse.json({ error: err }, { status: 502 });
+      return NextResponse.json({ error: text || `n8n returned ${res.status}` }, { status: 502 });
     }
 
-    const data = await res.json();
+    if (!text.trim()) {
+      return NextResponse.json({ error: 'Research webhook returned empty response — make sure the n8n Research workflow is active and the Respond to Webhook node is wired up.' }, { status: 502 });
+    }
+
+    let data: any;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      return NextResponse.json({ error: `Research webhook returned non-JSON: ${text.slice(0, 300)}` }, { status: 502 });
+    }
+
     return NextResponse.json(data);
   } catch (e: any) {
     return NextResponse.json({ error: e.message ?? 'Research failed' }, { status: 502 });

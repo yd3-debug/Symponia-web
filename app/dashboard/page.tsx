@@ -1072,16 +1072,32 @@ function ContentCard({ r, f, score, scoreColor, C, STATUS_COLOR, PLATFORM_COLOR,
   STATUS_COLOR: Record<string, string>; PLATFORM_COLOR: Record<string, string>;
   onClick: () => void; onApprove: () => void; onReject: () => void; onSchedule: () => void;
 }) {
-  const plat    = (f(r, 'Platform') as string)?.toLowerCase() ?? '';
-  const status  = (f(r, 'Status')   as string)?.toLowerCase() ?? '';
-  const sc      = score(r);
-  const preview = f(r, 'Hook') || f(r, 'Caption') || f(r, 'Script') || '';
+  const plat      = (f(r, 'Platform') as string)?.toLowerCase() ?? '';
+  const status    = (f(r, 'Status')   as string)?.toLowerCase() ?? '';
+  const sc        = score(r);
+  const preview   = f(r, 'Hook') || f(r, 'Caption') || f(r, 'Script') || '';
+  const visualUrl = f(r, 'Visual URL') as string;
 
   return (
     <div onClick={onClick} style={{ background: C.bgCard, border: `1px solid ${C.border}`, borderRadius: 12, padding: '18px', cursor: 'pointer', transition: 'all .15s', boxShadow: C.shadow }}
       onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 20px rgba(0,0,0,0.1)'; }}
       onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.boxShadow = C.shadow; }}>
       <div style={{ height: 3, background: `linear-gradient(90deg, ${PLATFORM_COLOR[plat] ?? C.violet}, transparent)`, borderRadius: 2, marginBottom: 14 }} />
+
+      {/* Visual preview — shown if Kie.ai has generated an image/video */}
+      {visualUrl && (
+        <div style={{ marginBottom: 12, borderRadius: 8, overflow: 'hidden', background: '#000', position: 'relative' }}>
+          {visualUrl.match(/\.(mp4|webm|mov)$/i) ? (
+            <video src={visualUrl} muted playsInline style={{ width: '100%', maxHeight: 180, objectFit: 'cover', display: 'block' }} />
+          ) : (
+            <img src={visualUrl} alt="Visual" style={{ width: '100%', maxHeight: 180, objectFit: 'cover', display: 'block' }} />
+          )}
+          <div style={{ position: 'absolute', bottom: 6, right: 6, fontSize: '0.6rem', fontWeight: 600, background: 'rgba(0,0,0,0.6)', color: '#fff', padding: '2px 7px', borderRadius: 5 }}>
+            {visualUrl.match(/\.(mp4|webm|mov)$/i) ? '▶ Video' : '◆ Visual'}
+          </div>
+        </div>
+      )}
+
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: PLATFORM_COLOR[plat] ?? C.dim, background: `${PLATFORM_COLOR[plat] ?? C.dim}18`, padding: '3px 8px', borderRadius: 5 }}>
@@ -1165,9 +1181,11 @@ function DetailPanel({ r, f, score, scoreColor, C, STATUS_COLOR, PLATFORM_COLOR,
   STATUS_COLOR: Record<string, string>; PLATFORM_COLOR: Record<string, string>;
   onApprove: () => void; onReject: () => void; onSchedule: () => void; onClose: () => void;
 }) {
-  const plat   = (f(r, 'Platform') as string)?.toLowerCase() ?? '';
-  const status = (f(r, 'Status')   as string)?.toLowerCase() ?? '';
-  const sc     = score(r);
+  const plat      = (f(r, 'Platform') as string)?.toLowerCase() ?? '';
+  const status    = (f(r, 'Status')   as string)?.toLowerCase() ?? '';
+  const sc        = score(r);
+  const visualUrl = f(r, 'Visual URL') as string;
+  const isVideo   = visualUrl?.match(/\.(mp4|webm|mov)$/i);
 
   const Row = ({ label, value }: { label: string; value: string }) => value ? (
     <div style={{ marginBottom: 18 }}>
@@ -1178,7 +1196,7 @@ function DetailPanel({ r, f, score, scoreColor, C, STATUS_COLOR, PLATFORM_COLOR,
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontSize: '0.68rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: PLATFORM_COLOR[plat] ?? C.dim, background: `${PLATFORM_COLOR[plat] ?? C.dim}18`, padding: '3px 8px', borderRadius: 5 }}>
             {PLATFORM_ICON[plat]} {plat}
@@ -1191,23 +1209,47 @@ function DetailPanel({ r, f, score, scoreColor, C, STATUS_COLOR, PLATFORM_COLOR,
         <div style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_COLOR[status] ?? C.dim }} />
         <span style={{ fontSize: '0.72rem', fontWeight: 600, color: STATUS_COLOR[status] ?? C.dim, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{status}</span>
       </div>
-      <Row label="Hook"          value={f(r, 'Hook')} />
-      <Row label="Caption"       value={f(r, 'Caption')} />
-      <Row label="Script"        value={f(r, 'Script')} />
-      <Row label="Hashtags"      value={f(r, 'Hashtags')} />
-      <Row label="Visual Prompt" value={f(r, 'Visual Prompt')} />
-      <Row label="Notes"         value={f(r, 'Notes')} />
-      <Row label="Scheduled"     value={f(r, 'Scheduled At')} />
+
+      {/* ── Visual preview ── */}
+      {visualUrl ? (
+        <div style={{ marginBottom: 22, borderRadius: 12, overflow: 'hidden', background: '#000', position: 'relative' }}>
+          {isVideo ? (
+            <video src={visualUrl} controls playsInline style={{ width: '100%', maxHeight: 320, objectFit: 'contain', display: 'block' }} />
+          ) : (
+            <img src={visualUrl} alt="Generated visual" style={{ width: '100%', maxHeight: 320, objectFit: 'contain', display: 'block' }} />
+          )}
+          <a href={visualUrl} target="_blank" rel="noopener noreferrer"
+            style={{ position: 'absolute', top: 8, right: 8, fontSize: '0.65rem', fontWeight: 600, background: 'rgba(0,0,0,0.65)', color: '#fff', padding: '4px 9px', borderRadius: 6, textDecoration: 'none', backdropFilter: 'blur(4px)' }}>
+            Open full size ↗
+          </a>
+        </div>
+      ) : (
+        <div style={{ marginBottom: 22, padding: '20px', background: 'rgba(124,58,237,0.05)', border: `1px dashed ${C.border}`, borderRadius: 12, textAlign: 'center' }}>
+          <div style={{ fontSize: '0.78rem', color: C.dim }}>Visual not generated yet</div>
+          <div style={{ fontSize: '0.68rem', color: C.dim, marginTop: 4, opacity: 0.7 }}>Kie.ai may still be processing — refresh in a moment</div>
+        </div>
+      )}
+
+      {/* ── Decision buttons pinned at top for review items ── */}
       {status === 'review' && (
-        <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-          <button onClick={onApprove} style={{ flex: 1, padding: '10px', background: C.green, border: 'none', borderRadius: 8, color: '#fff', fontFamily: C.body, fontSize: '0.82rem', fontWeight: 500, cursor: 'pointer' }}>✓ Approve</button>
-          <button onClick={onReject}  style={{ flex: 1, padding: '10px', background: 'none', border: `1px solid ${C.red}`, borderRadius: 8, color: C.red, fontFamily: C.body, fontSize: '0.82rem', cursor: 'pointer' }}>✗ Reject</button>
-          <button onClick={onSchedule} style={{ flex: 1, padding: '10px', background: C.teal, border: 'none', borderRadius: 8, color: '#fff', fontFamily: C.body, fontSize: '0.82rem', fontWeight: 500, cursor: 'pointer' }}>Schedule →</button>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 24, padding: '16px', background: 'rgba(124,58,237,0.05)', border: `1px solid ${C.border}`, borderRadius: 12 }}>
+          <button onClick={onApprove} style={{ flex: 1, padding: '11px', background: C.green, border: 'none', borderRadius: 8, color: '#fff', fontFamily: C.body, fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>✓ Approve</button>
+          <button onClick={onReject}  style={{ flex: 1, padding: '11px', background: 'none', border: `1px solid ${C.red}`, borderRadius: 8, color: C.red, fontFamily: C.body, fontSize: '0.82rem', cursor: 'pointer' }}>✗ Reject</button>
+          <button onClick={onSchedule} style={{ flex: 1, padding: '11px', background: C.teal, border: 'none', borderRadius: 8, color: '#fff', fontFamily: C.body, fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>Schedule →</button>
         </div>
       )}
       {status === 'approved' && (
-        <button onClick={onSchedule} style={{ width: '100%', padding: '10px', background: C.teal, border: 'none', borderRadius: 8, color: '#fff', fontFamily: C.body, fontSize: '0.82rem', fontWeight: 500, cursor: 'pointer', marginTop: 8 }}>Schedule via Blotato →</button>
+        <button onClick={onSchedule} style={{ width: '100%', padding: '11px', background: C.teal, border: 'none', borderRadius: 8, color: '#fff', fontFamily: C.body, fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', marginBottom: 24 }}>Schedule via Blotato →</button>
       )}
+
+      <Row label="Hook"          value={f(r, 'Hook')} />
+      <Row label="Caption"       value={f(r, 'Caption')} />
+      <Row label="Script"        value={f(r, 'Script')} />
+      <Row label="Slides"        value={f(r, 'Slides')} />
+      <Row label="Hashtags"      value={f(r, 'Hashtags')} />
+      <Row label="Visual Prompt" value={f(r, 'Visual Prompt')} />
+      <Row label="Manager Notes" value={f(r, 'Manager Notes')} />
+      <Row label="Scheduled"     value={f(r, 'Scheduled At')} />
     </div>
   );
 }

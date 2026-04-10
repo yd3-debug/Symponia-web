@@ -326,7 +326,7 @@ export default function Dashboard() {
           onChange={e => setCmd(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && runCommand()}
           placeholder='Tell the team what to create… e.g. "Create a TikTok video about shadow work trends" (⌘K)'
-          style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', color: C.fg, fontFamily: C.body, fontSize: '0.88rem', placeholder: C.dim }}
+          style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', color: C.fg, fontFamily: C.body, fontSize: '0.88rem' }}
         />
         <select value={cmdPlat} onChange={e => setCmdPlat(e.target.value as Platform)} style={{ background: C.bgCard, border: `0.5px solid ${C.border}`, borderRadius: 8, color: C.sub, fontFamily: C.body, fontSize: '0.75rem', padding: '6px 10px', outline: 'none' }}>
           <option value="all">All platforms</option>

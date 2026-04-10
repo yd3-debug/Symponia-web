@@ -48,9 +48,9 @@ const PACKS = [
   {
     id: 'monthly',
     name: 'Monthly',
-    tokens: null,
+    tokens: 350,
     price: '£12.99',
-    desc: 'Access as long as it\'s active.',
+    desc: 'Tokens refresh every month at renewal.',
     detail: 'per month · cancel anytime',
     accent: C.violet,
     popular: false,
@@ -99,9 +99,7 @@ function PricingCard({ pack }: { pack: typeof PACKS[0] }) {
               <span style={{ fontFamily: C.heading, fontSize: '2rem', fontWeight: 300, color: pack.accent }}>{pack.tokens}</span>
               <span style={{ fontFamily: C.body, fontSize: '0.75rem', fontWeight: 300, color: C.dim, letterSpacing: '0.08em' }}>tokens</span>
             </>
-          ) : (
-            <span style={{ fontFamily: C.body, fontSize: '0.75rem', fontWeight: 300, color: C.dim, letterSpacing: '0.08em' }}>Access while active</span>
-          )}
+          ) : null}
         </div>
         <p style={{ fontFamily: C.body, fontSize: '0.82rem', fontWeight: 300, color: C.sub, marginTop: 14, lineHeight: 1.7 }}>{pack.desc}</p>
       </div>

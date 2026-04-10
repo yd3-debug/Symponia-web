@@ -46,13 +46,32 @@ export default function TermsPage() {
         </Section>
 
         <div id="tokens"><Section title="Tokens and payments">
-          <p>Symponia uses a token system for Oracle readings. Each conversation exchange uses 1 token. New users receive 10 free readings. Additional tokens and monthly subscriptions are available for purchase within the app. The following applies:</p>
+          <p>Symponia uses a token system for Oracle readings. Each conversation exchange uses 1 token. New users receive 10 free readings. The following products are available for purchase within the app:</p>
+
+          <div style={{ margin: '20px 0', padding: '20px 24px', borderRadius: 12, border: `0.5px solid rgba(255,255,255,0.1)`, background: 'rgba(255,255,255,0.02)' }}>
+            <p style={{ color: C.fg, fontWeight: 400, marginBottom: 12 }}>Symponia Premium — Monthly Subscription</p>
+            <ul style={{ paddingLeft: 20, lineHeight: 2 }}>
+              <li>Price: £12.99 / month (auto-renewing)</li>
+              <li>Includes: 350 oracle readings per month</li>
+              <li>Tokens refresh every month at renewal. Unused tokens are replaced with a fresh 350.</li>
+            </ul>
+          </div>
+
+          <div style={{ margin: '20px 0', padding: '20px 24px', borderRadius: 12, border: `0.5px solid rgba(255,255,255,0.1)`, background: 'rgba(255,255,255,0.02)' }}>
+            <p style={{ color: C.fg, fontWeight: 400, marginBottom: 12 }}>Token Packs — One-time purchase</p>
+            <ul style={{ paddingLeft: 20, lineHeight: 2 }}>
+              <li>50 tokens — £4.99</li>
+              <li>150 tokens — £9.99</li>
+              <li>Tokens do not expire and carry over indefinitely.</li>
+            </ul>
+          </div>
+
+          <p style={{ marginTop: 16 }}>The following applies to all purchases:</p>
           <ul style={{ marginTop: 10, paddingLeft: 20, lineHeight: 2 }}>
-            <li>Tokens are non-refundable once used.</li>
-            <li>Unused tokens do not expire.</li>
-            <li>Monthly subscriptions renew automatically and can be cancelled at any time. Access continues until the end of the current billing period.</li>
-            <li>Prices are displayed within the app and are subject to change.</li>
-            <li>Payment is processed securely by Stripe. We do not store your payment details.</li>
+            <li>Payment will be charged to your Apple ID account at confirmation of purchase.</li>
+            <li>Subscriptions automatically renew unless cancelled at least 24 hours before the end of the current period.</li>
+            <li>Manage or cancel your subscription in your Apple ID Settings at any time.</li>
+            <li>Token pack purchases are non-refundable once tokens have been used.</li>
             <li>All purchases are final. Refunds are considered on a case-by-case basis — contact <a href="mailto:hello@symponia.io" style={{ color: C.cyan, textDecoration: 'none' }}>hello@symponia.io</a>.</li>
           </ul>
         </Section></div>

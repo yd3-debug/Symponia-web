@@ -173,7 +173,27 @@ const F = {
   topic:        'Topic',
 };
 
-type Tab      = 'queue' | 'brief' | 'agents' | 'calendar';
+type Tab      = 'queue' | 'brief' | 'research' | 'agents' | 'calendar';
+
+interface ResearchResult {
+  ok: boolean;
+  platform: string;
+  topic: string;
+  trendingAngle: string;
+  timingWindow: string;
+  hashtags: string;
+  topRedditTitles: string[];
+  topSubreddits: string[];
+  avgVelocity: number;
+  rankedPostCount: number;
+  algoTopSignals: string;
+  algoFormatWinner: string;
+  algoHashtagRule: string;
+  algoHookTiming: string;
+  algoPeakTimes: string;
+  algoAvoid: string;
+  algoSeoNote: string;
+}
 type Status   = 'review' | 'approved' | 'scheduled' | 'posted' | 'draft' | 'generating' | 'rejected' | 'all';
 type Platform = 'all' | 'instagram' | 'tiktok' | 'linkedin';
 interface AirtableRecord { id: string; fields: Record<string, any>; }
@@ -230,6 +250,13 @@ export default function Dashboard() {
 
   // Visual style
   const [visualStyle, setVisualStyle] = useState<VisualStyleId>('none');
+
+  // Research tab
+  const [researchTopic,    setResearchTopic]    = useState('');
+  const [researchPlatform, setResearchPlatform] = useState<Platform>('all');
+  const [researchLoading,  setResearchLoading]  = useState(false);
+  const [researchResult,   setResearchResult]   = useState<ResearchResult | null>(null);
+  const [researchError,    setResearchError]    = useState('');
 
   const [toast, setToast] = useState<{ msg: string; type?: string } | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -374,6 +401,20 @@ export default function Dashboard() {
     } finally { setChatLoading(false); }
   };
 
+  const runResearch = async () => {
+    if (!researchTopic.trim() || researchLoading) return;
+    setResearchLoading(true);
+    setResearchError('');
+    setResearchResult(null);
+    try {
+      const res = await apiPost('/api/dashboard/research', { topic: researchTopic, platform: researchPlatform }, token);
+      if (res.error) setResearchError(res.error);
+      else setResearchResult(res as ResearchResult);
+    } catch (e: any) {
+      setResearchError(e.message ?? 'Research failed');
+    } finally { setResearchLoading(false); }
+  };
+
   const f = (r: AirtableRecord, field: string) => r.fields[field] ?? '';
   const score = (r: AirtableRecord) => Number(f(r, F.viralScore)) || 0;
   const scoreColor = (n: number) => n >= 8 ? C.green : n >= 6 ? C.orange : C.dim;
@@ -432,7 +473,8 @@ export default function Dashboard() {
         {([
           { key: 'queue',    label: 'Content Queue',      icon: '▦' },
           { key: 'brief',    label: 'Brief Orchestrator', icon: '◈' },
-          { key: 'agents',   label: 'Agent Team',         icon: '◉' },
+          { key: 'research', label: 'Research',           icon: '◉' },
+          { key: 'agents',   label: 'Agent Team',         icon: '◆' },
           { key: 'calendar', label: 'Calendar',           icon: '▣' },
         ] as { key: Tab; label: string; icon: string }[]).map(t => (
           <button key={t.key} onClick={() => setTab(t.key)} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '0 14px', height: 56, background: 'none', border: 'none', borderBottom: `2px solid ${tab === t.key ? C.violet : 'transparent'}`, color: tab === t.key ? C.violet : C.dim, fontSize: '0.78rem', fontWeight: tab === t.key ? 600 : 400, letterSpacing: '0.02em', cursor: 'pointer', transition: 'all .15s', fontFamily: C.body }}>
@@ -505,7 +547,7 @@ export default function Dashboard() {
         )}
 
         {/* Main */}
-        <main style={{ flex: 1, overflowY: 'auto', padding: tab === 'brief' ? 0 : 24 }}>
+        <main style={{ flex: 1, overflowY: 'auto', padding: tab === 'brief' ? 0 : tab === 'research' ? '24px 32px' : 24 }}>
 
           {/* ── QUEUE TAB ── */}
           {tab === 'queue' && (
@@ -708,6 +750,192 @@ export default function Dashboard() {
                   </div>
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* ── RESEARCH TAB ── */}
+          {tab === 'research' && (
+            <div style={{ maxWidth: 860, margin: '0 auto', paddingBottom: 48 }}>
+
+              {/* Header */}
+              <div style={{ marginBottom: 28 }}>
+                <div style={{ fontSize: '1.3rem', fontWeight: 700, color: C.fg, marginBottom: 6, letterSpacing: '-0.01em' }}>Trend Research</div>
+                <div style={{ fontSize: '0.82rem', color: C.dim, lineHeight: 1.7, maxWidth: 560 }}>
+                  Enter a topic. The Trend Researcher and algorithm agents will scan Reddit, Google Trends, and platform signals — then surface the best angle, hashtags, and timing before you commit to generating content.
+                </div>
+              </div>
+
+              {/* Search bar */}
+              <div style={{ display: 'flex', gap: 10, marginBottom: 20, flexWrap: 'wrap' }}>
+                <input
+                  value={researchTopic}
+                  onChange={e => setResearchTopic(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') runResearch(); }}
+                  placeholder="e.g. shadow work, spirit animals, collective unconscious…"
+                  style={{ flex: 1, minWidth: 260, padding: '11px 16px', background: dark ? 'rgba(255,255,255,0.05)' : '#ffffff', border: `1px solid ${researchLoading ? C.violet : C.borderMid}`, borderRadius: 10, color: C.fg, fontFamily: C.body, fontSize: '0.9rem', outline: 'none', transition: 'border-color .15s' }}
+                />
+                <select value={researchPlatform} onChange={e => setResearchPlatform(e.target.value as Platform)}
+                  style={{ padding: '11px 12px', background: dark ? 'rgba(255,255,255,0.05)' : '#fff', border: `1px solid ${C.borderMid}`, borderRadius: 10, color: C.sub, fontFamily: C.body, fontSize: '0.8rem', outline: 'none', cursor: 'pointer' }}>
+                  <option value="all">All platforms</option>
+                  <option value="instagram">Instagram</option>
+                  <option value="tiktok">TikTok</option>
+                  <option value="linkedin">LinkedIn</option>
+                </select>
+                <button onClick={runResearch} disabled={!researchTopic.trim() || researchLoading}
+                  style={{ padding: '11px 24px', background: researchTopic.trim() && !researchLoading ? C.violet : (dark ? 'rgba(255,255,255,0.04)' : '#f0f0f5'), border: 'none', borderRadius: 10, color: researchTopic.trim() && !researchLoading ? '#fff' : C.dim, fontFamily: C.body, fontSize: '0.86rem', fontWeight: 600, cursor: researchTopic.trim() && !researchLoading ? 'pointer' : 'default', transition: 'all .15s', whiteSpace: 'nowrap' }}>
+                  {researchLoading ? 'Researching…' : '◉ Run Research'}
+                </button>
+              </div>
+
+              {/* Loading state */}
+              {researchLoading && (
+                <div style={{ padding: '48px 24px', textAlign: 'center', background: dark ? 'rgba(255,255,255,0.025)' : '#fff', border: `1px solid ${C.border}`, borderRadius: 14 }}>
+                  <div style={{ width: 48, height: 48, borderRadius: '50%', border: `3px solid ${C.violet}33`, borderTop: `3px solid ${C.violet}`, margin: '0 auto 16px', animation: 'spin 1s linear infinite' }} />
+                  <div style={{ fontSize: '0.9rem', fontWeight: 600, color: C.fg, marginBottom: 6 }}>Agents are scanning…</div>
+                  <div style={{ fontSize: '0.78rem', color: C.dim, lineHeight: 1.7 }}>
+                    Trend Researcher is checking Reddit, Google Trends, and platform signals.<br />This takes up to 25 seconds.
+                  </div>
+                  <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+                </div>
+              )}
+
+              {/* Error */}
+              {researchError && !researchLoading && (
+                <div style={{ padding: '16px 20px', background: `${C.red}12`, border: `1px solid ${C.red}44`, borderRadius: 12, color: C.red, fontSize: '0.84rem', marginBottom: 20 }}>
+                  <strong>Research failed:</strong> {researchError}
+                </div>
+              )}
+
+              {/* Results */}
+              {researchResult && !researchLoading && (() => {
+                const r = researchResult;
+                const platColor = r.platform === 'instagram' ? C.pink : r.platform === 'tiktok' ? C.cyan : r.platform === 'linkedin' ? C.teal : C.violet;
+                return (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+
+                    {/* Trending angle — hero card */}
+                    <div style={{ padding: '20px 22px', background: dark ? `${C.violet}12` : '#faf7ff', border: `1px solid ${C.violet}44`, borderRadius: 14, position: 'relative', overflow: 'hidden' }}>
+                      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, ${C.violet}, ${C.pink})` }} />
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                        <span style={{ fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.violet }}>◉ Trending Angle</span>
+                        <span style={{ fontSize: '0.6rem', color: C.dim, background: dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', padding: '2px 8px', borderRadius: 10 }}>
+                          {r.platform === 'all' ? 'All Platforms' : r.platform}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '1.05rem', fontWeight: 700, color: C.fg, lineHeight: 1.5, marginBottom: 10 }}>
+                        {r.trendingAngle || `${r.topic}`}
+                      </div>
+                      {r.timingWindow && (
+                        <div style={{ fontSize: '0.78rem', color: C.dim }}>
+                          <span style={{ color: C.yellow, fontWeight: 600 }}>Best window:</span> {r.timingWindow}
+                        </div>
+                      )}
+
+                      {/* Brief from research CTA */}
+                      <button
+                        onClick={() => {
+                          setChatInput(`Create content about: ${r.trendingAngle || r.topic}. Best angle: ${r.trendingAngle}. Use hashtags: ${r.hashtags}. Optimal timing: ${r.algoPeakTimes || r.timingWindow}`);
+                          setChatPlatform((['instagram','tiktok','linkedin'].includes(r.platform) ? r.platform : 'all') as Platform);
+                          setTab('brief');
+                        }}
+                        style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 18px', background: C.violet, border: 'none', borderRadius: 8, color: '#fff', fontFamily: C.body, fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}>
+                        Brief this topic → Generate content
+                      </button>
+                    </div>
+
+                    {/* 2-col grid: algo signals + reddit titles */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+
+                      {/* Algorithm signals */}
+                      <div style={{ padding: '18px 20px', background: C.bgCard, border: `1px solid ${C.border}`, borderRadius: 12 }}>
+                        <div style={{ fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: platColor, marginBottom: 12 }}>Algorithm Signals</div>
+                        {[
+                          { label: 'Top Signals',  val: r.algoTopSignals },
+                          { label: 'Best Format',  val: r.algoFormatWinner },
+                          { label: 'Hashtag Rule', val: r.algoHashtagRule },
+                          { label: 'Hook Timing',  val: r.algoHookTiming },
+                          { label: 'Avoid',        val: r.algoAvoid },
+                          { label: 'SEO Note',     val: r.algoSeoNote },
+                        ].filter(x => x.val).map(({ label, val }) => (
+                          <div key={label} style={{ marginBottom: 10 }}>
+                            <div style={{ fontSize: '0.62rem', fontWeight: 600, color: C.dim, marginBottom: 2 }}>{label}</div>
+                            <div style={{ fontSize: '0.8rem', color: C.sub, lineHeight: 1.5 }}>{val}</div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Reddit findings */}
+                      <div style={{ padding: '18px 20px', background: C.bgCard, border: `1px solid ${C.border}`, borderRadius: 12 }}>
+                        <div style={{ fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.orange, marginBottom: 12 }}>Reddit Intelligence</div>
+                        {r.topRedditTitles?.length > 0 ? (
+                          <>
+                            <div style={{ fontSize: '0.62rem', fontWeight: 600, color: C.dim, marginBottom: 8 }}>Top Posts</div>
+                            {r.topRedditTitles.slice(0, 5).map((title, i) => (
+                              <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 8, alignItems: 'flex-start' }}>
+                                <span style={{ fontSize: '0.68rem', color: C.orange, fontWeight: 700, flexShrink: 0, marginTop: 2 }}>{i + 1}</span>
+                                <span style={{ fontSize: '0.78rem', color: C.sub, lineHeight: 1.5 }}>{title}</span>
+                              </div>
+                            ))}
+                          </>
+                        ) : (
+                          <div style={{ fontSize: '0.78rem', color: C.dim, fontStyle: 'italic' }}>No Reddit data returned — try a broader topic or check the research webhook.</div>
+                        )}
+                        {r.topSubreddits?.length > 0 && (
+                          <div style={{ marginTop: 10 }}>
+                            <div style={{ fontSize: '0.62rem', fontWeight: 600, color: C.dim, marginBottom: 6 }}>Active Subreddits</div>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                              {r.topSubreddits.slice(0, 6).map(sub => (
+                                <span key={sub} style={{ fontSize: '0.68rem', padding: '3px 9px', borderRadius: 10, background: dark ? 'rgba(251,146,60,0.12)' : '#fff3e0', color: C.orange, fontWeight: 500 }}>r/{sub}</span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {r.avgVelocity > 0 && (
+                          <div style={{ marginTop: 10, fontSize: '0.72rem', color: C.dim }}>
+                            Avg velocity: <strong style={{ color: C.fg }}>{r.avgVelocity}</strong> · Posts scanned: <strong style={{ color: C.fg }}>{r.rankedPostCount}</strong>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Hashtags + peak times row */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+
+                      {/* Hashtags */}
+                      {r.hashtags && (
+                        <div style={{ padding: '18px 20px', background: C.bgCard, border: `1px solid ${C.border}`, borderRadius: 12 }}>
+                          <div style={{ fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.violet, marginBottom: 10 }}>Suggested Hashtags</div>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                            {r.hashtags.split(/[\s,]+/).filter(Boolean).map(tag => (
+                              <span key={tag} style={{ fontSize: '0.75rem', padding: '4px 10px', borderRadius: 10, background: dark ? 'rgba(167,139,250,0.1)' : '#ede9fb', color: C.violet, fontWeight: 500, fontFamily: C.mono }}>{tag.startsWith('#') ? tag : `#${tag}`}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Peak times */}
+                      {r.algoPeakTimes && (
+                        <div style={{ padding: '18px 20px', background: C.bgCard, border: `1px solid ${C.border}`, borderRadius: 12 }}>
+                          <div style={{ fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.green, marginBottom: 10 }}>Peak Post Times</div>
+                          <div style={{ fontSize: '0.82rem', color: C.sub, lineHeight: 1.7 }}>{r.algoPeakTimes}</div>
+                        </div>
+                      )}
+                    </div>
+
+                  </div>
+                );
+              })()}
+
+              {/* Empty state */}
+              {!researchResult && !researchLoading && !researchError && (
+                <div style={{ padding: '60px 24px', textAlign: 'center', background: dark ? 'rgba(255,255,255,0.02)' : '#fafaf8', border: `1px dashed ${C.border}`, borderRadius: 14 }}>
+                  <div style={{ fontSize: '2rem', opacity: 0.18, marginBottom: 14 }}>◉</div>
+                  <div style={{ fontSize: '0.88rem', fontWeight: 600, color: C.sub, marginBottom: 8 }}>Enter a topic to begin research</div>
+                  <div style={{ fontSize: '0.76rem', color: C.dim, lineHeight: 1.8 }}>
+                    The Trend Researcher will surface Reddit discussions, algorithm signals,<br />hashtag strategy, and optimal timing — all before you generate anything.
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

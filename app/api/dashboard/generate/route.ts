@@ -65,11 +65,12 @@ export async function POST(req: NextRequest) {
   if (!checkAuth(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const body = await req.json();
-  const command     = (body.command     ?? '').trim();
-  const platform    = (body.platform    ?? 'all').trim();
-  const type        = (body.type        ?? 'auto').trim();
-  const imageUrl    = (body.imageUrl    ?? '').trim();
-  const visualStyle = (body.visualStyle ?? '').trim();
+  const command      = (body.command      ?? '').trim();
+  const platform     = (body.platform     ?? 'all').trim();
+  const type         = (body.type         ?? 'auto').trim();
+  const imageUrl     = (body.imageUrl     ?? '').trim();
+  const visualStyle  = (body.visualStyle  ?? '').trim();
+  const visualModel  = (body.visualModel  ?? '').trim();
 
   // Extract topic from command if not provided explicitly
   const topic = (body.topic ?? command).trim();
@@ -81,6 +82,7 @@ export async function POST(req: NextRequest) {
     const payload: Record<string, string> = { platform, type, topic, command };
     if (imageUrl)    payload.imageUrl    = imageUrl;
     if (visualStyle) payload.visualStyle = visualStyle;
+    if (visualModel) payload.visualModel = visualModel;
     fetch(N8N_WEBHOOK_URL, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },

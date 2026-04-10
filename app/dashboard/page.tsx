@@ -134,6 +134,106 @@ const OPTIMAL_TIMES: Record<string, TimeSlot[]> = {
   ],
 };
 
+// ── Visual AI model library ───────────────────────────────────────────────────
+// Each entry: id = param sent to Kie.ai, sample = representative output image URL
+const MODEL_LIBRARY = [
+  // ── IMAGE MODELS ──
+  {
+    id: 'flux-pro', type: 'image' as const,
+    name: 'FLUX.1 Pro', provider: 'Black Forest Labs',
+    tagline: 'Hyper-realistic · Studio-grade detail',
+    description: 'The gold standard for photorealistic AI imagery. Exceptional at human faces, textures, and dramatic lighting. Best for cinematic visuals and editorial-quality stills.',
+    bestFor: ['Portraits', 'Cinematic stills', 'Dark aesthetic', 'Reels covers'],
+    speed: 'medium' as const, quality: 5,
+    sample: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=480&q=85&fit=crop',
+  },
+  {
+    id: 'flux-dev', type: 'image' as const,
+    name: 'FLUX.1 Dev', provider: 'Black Forest Labs',
+    tagline: 'Fast · Open-weight · Creative freedom',
+    description: 'Open-weight sibling of FLUX Pro — 2× faster with slightly softer rendering. Great for high-volume generation and iterating quickly on creative concepts.',
+    bestFor: ['Quick iterations', 'Concept drafts', 'High volume', 'Abstract'],
+    speed: 'fast' as const, quality: 4,
+    sample: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=480&q=85&fit=crop',
+  },
+  {
+    id: 'seedream-2', type: 'image' as const,
+    name: 'SeaDream 2', provider: 'ByteDance',
+    tagline: 'Dreamlike · Painterly · Cinematic depth',
+    description: 'ByteDance\'s flagship image model. Exceptional at dreamlike, surreal compositions with rich colour depth and painterly quality. Ideal for Symponia\'s mystical aesthetic.',
+    bestFor: ['Mystical scenes', 'Painterly art', 'Surreal concepts', 'Carousels'],
+    speed: 'medium' as const, quality: 5,
+    sample: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=480&q=85&fit=crop',
+  },
+  {
+    id: 'ideogram-v3', type: 'image' as const,
+    name: 'Ideogram v3', provider: 'Ideogram',
+    tagline: 'Text in images · Typography-aware',
+    description: 'Best-in-class for generating images with legible text overlays, logos, and graphic design elements. Use when the visual needs words baked in.',
+    bestFor: ['Quote cards', 'Text overlays', 'Slide graphics', 'Branded visuals'],
+    speed: 'fast' as const, quality: 4,
+    sample: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=480&q=85&fit=crop',
+  },
+  {
+    id: 'recraft-v3', type: 'image' as const,
+    name: 'Recraft v3', provider: 'Recraft',
+    tagline: 'Vector-clean · Brand-consistent · Illustration',
+    description: 'Purpose-built for brand assets and illustration. Produces clean, scalable visuals with consistent style — ideal for carousel slides and infographic-style content.',
+    bestFor: ['Illustration', 'Brand assets', 'Consistent style', 'Carousels'],
+    speed: 'fast' as const, quality: 4,
+    sample: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=480&q=85&fit=crop',
+  },
+  {
+    id: 'sd3', type: 'image' as const,
+    name: 'Stable Diffusion 3', provider: 'Stability AI',
+    tagline: 'Versatile · Creative · Open',
+    description: 'Highly versatile foundation model with strong community fine-tunes. Good all-rounder for artistic and abstract work, especially when using detailed style prompts.',
+    bestFor: ['Artistic', 'Abstract', 'Fine-tuned styles', 'Experimental'],
+    speed: 'fast' as const, quality: 3,
+    sample: 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=480&q=85&fit=crop',
+  },
+  // ── VIDEO MODELS ──
+  {
+    id: 'kling-pro', type: 'video' as const,
+    name: 'Kling 1.6 Pro', provider: 'Kuaishou',
+    tagline: 'Cinematic motion · 10s clips · Highest quality',
+    description: 'Top-tier video generation with smooth cinematic camera moves, realistic physics, and consistent subjects. The go-to for Reels and TikTok hero visuals.',
+    bestFor: ['Reels hero clips', 'Cinematic scenes', 'Nature & abstract', 'Brand videos'],
+    speed: 'slow' as const, quality: 5,
+    sample: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=480&q=85&fit=crop',
+  },
+  {
+    id: 'wan-pro', type: 'video' as const,
+    name: 'Wan 2.1 Pro', provider: 'Alibaba',
+    tagline: 'Fast video · Strong motion · Text-to-video',
+    description: 'Alibaba\'s open-source video model — excellent motion quality at faster generation speeds. Great for abstract and concept-driven animations.',
+    bestFor: ['Abstract motion', 'Fast turnaround', 'Concept clips', 'B-roll'],
+    speed: 'medium' as const, quality: 4,
+    sample: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=480&q=85&fit=crop',
+  },
+  {
+    id: 'hailuo', type: 'video' as const,
+    name: 'Hailuo / MiniMax', provider: 'MiniMax',
+    tagline: 'Stylised · Consistent characters · Smooth',
+    description: 'Strong character consistency across frames and a distinctive stylised aesthetic. Well-suited for narrative-driven short clips and Symponia\'s mystical visual language.',
+    bestFor: ['Character scenes', 'Mystical aesthetic', 'Storytelling', 'TikTok'],
+    speed: 'medium' as const, quality: 4,
+    sample: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=480&q=85&fit=crop',
+  },
+  {
+    id: 'veo3', type: 'video' as const,
+    name: 'Veo 3', provider: 'Google DeepMind',
+    tagline: 'Photorealistic video · Audio-native · 4K',
+    description: 'Google\'s state-of-the-art video model with native audio generation. Produces photorealistic clips with natural sound. Ideal when the visual needs to feel completely real.',
+    bestFor: ['Photorealism', 'Native audio', 'Premium output', 'Ads-quality'],
+    speed: 'slow' as const, quality: 5,
+    sample: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=480&q=85&fit=crop',
+  },
+] as const;
+
+type ModelId = typeof MODEL_LIBRARY[number]['id'];
+type ModelType = 'image' | 'video';
+
 // ── Visual style options ──────────────────────────────────────────────────────
 const VISUAL_STYLES = [
   { id: 'dark-mystical',  label: 'Dark Mystical',  desc: 'Deep shadows, violet glow, sacred geometry — Symponia signature',    emoji: '🌑' },
@@ -250,6 +350,11 @@ export default function Dashboard() {
 
   // Visual style
   const [visualStyle, setVisualStyle] = useState<VisualStyleId>('none');
+
+  // Visual AI model
+  const [selectedModel,    setSelectedModel]    = useState<ModelId>('flux-pro');
+  const [modelLibraryOpen, setModelLibraryOpen] = useState(false);
+  const [modelTypeFilter,  setModelTypeFilter]  = useState<'all' | ModelType>('all');
 
   // Research tab
   const [researchTopic,    setResearchTopic]    = useState('');
@@ -388,7 +493,7 @@ export default function Dashboard() {
     setVisualStyle('none');
     setChatLoading(true);
     try {
-      const payload: Record<string, string> = { command: chatInput, platform: chatPlatform };
+      const payload: Record<string, string> = { command: chatInput, platform: chatPlatform, visualModel: selectedModel };
       if (imageUrl) payload.imageUrl = imageUrl;
       if (style)    payload.visualStyle = style;
       const res = await apiPost('/api/dashboard/generate', payload, token);
@@ -667,7 +772,7 @@ export default function Dashboard() {
               {/* ── Input area ─────────────────────────────────────────────── */}
               <div style={{ borderTop: `1px solid ${C.border}`, background: C.bgMid }}>
 
-                {/* ── Row 1: Platform selector + Visual style ── */}
+                {/* ── Row 1: Platform selector + Visual style + Model picker ── */}
                 <div style={{ padding: '12px 24px 0', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                   <select value={chatPlatform} onChange={e => setChatPlatform(e.target.value as Platform)}
                     style={{ padding: '6px 10px', background: dark ? 'rgba(255,255,255,0.05)' : '#f4f3f9', border: `1px solid ${C.border}`, borderRadius: 7, color: C.sub, fontFamily: C.body, fontSize: '0.75rem', outline: 'none', cursor: 'pointer', marginRight: 4 }}>
@@ -676,7 +781,8 @@ export default function Dashboard() {
                     <option value="tiktok">▶ TikTok</option>
                     <option value="linkedin">◻ LinkedIn</option>
                   </select>
-                  <div style={{ fontSize: '0.62rem', color: C.dim, marginRight: 4, whiteSpace: 'nowrap' }}>Visual style:</div>
+
+                  <div style={{ fontSize: '0.62rem', color: C.dim, marginRight: 2, whiteSpace: 'nowrap' }}>Style:</div>
                   {VISUAL_STYLES.map(s => (
                     <button key={s.id} onClick={() => setVisualStyle(s.id as VisualStyleId)} title={s.desc}
                       style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '5px 10px', background: visualStyle === s.id ? (dark ? 'rgba(124,58,237,0.18)' : '#ede9fb') : (dark ? 'rgba(255,255,255,0.04)' : '#f4f3f9'), border: `1px solid ${visualStyle === s.id ? C.violet : C.border}`, borderRadius: 20, color: visualStyle === s.id ? C.violet : C.dim, fontFamily: C.body, fontSize: '0.7rem', fontWeight: visualStyle === s.id ? 600 : 400, cursor: 'pointer', transition: 'all .15s', whiteSpace: 'nowrap' }}>
@@ -684,6 +790,23 @@ export default function Dashboard() {
                       {s.label}
                     </button>
                   ))}
+
+                  <div style={{ width: 1, height: 16, background: C.border, margin: '0 4px', flexShrink: 0 }} />
+
+                  {/* Model picker button — shows selected model, opens library */}
+                  <button onClick={() => setModelLibraryOpen(true)}
+                    style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 11px', background: dark ? 'rgba(255,255,255,0.05)' : '#f4f3f9', border: `1px solid ${C.borderMid}`, borderRadius: 20, color: C.sub, fontFamily: C.body, fontSize: '0.7rem', fontWeight: 500, cursor: 'pointer', transition: 'all .15s', whiteSpace: 'nowrap' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = C.violet; (e.currentTarget as HTMLElement).style.color = C.violet; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = C.borderMid; (e.currentTarget as HTMLElement).style.color = C.sub; }}>
+                    {(() => {
+                      const m = MODEL_LIBRARY.find(x => x.id === selectedModel);
+                      return <>
+                        <span style={{ fontSize: '0.65rem', opacity: 0.7 }}>{m?.type === 'video' ? '▶' : '◆'}</span>
+                        <span>{m?.name ?? selectedModel}</span>
+                        <span style={{ fontSize: '0.6rem', opacity: 0.55 }}>▾</span>
+                      </>;
+                    })()}
+                  </button>
                 </div>
 
                 {/* ── Row 2: Image upload zone (shown collapsed, expands on hover/when attached) ── */}
@@ -1054,12 +1177,175 @@ export default function Dashboard() {
         );
       })()}
 
+      {/* Model Library Modal */}
+      {modelLibraryOpen && (
+        <ModelLibraryModal
+          selectedModel={selectedModel}
+          onSelect={(id) => { setSelectedModel(id as ModelId); setModelLibraryOpen(false); }}
+          onClose={() => setModelLibraryOpen(false)}
+          C={C} dark={dark}
+          typeFilter={modelTypeFilter}
+          onTypeFilter={setModelTypeFilter}
+        />
+      )}
+
       {/* Toast */}
       {toast && (
         <div style={{ position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)', background: C.bgMid, border: `1px solid ${toast.type === 'error' ? C.red : C.borderMid}`, borderRadius: 10, padding: '10px 20px', fontSize: '0.82rem', color: toast.type === 'error' ? C.red : C.fg, zIndex: 300, boxShadow: '0 4px 20px rgba(0,0,0,0.12)', fontFamily: C.body }}>
           {toast.msg}
         </div>
       )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MODEL LIBRARY MODAL
+// ─────────────────────────────────────────────────────────────────────────────
+function ModelLibraryModal({ selectedModel, onSelect, onClose, C, dark, typeFilter, onTypeFilter }: {
+  selectedModel: string;
+  onSelect: (id: string) => void;
+  onClose: () => void;
+  C: typeof LIGHT; dark: boolean;
+  typeFilter: 'all' | ModelType;
+  onTypeFilter: (t: 'all' | ModelType) => void;
+}) {
+  const [hovered,  setHovered]  = React.useState<string | null>(null);
+  const [expanded, setExpanded] = React.useState<string | null>(null);
+
+  const filtered = typeFilter === 'all' ? MODEL_LIBRARY : MODEL_LIBRARY.filter(m => m.type === typeFilter);
+
+  const QualityDots = ({ n }: { n: number }) => (
+    <div style={{ display: 'flex', gap: 2 }}>
+      {[1,2,3,4,5].map(i => (
+        <div key={i} style={{ width: 5, height: 5, borderRadius: '50%', background: i <= n ? C.violet : (dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)') }} />
+      ))}
+    </div>
+  );
+
+  const speedColor = (s: string) => s === 'fast' ? C.green : s === 'medium' ? C.yellow : C.orange;
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, backdropFilter: 'blur(6px)', padding: 20 }}
+      onClick={onClose}>
+      <div style={{ width: '100%', maxWidth: 980, maxHeight: '92vh', background: C.bgMid, border: `1px solid ${C.borderMid}`, borderRadius: 20, display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 24px 80px rgba(0,0,0,0.4)' }}
+        onClick={e => e.stopPropagation()}>
+
+        {/* Header */}
+        <div style={{ padding: '22px 28px 0', borderBottom: `1px solid ${C.border}`, flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
+            <div>
+              <div style={{ fontSize: '1.15rem', fontWeight: 700, color: C.fg, letterSpacing: '-0.01em', marginBottom: 4 }}>Visual AI Library</div>
+              <div style={{ fontSize: '0.78rem', color: C.dim }}>Choose the model that generates your visuals. Click any card to read full specs.</div>
+            </div>
+            <button onClick={onClose} style={{ background: 'none', border: `1px solid ${C.border}`, borderRadius: 8, color: C.dim, cursor: 'pointer', padding: '6px 12px', fontFamily: C.body, fontSize: '0.78rem', flexShrink: 0, marginTop: 2 }}>✕ Close</button>
+          </div>
+
+          {/* Type filter tabs */}
+          <div style={{ display: 'flex', gap: 4, paddingBottom: 0 }}>
+            {(['all', 'image', 'video'] as const).map(t => (
+              <button key={t} onClick={() => onTypeFilter(t)}
+                style={{ padding: '8px 16px', background: 'none', border: 'none', borderBottom: `2px solid ${typeFilter === t ? C.violet : 'transparent'}`, color: typeFilter === t ? C.violet : C.dim, fontFamily: C.body, fontSize: '0.78rem', fontWeight: typeFilter === t ? 600 : 400, cursor: 'pointer', textTransform: 'capitalize', transition: 'all .15s' }}>
+                {t === 'all' ? `All (${MODEL_LIBRARY.length})` : t === 'image' ? `Images (${MODEL_LIBRARY.filter(m=>m.type==='image').length})` : `Video (${MODEL_LIBRARY.filter(m=>m.type==='video').length})`}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Grid */}
+        <div style={{ overflowY: 'auto', padding: '20px 28px 28px', flex: 1 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 14 }}>
+            {filtered.map(model => {
+              const isSelected = model.id === selectedModel;
+              const isHovered  = hovered === model.id;
+              const isExpanded = expanded === model.id;
+
+              return (
+                <div key={model.id}
+                  onMouseEnter={() => setHovered(model.id)}
+                  onMouseLeave={() => setHovered(null)}
+                  style={{
+                    background: isSelected ? (dark ? `${C.violet}14` : '#f5f0ff') : C.bgCard,
+                    border: `1.5px solid ${isSelected ? C.violet : isHovered ? C.borderStrong : C.border}`,
+                    borderRadius: 14, overflow: 'hidden', transition: 'all .18s',
+                    boxShadow: isHovered || isSelected ? '0 6px 24px rgba(0,0,0,0.12)' : 'none',
+                    cursor: 'pointer',
+                    transform: isHovered && !isSelected ? 'translateY(-2px)' : 'none',
+                  }}>
+
+                  {/* Sample image */}
+                  <div style={{ position: 'relative', height: 160, overflow: 'hidden', background: '#000' }}
+                    onClick={() => onSelect(model.id)}>
+                    <img
+                      src={model.sample}
+                      alt={model.name}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform .4s', transform: isHovered ? 'scale(1.04)' : 'scale(1)', filter: isSelected ? 'none' : 'brightness(0.88)' }}
+                    />
+                    {/* Overlay */}
+                    <div style={{ position: 'absolute', inset: 0, background: isHovered ? 'rgba(0,0,0,0.15)' : 'rgba(0,0,0,0.3)', transition: 'background .2s' }} />
+
+                    {/* Type badge */}
+                    <div style={{ position: 'absolute', top: 8, left: 8, fontSize: '0.6rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', background: model.type === 'video' ? `${C.cyan}cc` : `${C.violet}cc`, color: '#fff', padding: '3px 8px', borderRadius: 5, backdropFilter: 'blur(4px)' }}>
+                      {model.type === 'video' ? '▶ Video' : '◆ Image'}
+                    </div>
+
+                    {/* Selected tick */}
+                    {isSelected && (
+                      <div style={{ position: 'absolute', top: 8, right: 8, width: 24, height: 24, borderRadius: '50%', background: C.violet, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', color: '#fff', fontWeight: 700 }}>✓</div>
+                    )}
+
+                    {/* Provider chip at bottom */}
+                    <div style={{ position: 'absolute', bottom: 8, left: 8, fontSize: '0.6rem', color: 'rgba(255,255,255,0.75)', background: 'rgba(0,0,0,0.5)', padding: '2px 7px', borderRadius: 5, backdropFilter: 'blur(4px)' }}>
+                      {model.provider}
+                    </div>
+                  </div>
+
+                  {/* Card body */}
+                  <div style={{ padding: '14px 16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 6 }}>
+                      <div>
+                        <div style={{ fontSize: '0.88rem', fontWeight: 700, color: C.fg, marginBottom: 2 }}>{model.name}</div>
+                        <div style={{ fontSize: '0.7rem', color: C.dim, lineHeight: 1.4 }}>{model.tagline}</div>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, marginLeft: 8 }}>
+                        <span style={{ fontSize: '0.6rem', fontWeight: 600, color: speedColor(model.speed), background: `${speedColor(model.speed)}18`, padding: '2px 7px', borderRadius: 10, textTransform: 'capitalize' }}>{model.speed}</span>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                      <span style={{ fontSize: '0.6rem', color: C.dim }}>Quality</span>
+                      <QualityDots n={model.quality} />
+                    </div>
+
+                    {/* Expand/collapse details */}
+                    <button onClick={e => { e.stopPropagation(); setExpanded(expanded === model.id ? null : model.id); }}
+                      style={{ background: 'none', border: 'none', padding: 0, color: C.dim, fontFamily: C.body, fontSize: '0.68rem', cursor: 'pointer', marginBottom: isExpanded ? 10 : 0 }}>
+                      {isExpanded ? '▴ Less' : '▾ Details & best for'}
+                    </button>
+
+                    {isExpanded && (
+                      <div>
+                        <div style={{ fontSize: '0.75rem', color: C.sub, lineHeight: 1.65, marginBottom: 10 }}>{model.description}</div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                          {model.bestFor.map(tag => (
+                            <span key={tag} style={{ fontSize: '0.65rem', padding: '3px 8px', borderRadius: 8, background: dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)', color: C.sub }}>{tag}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Select button */}
+                    <button onClick={() => onSelect(model.id)}
+                      style={{ marginTop: 12, width: '100%', padding: '8px', background: isSelected ? C.violet : (dark ? 'rgba(255,255,255,0.05)' : '#f4f3f9'), border: `1px solid ${isSelected ? C.violet : C.border}`, borderRadius: 8, color: isSelected ? '#fff' : C.sub, fontFamily: C.body, fontSize: '0.76rem', fontWeight: 600, cursor: 'pointer', transition: 'all .15s' }}>
+                      {isSelected ? '✓ Selected' : 'Use this model'}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 
 // ── Theme ─────────────────────────────────────────────────────────────────────
 const LIGHT = {
@@ -110,6 +110,51 @@ const PLATFORM_ICON: Record<string, string> = {
   instagram: '◎', tiktok: '▶', linkedin: '◻',
 };
 
+// ── Algorithm-optimal posting windows ────────────────────────────────────────
+// Based on 2025/2026 platform algorithm signals baked into our agents
+type TimeSlot = { label: string; day: number; hour: number; minute: number; reason: string };
+const OPTIMAL_TIMES: Record<string, TimeSlot[]> = {
+  instagram: [
+    { label: 'Tue 9:00 AM',  day: 2, hour: 9,  minute: 0,  reason: 'Highest DM-share window — 3-5× engagement boost' },
+    { label: 'Wed 11:00 AM', day: 3, hour: 11, minute: 0,  reason: 'Mid-week Explore push — max Reels reach' },
+    { label: 'Fri 7:00 PM',  day: 5, hour: 19, minute: 0,  reason: 'Weekend wind-down — carousel saves spike 40%' },
+    { label: 'Sun 9:00 AM',  day: 0, hour: 9,  minute: 0,  reason: 'Spiritual content peaks Sunday morning' },
+  ],
+  tiktok: [
+    { label: 'Tue 9:00 AM',  day: 2, hour: 9,  minute: 0,  reason: 'Pre-work scroll — highest completion rate window' },
+    { label: 'Thu 12:00 PM', day: 4, hour: 12, minute: 0,  reason: 'Lunch break FYP — peak distribution velocity' },
+    { label: 'Fri 7:00 PM',  day: 5, hour: 19, minute: 0,  reason: 'Weekend start — viral momentum highest' },
+    { label: 'Sat 11:00 AM', day: 6, hour: 11, minute: 0,  reason: 'Weekend browsing peak for niche content' },
+  ],
+  linkedin: [
+    { label: 'Tue 8:00 AM',  day: 2, hour: 8,  minute: 0,  reason: 'Pre-meeting scroll — dwell time at peak' },
+    { label: 'Wed 12:00 PM', day: 3, hour: 12, minute: 0,  reason: 'Lunch hour — B2B content engagement high' },
+    { label: 'Thu 8:00 AM',  day: 4, hour: 8,  minute: 0,  reason: '360Brew AI rewards Thu consistency' },
+    { label: 'Sun 7:00 PM',  day: 0, hour: 19, minute: 0,  reason: 'Sunday prep mindset — thought leadership peak' },
+  ],
+};
+
+// ── Visual style options ──────────────────────────────────────────────────────
+const VISUAL_STYLES = [
+  { id: 'dark-mystical',  label: 'Dark Mystical',  desc: 'Deep shadows, violet glow, sacred geometry — Symponia signature',    emoji: '🌑' },
+  { id: 'cinematic-real', label: 'Cinematic Real',  desc: 'Photorealistic, dramatic lighting, editorial quality',                emoji: '📷' },
+  { id: 'illustrated',    label: 'Illustrated',     desc: 'Digital art, painterly strokes, hand-crafted feel',                   emoji: '🎨' },
+  { id: 'minimal-clean',  label: 'Minimal Clean',   desc: 'White space, bold typography, no-noise aesthetic',                    emoji: '◻' },
+  { id: 'cosmic-surreal', label: 'Cosmic Surreal',  desc: 'Dreamlike, otherworldly, celestial and cosmic elements',              emoji: '✦' },
+  { id: 'none',           label: 'Let AI decide',   desc: 'Visual Director chooses the best style for the content',              emoji: '◈' },
+] as const;
+type VisualStyleId = typeof VISUAL_STYLES[number]['id'];
+
+function nextOccurrence(dayOfWeek: number, hour: number, minute: number): string {
+  const now = new Date();
+  const result = new Date(now);
+  const diff = (dayOfWeek - now.getDay() + 7) % 7 || 7; // next occurrence (not today unless it's still upcoming)
+  result.setDate(now.getDate() + diff);
+  result.setHours(hour, minute, 0, 0);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${result.getFullYear()}-${pad(result.getMonth() + 1)}-${pad(result.getDate())}T${pad(hour)}:${pad(minute)}`;
+}
+
 const F = {
   platform:     'Platform',
   contentType:  'Content Type',
@@ -132,7 +177,7 @@ type Tab      = 'queue' | 'brief' | 'agents' | 'calendar';
 type Status   = 'review' | 'approved' | 'scheduled' | 'posted' | 'draft' | 'generating' | 'rejected' | 'all';
 type Platform = 'all' | 'instagram' | 'tiktok' | 'linkedin';
 interface AirtableRecord { id: string; fields: Record<string, any>; }
-interface ChatMessage { role: 'user' | 'assistant'; content: string; agents?: string[]; ts: number; }
+interface ChatMessage { role: 'user' | 'assistant'; content: string; agents?: string[]; imageUrl?: string; visualStyle?: string; ts: number; }
 
 const TOKEN_KEY    = 'sym_dashboard_token';
 const DARKMODE_KEY = 'sym_dashboard_dark';
@@ -151,7 +196,7 @@ export default function Dashboard() {
   const [loginErr, setLoginErr] = useState('');
   const [token,    setTokenState] = useState('');
 
-  const [dark,     setDark]     = useState(false);
+  const [dark,     setDark]     = useState(true);
   const C = dark ? DARK : LIGHT;
   const STATUS_COLOR = dark ? STATUS_COLOR_DARK : STATUS_COLOR_LIGHT;
   const PLATFORM_COLOR: Record<string, string> = {
@@ -175,7 +220,16 @@ export default function Dashboard() {
   const [chatInput,   setChatInput]   = useState('');
   const [chatPlatform,setChatPlatform] = useState<Platform>('all');
   const [chatLoading, setChatLoading] = useState(false);
-  const chatEndRef = useRef<HTMLDivElement>(null);
+  const chatEndRef   = useRef<HTMLDivElement>(null);
+
+  // Image attachment
+  const [attachedImage,    setAttachedImage]    = useState<{ url: string; preview: string } | null>(null);
+  const [imageUploading,   setImageUploading]   = useState(false);
+  const [isDraggingOver,   setIsDraggingOver]   = useState(false);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+
+  // Visual style
+  const [visualStyle, setVisualStyle] = useState<VisualStyleId>('none');
 
   const [toast, setToast] = useState<{ msg: string; type?: string } | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -186,11 +240,45 @@ export default function Dashboard() {
     toastTimer.current = setTimeout(() => setToast(null), 3500);
   }, []);
 
+  const handleImageAttach = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const preview = URL.createObjectURL(file);
+    setAttachedImage({ url: preview, preview });  // optimistic local preview
+    setImageUploading(true);
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      const res  = await fetch('/api/dashboard/upload', { method: 'POST', headers: { 'x-dashboard-token': token }, body: form });
+      const data = await res.json();
+      if (!res.ok || !data.url) throw new Error(data.error ?? 'Upload failed');
+      setAttachedImage({ url: data.url, preview });
+    } catch (err: any) {
+      showToast(err.message ?? 'Image upload failed', 'error');
+      setAttachedImage(null);
+    } finally {
+      setImageUploading(false);
+      if (imageInputRef.current) imageInputRef.current.value = '';
+    }
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDraggingOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (!file || !file.type.startsWith('image/')) return;
+    // Reuse the same upload logic
+    const fakeEvent = { target: { files: [file] } } as unknown as React.ChangeEvent<HTMLInputElement>;
+    await handleImageAttach(fakeEvent);
+  };
+
   useEffect(() => {
     const t = getToken();
     if (t) { setTokenState(t); setAuthed(true); }
     const savedDark = localStorage.getItem(DARKMODE_KEY);
-    if (savedDark === 'true') setDark(true);
+    // Default: dark mode ON (or honour saved preference)
+    if (savedDark === null) { setDark(true); }
+    else { setDark(savedDark === 'true'); }
   }, []);
 
   const toggleDark = () => {
@@ -263,13 +351,20 @@ export default function Dashboard() {
   };
 
   const sendChat = async () => {
-    if (!chatInput.trim() || chatLoading) return;
-    const userMsg: ChatMessage = { role: 'user', content: chatInput, ts: Date.now() };
+    if ((!chatInput.trim() && !attachedImage) || chatLoading) return;
+    const imageUrl = attachedImage?.url ?? undefined;
+    const style    = visualStyle !== 'none' ? visualStyle : undefined;
+    const userMsg: ChatMessage = { role: 'user', content: chatInput || '(image brief)', imageUrl, visualStyle: style, ts: Date.now() };
     setMessages(m => [...m, userMsg]);
     setChatInput('');
+    setAttachedImage(null);
+    setVisualStyle('none');
     setChatLoading(true);
     try {
-      const res = await apiPost('/api/dashboard/generate', { command: chatInput, platform: chatPlatform }, token);
+      const payload: Record<string, string> = { command: chatInput, platform: chatPlatform };
+      if (imageUrl) payload.imageUrl = imageUrl;
+      if (style)    payload.visualStyle = style;
+      const res = await apiPost('/api/dashboard/generate', payload, token);
       const reply = res.message ?? 'Team briefed — content will appear in queue shortly.';
       const agentsRouted: string[] = res.agents ?? [];
       setMessages(m => [...m, { role: 'assistant', content: reply, agents: agentsRouted, ts: Date.now() }]);
@@ -283,7 +378,6 @@ export default function Dashboard() {
   const score = (r: AirtableRecord) => Number(f(r, F.viralScore)) || 0;
   const scoreColor = (n: number) => n >= 8 ? C.green : n >= 6 ? C.orange : C.dim;
   const calendarRecords = records.filter(r => f(r, F.scheduledAt));
-  const scheduledDates  = new Set(calendarRecords.map(r => f(r, F.scheduledAt)?.slice(0, 10)));
 
   // ── LOGIN ──────────────────────────────────────────────────────────────────
   if (!authed) {
@@ -321,37 +415,56 @@ export default function Dashboard() {
     <div style={{ minHeight: '100vh', background: C.bg, display: 'flex', flexDirection: 'column', fontFamily: C.body, color: C.fg }}>
 
       {/* Top bar */}
-      <header style={{ height: 52, background: C.bgMid, borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', padding: '0 20px', gap: 0, flexShrink: 0, boxShadow: dark ? 'none' : C.shadow }}>
-        <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8, marginRight: 32 }}>
-          <span style={{ fontSize: '1rem', fontWeight: 700, color: C.violet }}>◈</span>
-          <span style={{ fontSize: '0.95rem', fontWeight: 600, color: C.fg }}>Symponia</span>
-          <span style={{ fontSize: '0.6rem', color: C.dim, letterSpacing: '0.15em', textTransform: 'uppercase' }}>Marketing OS</span>
+      <header style={{ height: 56, background: C.bgMid, borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', padding: '0 20px', gap: 0, flexShrink: 0, position: 'relative' }}>
+        {/* Subtle violet gradient line at top */}
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, ${C.violet}, ${C.pink}, ${C.cyan}, transparent)`, opacity: 0.7 }} />
+
+        <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10, marginRight: 36 }}>
+          <div style={{ width: 28, height: 28, borderRadius: 7, background: `linear-gradient(135deg, ${C.violet}, ${C.pink})`, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 2px 8px ${C.violet}40` }}>
+            <span style={{ fontSize: '0.9rem', color: '#fff', lineHeight: 1 }}>◈</span>
+          </div>
+          <div>
+            <div style={{ fontSize: '0.88rem', fontWeight: 700, color: C.fg, lineHeight: 1.1 }}>Symponia</div>
+            <div style={{ fontSize: '0.55rem', color: C.dim, letterSpacing: '0.2em', textTransform: 'uppercase', lineHeight: 1 }}>Marketing OS</div>
+          </div>
         </a>
 
-        {(['queue', 'brief', 'agents', 'calendar'] as Tab[]).map(t => (
-          <button key={t} onClick={() => setTab(t)} style={{ padding: '0 14px', height: 52, background: 'none', border: 'none', borderBottom: `2px solid ${tab === t ? C.violet : 'transparent'}`, color: tab === t ? C.violet : C.dim, fontSize: '0.78rem', fontWeight: tab === t ? 600 : 400, letterSpacing: '0.04em', cursor: 'pointer', transition: 'all .15s', fontFamily: C.body }}>
-            {t === 'queue' ? 'Content Queue' : t === 'brief' ? 'Brief Orchestrator' : t === 'agents' ? 'Agent Team' : 'Calendar'}
+        {([
+          { key: 'queue',    label: 'Content Queue',      icon: '▦' },
+          { key: 'brief',    label: 'Brief Orchestrator', icon: '◈' },
+          { key: 'agents',   label: 'Agent Team',         icon: '◉' },
+          { key: 'calendar', label: 'Calendar',           icon: '▣' },
+        ] as { key: Tab; label: string; icon: string }[]).map(t => (
+          <button key={t.key} onClick={() => setTab(t.key)} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '0 14px', height: 56, background: 'none', border: 'none', borderBottom: `2px solid ${tab === t.key ? C.violet : 'transparent'}`, color: tab === t.key ? C.violet : C.dim, fontSize: '0.78rem', fontWeight: tab === t.key ? 600 : 400, letterSpacing: '0.02em', cursor: 'pointer', transition: 'all .15s', fontFamily: C.body }}>
+            <span style={{ fontSize: '0.7rem', opacity: 0.7 }}>{t.icon}</span>
+            {t.label}
           </button>
         ))}
 
         <div style={{ flex: 1 }} />
 
-        {(['review','approved','scheduled'] as Status[]).map(s => (
-          <div key={s} onClick={() => { setTab('queue'); setStatus(s); }} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '3px 10px', cursor: 'pointer', opacity: status === s && tab === 'queue' ? 1 : 0.5, borderRadius: 6 }}>
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_COLOR[s] }} />
-            <span style={{ fontSize: '0.72rem', fontWeight: 500, color: C.sub }}>{counts[s] ?? 0}</span>
-            <span style={{ fontSize: '0.65rem', color: C.dim, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s}</span>
+        {/* Pipeline status pills */}
+        {([
+          { key: 'review' as Status,    label: 'Review' },
+          { key: 'approved' as Status,  label: 'Approved' },
+          { key: 'scheduled' as Status, label: 'Scheduled' },
+        ]).map(s => (
+          <div key={s.key} onClick={() => { setTab('queue'); setStatus(s.key); }} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px', cursor: 'pointer', borderRadius: 20, background: status === s.key && tab === 'queue' ? `${STATUS_COLOR[s.key]}18` : 'transparent', border: `1px solid ${status === s.key && tab === 'queue' ? STATUS_COLOR[s.key]+'44' : 'transparent'}`, marginRight: 4, transition: 'all .15s' }}>
+            <div style={{ width: 5, height: 5, borderRadius: '50%', background: STATUS_COLOR[s.key] }} />
+            <span style={{ fontSize: '0.7rem', fontWeight: 600, color: STATUS_COLOR[s.key], fontFamily: C.mono }}>{counts[s.key] ?? 0}</span>
+            <span style={{ fontSize: '0.62rem', color: C.dim, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</span>
           </div>
         ))}
 
-        {/* Dark mode toggle */}
+        <div style={{ width: 1, height: 20, background: C.border, margin: '0 8px' }} />
+
         <button onClick={toggleDark} title={dark ? 'Light mode' : 'Dark mode'}
-          style={{ marginLeft: 12, padding: '5px 10px', background: C.bgActive, border: `1px solid ${C.border}`, borderRadius: 6, cursor: 'pointer', fontSize: '0.75rem', color: C.sub, fontFamily: C.body }}>
-          {dark ? '☀ Light' : '☾ Dark'}
+          style={{ padding: '5px 10px', background: 'transparent', border: `1px solid ${C.border}`, borderRadius: 6, cursor: 'pointer', fontSize: '0.72rem', color: C.dim, fontFamily: C.body }}>
+          {dark ? '☀' : '☾'}
         </button>
 
         <button onClick={() => { clearToken(); setAuthed(false); }}
-          style={{ marginLeft: 10, fontSize: '0.72rem', color: C.dim, background: 'none', border: `1px solid ${C.border}`, borderRadius: 6, cursor: 'pointer', padding: '5px 10px', fontFamily: C.body }}>
+          style={{ marginLeft: 8, fontSize: '0.72rem', color: C.dim, background: 'none', border: `1px solid ${C.border}`, borderRadius: 6, cursor: 'pointer', padding: '5px 10px', fontFamily: C.body }}>
           Sign out
         </button>
       </header>
@@ -425,41 +538,51 @@ export default function Dashboard() {
           {tab === 'brief' && (
             <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
               {/* Chat header */}
-              <div style={{ padding: '16px 24px', borderBottom: `1px solid ${C.border}`, background: C.bgMid, display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ width: 36, height: 36, borderRadius: '50%', background: dark ? 'rgba(124,58,237,0.15)' : '#ede9fb', display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.violet, fontSize: '1rem', fontWeight: 700 }}>◈</div>
+              <div style={{ padding: '14px 24px', borderBottom: `1px solid ${C.border}`, background: C.bgMid, display: 'flex', alignItems: 'center', gap: 14 }}>
+                <div style={{ width: 38, height: 38, borderRadius: 10, background: `linear-gradient(135deg, ${C.violet}33, ${C.pink}22)`, border: `1px solid ${C.violet}44`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.violet, fontSize: '1.1rem', fontWeight: 700, flexShrink: 0 }}>◈</div>
                 <div>
-                  <div style={{ fontSize: '0.88rem', fontWeight: 600, color: C.fg }}>Orchestrator</div>
-                  <div style={{ fontSize: '0.72rem', color: C.green, display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <span style={{ width: 5, height: 5, borderRadius: '50%', background: C.green, display: 'inline-block' }} />
-                    Online · Marketing Director
+                  <div style={{ fontSize: '0.9rem', fontWeight: 700, color: C.fg, letterSpacing: '-0.01em' }}>Orchestrator</div>
+                  <div style={{ fontSize: '0.7rem', color: C.green, display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <span style={{ width: 5, height: 5, borderRadius: '50%', background: C.green, display: 'inline-block', boxShadow: `0 0 4px ${C.green}` }} />
+                    Online · Marketing Director · 8 agents ready
                   </div>
                 </div>
-                <div style={{ marginLeft: 'auto', fontSize: '0.75rem', color: C.dim }}>
-                  Describe what you need — the Orchestrator will decide which agents to brief and why.
+                <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+                  {(['instagram','tiktok','linkedin'] as Platform[]).map(p => (
+                    <div key={p} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '3px 9px', borderRadius: 20, background: dark ? 'rgba(255,255,255,0.04)' : '#f4f3f9', border: `1px solid ${C.border}` }}>
+                      <span style={{ color: p === 'instagram' ? C.pink : p === 'tiktok' ? C.cyan : C.teal, fontSize: '0.65rem' }}>{PLATFORM_ICON[p]}</span>
+                      <span style={{ fontSize: '0.63rem', color: C.dim, textTransform: 'capitalize' }}>{p}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
               {/* Messages */}
               <div style={{ flex: 1, overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: 16 }}>
                 {messages.length === 0 && (
-                  <div style={{ margin: 'auto', textAlign: 'center', maxWidth: 480 }}>
-                    <div style={{ fontSize: '2.5rem', marginBottom: 12, opacity: 0.2 }}>◈</div>
-                    <div style={{ fontSize: '1rem', fontWeight: 600, color: C.sub, marginBottom: 8 }}>Brief the Orchestrator</div>
-                    <div style={{ fontSize: '0.82rem', color: C.dim, lineHeight: 1.8, marginBottom: 24 }}>
-                      Tell the team what to create. The Orchestrator will read your brief, decide which agents to activate, and explain its routing decisions before generating content.
+                  <div style={{ margin: 'auto', textAlign: 'center', maxWidth: 520 }}>
+                    <div style={{ width: 64, height: 64, borderRadius: 16, background: `linear-gradient(135deg, ${C.violet}22, ${C.pink}11)`, border: `1px solid ${C.violet}33`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: '1.8rem' }}>◈</div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 700, color: C.fg, marginBottom: 8, letterSpacing: '-0.01em' }}>Brief the Marketing Team</div>
+                    <div style={{ fontSize: '0.82rem', color: C.dim, lineHeight: 1.8, marginBottom: 28, maxWidth: 400, margin: '0 auto 28px' }}>
+                      Describe what you need. The Orchestrator reads your brief, routes to the right agents, and content appears in your queue — fully scored and ready to review.
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
                       {[
-                        'Create a TikTok video about shadow work trends',
-                        'Write a LinkedIn post on animal archetype psychology',
-                        'Generate an Instagram carousel on the 7 spirit animals',
+                        { text: 'Create a TikTok video about shadow work trends',     icon: '▶', platform: 'TikTok' },
+                        { text: 'Write a LinkedIn post on animal archetype psychology', icon: '◻', platform: 'LinkedIn' },
+                        { text: 'Generate an Instagram carousel on the 7 spirit animals', icon: '◎', platform: 'Instagram' },
+                        { text: 'Create content on collective shadow and society',       icon: '◈', platform: 'All' },
                       ].map(s => (
-                        <button key={s} onClick={() => setChatInput(s)}
-                          style={{ padding: '10px 16px', background: dark ? 'rgba(255,255,255,0.04)' : '#fff', border: `1px solid ${C.border}`, borderRadius: 8, color: C.sub, fontFamily: C.body, fontSize: '0.8rem', cursor: 'pointer', textAlign: 'left', boxShadow: dark ? 'none' : C.shadow }}>
-                          {s}
+                        <button key={s.text} onClick={() => setChatInput(s.text)}
+                          style={{ padding: '12px 14px', background: dark ? 'rgba(255,255,255,0.03)' : '#fff', border: `1px solid ${C.border}`, borderRadius: 10, color: C.sub, fontFamily: C.body, fontSize: '0.78rem', cursor: 'pointer', textAlign: 'left', lineHeight: 1.5, transition: 'all .15s', display: 'flex', flexDirection: 'column', gap: 6 }}
+                          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = C.violet; (e.currentTarget as HTMLElement).style.background = dark ? 'rgba(124,58,237,0.06)' : '#f5f3ff'; }}
+                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = C.border; (e.currentTarget as HTMLElement).style.background = dark ? 'rgba(255,255,255,0.03)' : '#fff'; }}>
+                          <span style={{ fontSize: '0.62rem', color: C.violet, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{s.icon} {s.platform}</span>
+                          {s.text}
                         </button>
                       ))}
                     </div>
+                    <div style={{ fontSize: '0.68rem', color: C.dim }}>Or attach a reference image below to generate content around it</div>
                   </div>
                 )}
                 {messages.map((msg, i) => (
@@ -468,6 +591,9 @@ export default function Dashboard() {
                       {msg.role === 'user' ? 'Y' : '◈'}
                     </div>
                     <div style={{ maxWidth: '72%', display: 'flex', flexDirection: 'column', gap: 6, alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
+                      {msg.imageUrl && (
+                        <img src={msg.imageUrl} alt="attached" style={{ maxWidth: 220, maxHeight: 160, borderRadius: 10, objectFit: 'cover', border: `1px solid ${C.border}` }} />
+                      )}
                       <div style={{ padding: '12px 16px', borderRadius: msg.role === 'user' ? '16px 4px 16px 16px' : '4px 16px 16px 16px', background: msg.role === 'user' ? C.violet : (dark ? 'rgba(255,255,255,0.05)' : '#ffffff'), color: msg.role === 'user' ? '#fff' : C.fg, fontSize: '0.85rem', lineHeight: 1.7, boxShadow: dark ? 'none' : C.shadow, border: msg.role === 'user' ? 'none' : `1px solid ${C.border}` }}>
                         {msg.content}
                       </div>
@@ -496,30 +622,91 @@ export default function Dashboard() {
                 <div ref={chatEndRef} />
               </div>
 
-              {/* Input */}
-              <div style={{ padding: '16px 24px', borderTop: `1px solid ${C.border}`, background: C.bgMid }}>
-                <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end' }}>
+              {/* ── Input area ─────────────────────────────────────────────── */}
+              <div style={{ borderTop: `1px solid ${C.border}`, background: C.bgMid }}>
+
+                {/* ── Row 1: Platform selector + Visual style ── */}
+                <div style={{ padding: '12px 24px 0', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                   <select value={chatPlatform} onChange={e => setChatPlatform(e.target.value as Platform)}
-                    style={{ padding: '10px 12px', background: dark ? 'rgba(255,255,255,0.04)' : '#f8f8fb', border: `1px solid ${C.border}`, borderRadius: 8, color: C.sub, fontFamily: C.body, fontSize: '0.78rem', outline: 'none', flexShrink: 0 }}>
-                    <option value="all">All platforms</option>
-                    <option value="instagram">Instagram</option>
-                    <option value="tiktok">TikTok</option>
-                    <option value="linkedin">LinkedIn</option>
+                    style={{ padding: '6px 10px', background: dark ? 'rgba(255,255,255,0.05)' : '#f4f3f9', border: `1px solid ${C.border}`, borderRadius: 7, color: C.sub, fontFamily: C.body, fontSize: '0.75rem', outline: 'none', cursor: 'pointer', marginRight: 4 }}>
+                    <option value="all">◈ All platforms</option>
+                    <option value="instagram">◎ Instagram</option>
+                    <option value="tiktok">▶ TikTok</option>
+                    <option value="linkedin">◻ LinkedIn</option>
                   </select>
+                  <div style={{ fontSize: '0.62rem', color: C.dim, marginRight: 4, whiteSpace: 'nowrap' }}>Visual style:</div>
+                  {VISUAL_STYLES.map(s => (
+                    <button key={s.id} onClick={() => setVisualStyle(s.id as VisualStyleId)} title={s.desc}
+                      style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '5px 10px', background: visualStyle === s.id ? (dark ? 'rgba(124,58,237,0.18)' : '#ede9fb') : (dark ? 'rgba(255,255,255,0.04)' : '#f4f3f9'), border: `1px solid ${visualStyle === s.id ? C.violet : C.border}`, borderRadius: 20, color: visualStyle === s.id ? C.violet : C.dim, fontFamily: C.body, fontSize: '0.7rem', fontWeight: visualStyle === s.id ? 600 : 400, cursor: 'pointer', transition: 'all .15s', whiteSpace: 'nowrap' }}>
+                      <span style={{ fontSize: '0.75rem' }}>{s.emoji}</span>
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* ── Row 2: Image upload zone (shown collapsed, expands on hover/when attached) ── */}
+                <div style={{ padding: '10px 24px 0' }}>
+                  <input ref={imageInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageAttach} />
+
+                  {!attachedImage ? (
+                    /* Drop zone */
+                    <div
+                      onClick={() => imageInputRef.current?.click()}
+                      onDragOver={e => { e.preventDefault(); setIsDraggingOver(true); }}
+                      onDragLeave={() => setIsDraggingOver(false)}
+                      onDrop={handleDrop}
+                      style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: isDraggingOver ? (dark ? 'rgba(124,58,237,0.12)' : '#ede9fb') : (dark ? 'rgba(255,255,255,0.025)' : '#f8f7ff'), border: `1.5px dashed ${isDraggingOver ? C.violet : C.border}`, borderRadius: 10, cursor: 'pointer', transition: 'all .15s' }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={isDraggingOver ? C.violet : C.dim} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                      </svg>
+                      <div style={{ flex: 1 }}>
+                        <span style={{ fontSize: '0.76rem', fontWeight: 500, color: isDraggingOver ? C.violet : C.sub }}>
+                          {isDraggingOver ? 'Drop image here' : 'Attach a reference image'}
+                        </span>
+                        <span style={{ fontSize: '0.68rem', color: C.dim, marginLeft: 6 }}>
+                          {isDraggingOver ? '' : '— drag & drop or click to browse · max 8 MB'}
+                        </span>
+                      </div>
+                      <span style={{ fontSize: '0.65rem', color: C.dim, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)', padding: '2px 7px', borderRadius: 5 }}>Browse</span>
+                    </div>
+                  ) : (
+                    /* Attached image preview */
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 14px', background: dark ? 'rgba(124,58,237,0.08)' : '#ede9fb', borderRadius: 10, border: `1px solid ${C.violet}44` }}>
+                      <img src={attachedImage.preview} alt="preview" style={{ width: 44, height: 44, borderRadius: 7, objectFit: 'cover', flexShrink: 0, border: `1px solid ${C.violet}44` }} />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: '0.75rem', fontWeight: 600, color: C.violet }}>
+                          {imageUploading ? 'Uploading…' : '✓ Reference image attached'}
+                        </div>
+                        <div style={{ fontSize: '0.65rem', color: C.dim, marginTop: 1 }}>
+                          Visual Director + all platform agents will analyse this
+                        </div>
+                      </div>
+                      {!imageUploading && (
+                        <button onClick={() => setAttachedImage(null)}
+                          style={{ background: 'none', border: `1px solid ${C.border}`, borderRadius: 6, color: C.dim, cursor: 'pointer', fontSize: '0.68rem', padding: '4px 9px', fontFamily: C.body }}>✕ Remove</button>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* ── Row 3: Textarea + brief button ── */}
+                <div style={{ padding: '10px 24px 16px', display: 'flex', gap: 10, alignItems: 'flex-end' }}>
                   <textarea
                     value={chatInput}
                     onChange={e => setChatInput(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); } }}
-                    placeholder='Describe what you want the team to create… (Enter to send, Shift+Enter for new line)'
+                    placeholder={attachedImage ? 'Describe how to use this image, or leave blank to let agents decide the angle…' : 'Brief the team — what to create, the angle, any specific details…'}
                     rows={2}
-                    style={{ flex: 1, padding: '10px 14px', background: dark ? 'rgba(255,255,255,0.04)' : '#f8f8fb', border: `1px solid ${C.border}`, borderRadius: 8, color: C.fg, fontFamily: C.body, fontSize: '0.88rem', outline: 'none', resize: 'none', lineHeight: 1.5 }}
+                    style={{ flex: 1, padding: '10px 14px', background: dark ? 'rgba(255,255,255,0.04)' : '#f8f8fb', border: `1px solid ${C.border}`, borderRadius: 10, color: C.fg, fontFamily: C.body, fontSize: '0.88rem', outline: 'none', resize: 'none', lineHeight: 1.6 }}
                   />
-                  <button onClick={sendChat} disabled={chatLoading || !chatInput.trim()}
-                    style={{ padding: '10px 20px', background: chatInput.trim() ? C.violet : (dark ? 'rgba(255,255,255,0.04)' : '#f0f0f5'), border: 'none', borderRadius: 8, color: chatInput.trim() ? '#fff' : C.dim, fontFamily: C.body, fontSize: '0.82rem', fontWeight: 500, cursor: chatInput.trim() ? 'pointer' : 'default', flexShrink: 0, transition: 'all .15s' }}>
-                    {chatLoading ? '…' : 'Send →'}
-                  </button>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-end', flexShrink: 0 }}>
+                    <button onClick={sendChat} disabled={chatLoading || (!chatInput.trim() && !attachedImage) || imageUploading}
+                      style={{ padding: '10px 22px', background: (chatInput.trim() || attachedImage) && !imageUploading ? C.violet : (dark ? 'rgba(255,255,255,0.04)' : '#f0f0f5'), border: 'none', borderRadius: 9, color: (chatInput.trim() || attachedImage) && !imageUploading ? '#fff' : C.dim, fontFamily: C.body, fontSize: '0.84rem', fontWeight: 600, cursor: (chatInput.trim() || attachedImage) && !imageUploading ? 'pointer' : 'default', transition: 'all .15s' }}>
+                      {chatLoading ? '…' : 'Brief →'}
+                    </button>
+                    <span style={{ fontSize: '0.6rem', color: C.dim }}>⏎ to send</span>
+                  </div>
                 </div>
-                <div style={{ fontSize: '0.68rem', color: C.dim, marginTop: 8 }}>The Orchestrator will explain which agents are being activated and why.</div>
               </div>
             </div>
           )}
@@ -541,7 +728,8 @@ export default function Dashboard() {
 
           {/* ── CALENDAR TAB ── */}
           {tab === 'calendar' && (
-            <CalendarView records={records} f={f} scheduledDates={scheduledDates} onLoad={loadRecords} platform={platform} C={C} />
+            <CalendarView records={records} f={f} onLoad={loadRecords} platform={platform} C={C} dark={dark}
+              onScheduleRecord={r => { setSchedModal({ record: r }); setSchedDate(''); }} />
           )}
         </main>
       </div>
@@ -560,22 +748,83 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Schedule modal */}
-      {schedModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200 }} onClick={() => setSchedModal(null)}>
-          <div style={{ width: 400, background: C.bgMid, border: `1px solid ${C.borderMid}`, borderRadius: 16, padding: 28, boxShadow: '0 8px 40px rgba(0,0,0,0.15)' }} onClick={e => e.stopPropagation()}>
-            <div style={{ fontSize: '1.1rem', fontWeight: 600, color: C.fg, marginBottom: 4 }}>Schedule Post</div>
-            <div style={{ fontSize: '0.78rem', color: C.dim, marginBottom: 20 }}>Will be sent to Blotato and posted automatically at the selected time.</div>
-            <div style={{ fontSize: '0.72rem', fontWeight: 500, color: C.sub, marginBottom: 6 }}>Date & Time</div>
-            <input type="datetime-local" value={schedDate} onChange={e => setSchedDate(e.target.value)}
-              style={{ width: '100%', padding: '10px 12px', background: dark ? 'rgba(255,255,255,0.04)' : '#f8f8fb', border: `1px solid ${C.border}`, borderRadius: 8, color: C.fg, fontFamily: C.body, fontSize: '0.88rem', outline: 'none', marginBottom: 18, boxSizing: 'border-box' }} />
-            <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={() => setSchedModal(null)} style={{ flex: 1, padding: '10px', background: 'none', border: `1px solid ${C.border}`, borderRadius: 8, color: C.dim, fontFamily: C.body, fontSize: '0.82rem', cursor: 'pointer' }}>Cancel</button>
-              <button onClick={schedulePost} disabled={!schedDate} style={{ flex: 2, padding: '10px', background: C.teal, border: 'none', borderRadius: 8, color: '#fff', fontFamily: C.body, fontSize: '0.82rem', fontWeight: 500, cursor: 'pointer' }}>Schedule via Blotato →</button>
+      {/* Schedule modal — smart with algorithm-recommended times */}
+      {schedModal && (() => {
+        const recPlat = (schedModal.record.fields['Platform'] as string ?? 'instagram').toLowerCase() as 'instagram' | 'tiktok' | 'linkedin';
+        const recHook = (schedModal.record.fields['Hook'] as string ?? schedModal.record.fields['Caption'] as string ?? '').slice(0, 90);
+        const slots = OPTIMAL_TIMES[recPlat] ?? OPTIMAL_TIMES.instagram;
+        const platColor = recPlat === 'instagram' ? C.pink : recPlat === 'tiktok' ? C.cyan : C.teal;
+        return (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, backdropFilter: 'blur(4px)' }} onClick={() => setSchedModal(null)}>
+            <div style={{ width: 520, background: C.bgMid, border: `1px solid ${C.borderMid}`, borderRadius: 18, padding: 28, boxShadow: '0 20px 60px rgba(0,0,0,0.3)', maxHeight: '90vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
+
+              {/* Header */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                    <span style={{ fontSize: '0.65rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: platColor, background: `${platColor}18`, padding: '3px 9px', borderRadius: 20 }}>
+                      {PLATFORM_ICON[recPlat]} {recPlat}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '1.1rem', fontWeight: 700, color: C.fg, letterSpacing: '-0.01em' }}>Schedule Post</div>
+                </div>
+                <button onClick={() => setSchedModal(null)} style={{ background: 'none', border: `1px solid ${C.border}`, borderRadius: 8, color: C.dim, cursor: 'pointer', padding: '6px 10px', fontFamily: C.body, fontSize: '0.78rem' }}>✕ Close</button>
+              </div>
+
+              {/* Content preview */}
+              {recHook && (
+                <div style={{ padding: '12px 14px', background: dark ? 'rgba(255,255,255,0.03)' : '#f8f7ff', border: `1px solid ${C.border}`, borderRadius: 10, marginBottom: 20 }}>
+                  <div style={{ fontSize: '0.62rem', fontWeight: 600, color: C.dim, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 5 }}>Hook</div>
+                  <div style={{ fontSize: '0.85rem', color: C.sub, lineHeight: 1.5, fontStyle: 'italic' }}>"{recHook}{recHook.length >= 90 ? '…' : ''}"</div>
+                </div>
+              )}
+
+              {/* AI-Recommended Times */}
+              <div style={{ marginBottom: 20 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                  <span style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: C.violet }}>◉ AI-Recommended Times</span>
+                </div>
+                <div style={{ fontSize: '0.72rem', color: C.dim, marginBottom: 12 }}>
+                  Based on {recPlat === 'instagram' ? 'DM-share windows & Explore algorithm' : recPlat === 'tiktok' ? 'completion rate peaks & FYP distribution' : 'dwell-time signals & 360Brew AI patterns'}
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                  {slots.map((slot, i) => {
+                    const val = nextOccurrence(slot.day, slot.hour, slot.minute);
+                    const selected = schedDate === val;
+                    return (
+                      <button key={i} onClick={() => setSchedDate(val)}
+                        style={{ padding: '12px 14px', background: selected ? `${C.violet}18` : dark ? 'rgba(255,255,255,0.03)' : '#f8f8fb', border: `1px solid ${selected ? C.violet : C.border}`, borderRadius: 10, cursor: 'pointer', textAlign: 'left', transition: 'all .15s', fontFamily: C.body }}>
+                        <div style={{ fontSize: '0.82rem', fontWeight: 700, color: selected ? C.violet : C.fg, marginBottom: 4 }}>{slot.label}</div>
+                        <div style={{ fontSize: '0.68rem', color: C.dim, lineHeight: 1.4 }}>{slot.reason}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Divider */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+                <div style={{ flex: 1, height: 1, background: C.border }} />
+                <span style={{ fontSize: '0.65rem', color: C.dim, textTransform: 'uppercase', letterSpacing: '0.1em' }}>or pick a custom time</span>
+                <div style={{ flex: 1, height: 1, background: C.border }} />
+              </div>
+
+              {/* Custom datetime */}
+              <input type="datetime-local" value={schedDate} onChange={e => setSchedDate(e.target.value)}
+                style={{ width: '100%', padding: '10px 12px', background: dark ? 'rgba(255,255,255,0.04)' : '#f8f8fb', border: `1px solid ${C.border}`, borderRadius: 8, color: C.fg, fontFamily: C.body, fontSize: '0.85rem', outline: 'none', marginBottom: 18, boxSizing: 'border-box' }} />
+
+              {/* Actions */}
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button onClick={() => setSchedModal(null)} style={{ flex: 1, padding: '11px', background: 'none', border: `1px solid ${C.border}`, borderRadius: 9, color: C.dim, fontFamily: C.body, fontSize: '0.82rem', cursor: 'pointer' }}>Cancel</button>
+                <button onClick={schedulePost} disabled={!schedDate}
+                  style={{ flex: 2, padding: '11px', background: schedDate ? C.teal : (dark ? 'rgba(255,255,255,0.04)' : '#f0f0f5'), border: 'none', borderRadius: 9, color: schedDate ? '#fff' : C.dim, fontFamily: C.body, fontSize: '0.83rem', fontWeight: 600, cursor: schedDate ? 'pointer' : 'default', transition: 'all .15s' }}>
+                  {schedDate ? `Schedule via Blotato →` : 'Select a time above'}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Toast */}
       {toast && (
@@ -738,38 +987,105 @@ function DetailPanel({ r, f, score, scoreColor, C, STATUS_COLOR, PLATFORM_COLOR,
 // ─────────────────────────────────────────────────────────────────────────────
 // CALENDAR VIEW
 // ─────────────────────────────────────────────────────────────────────────────
-function CalendarView({ records, f, scheduledDates, onLoad, platform, C }: {
-  records: AirtableRecord[]; f: any; scheduledDates: Set<string>; onLoad: () => void; platform: Platform; C: typeof LIGHT;
+function CalendarView({ records, f, onLoad, platform, C, dark, onScheduleRecord }: {
+  records: AirtableRecord[]; f: any; onLoad: () => void; platform: Platform; C: typeof LIGHT; dark: boolean;
+  onScheduleRecord: (r: AirtableRecord) => void;
 }) {
+  const [offset, setOffset] = React.useState(0);
   const now   = new Date();
-  const year  = now.getFullYear();
-  const month = now.getMonth();
+  const base  = new Date(now.getFullYear(), now.getMonth() + offset, 1);
+  const year  = base.getFullYear();
+  const month = base.getMonth();
   const first = new Date(year, month, 1).getDay();
   const days  = new Date(year, month + 1, 0).getDate();
   const names = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  const monthName = now.toLocaleString('default', { month: 'long', year: 'numeric' });
+  const monthName = base.toLocaleString('default', { month: 'long', year: 'numeric' });
+  const pad = (n: number) => String(n).padStart(2, '0');
+
+  // Build map: date string → records scheduled that day
+  const dayMap: Record<string, AirtableRecord[]> = {};
+  records.filter(r => f(r, 'Scheduled At')).forEach(r => {
+    const d = (f(r, 'Scheduled At') as string).slice(0, 10);
+    if (!dayMap[d]) dayMap[d] = [];
+    dayMap[d].push(r);
+  });
+
+  const PLAT_COLOR: Record<string, string> = { instagram: C.pink, tiktok: C.cyan, linkedin: C.teal };
+
+  // Optimal times to show on calendar as "suggested" markers
+  const suggestedDays = [2, 4, 5]; // Tue, Thu, Fri — strong for all platforms
 
   return (
     <div>
+      {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-        <div style={{ fontSize: '1.1rem', fontWeight: 600, color: C.fg }}>{monthName}</div>
-        <button onClick={onLoad} style={{ padding: '6px 14px', background: 'none', border: `1px solid ${C.border}`, borderRadius: 6, color: C.sub, fontFamily: C.body, fontSize: '0.78rem', cursor: 'pointer' }}>↺ Refresh</button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <button onClick={() => setOffset(o => o - 1)} style={{ padding: '6px 10px', background: 'none', border: `1px solid ${C.border}`, borderRadius: 7, color: C.sub, fontFamily: C.body, cursor: 'pointer', fontSize: '0.82rem' }}>‹</button>
+          <div style={{ fontSize: '1.1rem', fontWeight: 700, color: C.fg, minWidth: 180, textAlign: 'center' }}>{monthName}</div>
+          <button onClick={() => setOffset(o => o + 1)} style={{ padding: '6px 10px', background: 'none', border: `1px solid ${C.border}`, borderRadius: 7, color: C.sub, fontFamily: C.body, cursor: 'pointer', fontSize: '0.82rem' }}>›</button>
+          {offset !== 0 && <button onClick={() => setOffset(0)} style={{ padding: '5px 10px', background: 'none', border: `1px solid ${C.border}`, borderRadius: 7, color: C.violet, fontFamily: C.body, cursor: 'pointer', fontSize: '0.72rem' }}>Today</button>}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {/* Legend */}
+          {Object.entries(PLAT_COLOR).map(([p, col]) => (
+            <div key={p} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <div style={{ width: 7, height: 7, borderRadius: 2, background: col }} />
+              <span style={{ fontSize: '0.62rem', color: C.dim, textTransform: 'capitalize' }}>{p}</span>
+            </div>
+          ))}
+          <div style={{ width: 1, height: 12, background: C.border }} />
+          <button onClick={onLoad} style={{ padding: '6px 12px', background: 'none', border: `1px solid ${C.border}`, borderRadius: 7, color: C.sub, fontFamily: C.body, fontSize: '0.72rem', cursor: 'pointer' }}>↺ Refresh</button>
+        </div>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 1 }}>
-        {names.map(n => <div key={n} style={{ padding: '8px', textAlign: 'center', fontSize: '0.68rem', fontWeight: 600, color: C.dim, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{n}</div>)}
+
+      {/* Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4 }}>
+        {names.map(n => (
+          <div key={n} style={{ padding: '6px 8px', textAlign: 'center', fontSize: '0.62rem', fontWeight: 600, color: C.dim, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{n}</div>
+        ))}
         {Array.from({ length: first }).map((_, i) => <div key={`e${i}`} />)}
         {Array.from({ length: days }).map((_, i) => {
           const d = i + 1;
-          const key = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-          const hasPost = scheduledDates.has(key);
-          const isToday = d === now.getDate();
+          const key = `${year}-${pad(month + 1)}-${pad(d)}`;
+          const dayRecords = dayMap[key] ?? [];
+          const isToday = d === now.getDate() && offset === 0;
+          const dayOfWeek = new Date(year, month, d).getDay();
+          const isSuggestedDay = suggestedDays.includes(dayOfWeek);
+          const isPast = new Date(year, month, d) < new Date(now.getFullYear(), now.getMonth(), now.getDate());
           return (
-            <div key={d} style={{ padding: '10px 8px', minHeight: 64, background: C.bgCard, border: `1px solid ${C.border}`, borderRadius: 6, position: 'relative', boxShadow: C.shadow }}>
-              <div style={{ fontSize: '0.75rem', fontWeight: isToday ? 700 : 400, color: isToday ? C.violet : C.sub, width: 22, height: 22, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: isToday ? `${C.violet}18` : 'transparent' }}>{d}</div>
-              {hasPost && <div style={{ marginTop: 4, width: 6, height: 6, borderRadius: '50%', background: C.violet }} />}
+            <div key={d} style={{ padding: '8px', minHeight: 72, background: isToday ? (dark ? `${C.violet}18` : '#f5f3ff') : C.bgCard, border: `1px solid ${isToday ? C.violet+'44' : C.border}`, borderRadius: 8, position: 'relative', opacity: isPast ? 0.55 : 1, transition: 'all .15s' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                <div style={{ fontSize: '0.72rem', fontWeight: isToday ? 700 : 400, color: isToday ? C.violet : C.sub, width: 20, height: 20, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: isToday ? `${C.violet}22` : 'transparent' }}>{d}</div>
+                {isSuggestedDay && !isPast && dayRecords.length === 0 && (
+                  <div title="AI-recommended posting day" style={{ fontSize: '0.55rem', color: C.violet, opacity: 0.5 }}>◉</div>
+                )}
+              </div>
+              {/* Scheduled content dots */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {dayRecords.slice(0, 3).map(r => {
+                  const p = (f(r, 'Platform') as string ?? '').toLowerCase();
+                  const col = PLAT_COLOR[p] ?? C.violet;
+                  return (
+                    <div key={r.id} onClick={() => onScheduleRecord(r)}
+                      style={{ fontSize: '0.58rem', padding: '2px 5px', borderRadius: 3, background: `${col}22`, color: col, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'pointer', border: `1px solid ${col}33` }}>
+                      {PLATFORM_ICON[p]} {f(r, 'Hook') ? (f(r, 'Hook') as string).slice(0, 18) + '…' : p}
+                    </div>
+                  );
+                })}
+                {dayRecords.length > 3 && <div style={{ fontSize: '0.58rem', color: C.dim }}>+{dayRecords.length - 3} more</div>}
+              </div>
             </div>
           );
         })}
+      </div>
+
+      {/* Algorithm posting cadence tip */}
+      <div style={{ marginTop: 16, padding: '12px 16px', background: dark ? 'rgba(124,58,237,0.06)' : '#f5f3ff', border: `1px solid ${C.violet}22`, borderRadius: 10, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+        <span style={{ color: C.violet, fontSize: '0.8rem', flexShrink: 0, marginTop: 1 }}>◉</span>
+        <div style={{ fontSize: '0.72rem', color: C.dim, lineHeight: 1.6 }}>
+          <span style={{ color: C.sub, fontWeight: 600 }}>Optimal cadence: </span>
+          Instagram 3-5×/week (Tue/Wed/Fri) · TikTok 1-4×/day (Tue 9am, Thu 12pm) · LinkedIn 3-5×/week (Tue/Wed/Thu 8am). Days marked with <span style={{ color: C.violet }}>◉</span> are high-engagement windows.
+        </div>
       </div>
     </div>
   );

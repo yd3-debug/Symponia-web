@@ -37,7 +37,7 @@ function resolveAgents(platform: string): string[] {
 }
 
 // Human-readable message from the Orchestrator
-function orchestratorMessage(platform: string, command: string, topic: string): string {
+function orchestratorMessage(platform: string, command: string, topic: string, hasImage: boolean, visualStyle?: string): string {
   const plat = platform === 'all' ? 'all platforms' : platform.charAt(0).toUpperCase() + platform.slice(1);
   const subject = topic || command || 'the requested topic';
   const agents = resolveAgents(platform);
@@ -47,11 +47,15 @@ function orchestratorMessage(platform: string, command: string, topic: string): 
     .map(a => a.charAt(0).toUpperCase() + a.slice(1))
     .join(', ');
 
+  const styleNote = visualStyle && visualStyle !== 'none'
+    ? ` Visual Director will apply the "${visualStyle.replace(/-/g, ' ')}" aesthetic.`
+    : '';
+
   return [
     `Briefing the team for ${plat}.`,
-    `Trend Researcher is scanning for live signals around "${subject}".`,
+    hasImage ? `Visual Director is analysing the reference image for brand alignment and content direction.` : `Trend Researcher is scanning for live signals around "${subject}".`,
     `Routing to: ${agentList || plat} Specialist${agents.length > 1 ? 's' : ''}.`,
-    `Copywriter and Visual Director will refine the output before it reaches your queue.`,
+    `Copywriter and Visual Director will refine the output before it reaches your queue.${styleNote}`,
     `Manager will score everything — minimum 6.0/10 to approve. Content will appear in your queue shortly.`,
   ].join(' ');
 }
@@ -61,9 +65,11 @@ export async function POST(req: NextRequest) {
   if (!checkAuth(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const body = await req.json();
-  const command  = (body.command  ?? '').trim();
-  const platform = (body.platform ?? 'all').trim();
-  const type     = (body.type     ?? 'auto').trim();
+  const command     = (body.command     ?? '').trim();
+  const platform    = (body.platform    ?? 'all').trim();
+  const type        = (body.type        ?? 'auto').trim();
+  const imageUrl    = (body.imageUrl    ?? '').trim();
+  const visualStyle = (body.visualStyle ?? '').trim();
 
   // Extract topic from command if not provided explicitly
   const topic = (body.topic ?? command).trim();
@@ -72,16 +78,19 @@ export async function POST(req: NextRequest) {
 
   if (N8N_WEBHOOK_URL) {
     // Fire n8n — non-blocking so dashboard doesn't wait for the full pipeline
+    const payload: Record<string, string> = { platform, type, topic, command };
+    if (imageUrl)    payload.imageUrl    = imageUrl;
+    if (visualStyle) payload.visualStyle = visualStyle;
     fetch(N8N_WEBHOOK_URL, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ platform, type, topic, command }),
+      body:    JSON.stringify(payload),
     }).catch(() => {});
 
     return NextResponse.json({
       ok:      true,
       method:  'n8n',
-      message: orchestratorMessage(platform, command, topic),
+      message: orchestratorMessage(platform, command, topic, !!imageUrl, visualStyle),
       agents,
     });
   }

@@ -369,9 +369,9 @@ export default function Dashboard() {
     } catch { setLoginErr('Login failed — please try again'); }
   };
 
-  const loadRecords = useCallback(async () => {
+  const loadRecords = useCallback(async (silent = false) => {
     if (!authed) return;
-    setLoading(true);
+    if (!silent) setLoading(true);
     try {
       const p = new URLSearchParams();
       if (status !== 'all') p.set('status', status);
@@ -380,8 +380,8 @@ export default function Dashboard() {
       setRecords(data.records ?? []);
     } catch (err: any) {
       if (err.message === 'UNAUTHORIZED') setAuthed(false);
-      else showToast('Failed to load records', 'error');
-    } finally { setLoading(false); }
+      else if (!silent) showToast('Failed to load records', 'error');
+    } finally { if (!silent) setLoading(false); }
   }, [authed, status, platform, showToast, token]);
 
   const loadCounts = useCallback(async () => {
@@ -396,7 +396,7 @@ export default function Dashboard() {
   }, [authed, token]);
 
   useEffect(() => { if (authed) { loadRecords(); loadCounts(); } }, [authed, status, platform, loadRecords, loadCounts]);
-  useEffect(() => { if (!authed) return; const t = setInterval(() => { loadRecords(); loadCounts(); }, 60000); return () => clearInterval(t); }, [authed, loadRecords, loadCounts]);
+  useEffect(() => { if (!authed) return; const t = setInterval(() => { loadRecords(true); loadCounts(); }, 60000); return () => clearInterval(t); }, [authed, loadRecords, loadCounts]);
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
 
   const updateStatus = async (id: string, newStatus: string) => {
@@ -451,11 +451,11 @@ export default function Dashboard() {
       const agentsRouted: string[] = res.agents ?? [];
       setMessages(m => [...m, { role: 'assistant', content: reply, agents: agentsRouted, ts: Date.now() }]);
       setPipelineStarted(Date.now());
-      // Poll for new content — n8n pipeline takes 30-90s; 15s × 12 polls = 3 min
+      // Poll for new content silently — n8n pipeline takes 30-90s; 15s × 12 polls = 3 min
       let polls = 0;
       const poll = setInterval(() => {
         polls++;
-        loadRecords(); loadCounts();
+        loadRecords(true); loadCounts();
         if (polls >= 12) { clearInterval(poll); setPipelineStarted(null); }
       }, 15000);
     } catch {

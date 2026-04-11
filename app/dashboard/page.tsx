@@ -212,10 +212,18 @@ const F = {
 
 type Tab      = 'queue' | 'brief' | 'research' | 'models' | 'agents' | 'calendar';
 
+interface ResearchIdea {
+  title: string;
+  hook: string;
+  format: string;
+  pillar: string;
+  whyItWorks: string;
+}
 interface ResearchResult {
   ok: boolean;
   platform: string;
   topic: string;
+  command?: string;
   trendingAngle: string;
   timingWindow: string;
   hashtags: string;
@@ -223,13 +231,17 @@ interface ResearchResult {
   topSubreddits: string[];
   avgVelocity: number;
   rankedPostCount: number;
+  searchQuery?: string;
+  summary?: string;
+  bestFormat?: string;
+  ideas?: ResearchIdea[];
   algoTopSignals: string;
   algoFormatWinner: string;
   algoHashtagRule: string;
   algoHookTiming: string;
   algoPeakTimes: string;
   algoAvoid: string;
-  algoSeoNote: string;
+  algoSeoNote?: string;
 }
 type Status   = 'review' | 'approved' | 'scheduled' | 'posted' | 'draft' | 'generating' | 'rejected' | 'all';
 type Platform = 'all' | 'instagram' | 'tiktok' | 'linkedin';
@@ -1069,7 +1081,7 @@ export default function Dashboard() {
                   value={researchTopic}
                   onChange={e => setResearchTopic(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter') runResearch(); }}
-                  placeholder="e.g. shadow work, spirit animals, collective unconscious…"
+                  placeholder="e.g. wolf archetype and leadership, daily presence practices, shadow animal reveal…"
                   style={{ flex: 1, minWidth: 260, padding: '11px 16px', background: dark ? 'rgba(255,255,255,0.05)' : '#ffffff', border: `1px solid ${researchLoading ? C.violet : C.borderMid}`, borderRadius: 10, color: C.fg, fontFamily: C.body, fontSize: '0.9rem', outline: 'none', transition: 'border-color .15s' }}
                 />
                 <select value={researchPlatform} onChange={e => setResearchPlatform(e.target.value as Platform)}
@@ -1081,7 +1093,7 @@ export default function Dashboard() {
                 </select>
                 <button onClick={runResearch} disabled={!researchTopic.trim() || researchLoading}
                   style={{ padding: '11px 24px', background: researchTopic.trim() && !researchLoading ? C.violet : (dark ? 'rgba(255,255,255,0.04)' : '#f0f0f5'), border: 'none', borderRadius: 10, color: researchTopic.trim() && !researchLoading ? '#fff' : C.dim, fontFamily: C.body, fontSize: '0.86rem', fontWeight: 600, cursor: researchTopic.trim() && !researchLoading ? 'pointer' : 'default', transition: 'all .15s', whiteSpace: 'nowrap' }}>
-                  {researchLoading ? 'Researching…' : '◉ Run Research'}
+                  {researchLoading ? 'Agents researching…' : '◉ Get Ideas'}
                 </button>
               </div>
 
@@ -1195,6 +1207,53 @@ export default function Dashboard() {
                         )}
                       </div>
                     </div>
+
+                    {/* AI Content Ideas — main output */}
+                    {r.ideas && r.ideas.length > 0 && (
+                      <div>
+                        <div style={{ fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.violet, marginBottom: 12 }}>
+                          ✦ Content Ideas Based on Your Research
+                        </div>
+                        {r.summary && (
+                          <div style={{ padding: '14px 18px', background: dark ? 'rgba(255,255,255,0.04)' : '#f7f5ff', border: `1px solid ${C.border}`, borderRadius: 10, fontSize: '0.83rem', color: C.sub, lineHeight: 1.6, marginBottom: 12 }}>
+                            {r.summary}
+                            {r.bestFormat && <span style={{ display: 'block', marginTop: 6, color: C.violet, fontWeight: 500 }}>Best format: {r.bestFormat}</span>}
+                          </div>
+                        )}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                          {r.ideas.map((idea, i) => (
+                            <div key={i} style={{ padding: '18px 20px', background: C.bgCard, border: `1px solid ${C.border}`, borderRadius: 12, position: 'relative' }}>
+                              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, marginBottom: 8 }}>
+                                <div style={{ flex: 1 }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                                    <span style={{ fontSize: '0.62rem', fontWeight: 700, padding: '2px 8px', borderRadius: 8, background: dark ? `${C.violet}20` : '#ede9fb', color: C.violet }}>
+                                      {idea.format || 'post'}
+                                    </span>
+                                    {idea.pillar && (
+                                      <span style={{ fontSize: '0.62rem', color: C.dim }}>{idea.pillar}</span>
+                                    )}
+                                  </div>
+                                  <div style={{ fontSize: '0.92rem', fontWeight: 700, color: C.fg, marginBottom: 6 }}>{idea.title}</div>
+                                  <div style={{ fontSize: '0.83rem', color: C.sub, fontStyle: 'italic', lineHeight: 1.5, marginBottom: 8 }}>"{idea.hook}"</div>
+                                  {idea.whyItWorks && (
+                                    <div style={{ fontSize: '0.75rem', color: C.dim, lineHeight: 1.5 }}>↗ {idea.whyItWorks}</div>
+                                  )}
+                                </div>
+                                <button
+                                  onClick={() => {
+                                    setChatInput(`Create a ${idea.format || 'post'} about: ${idea.title}. Hook: "${idea.hook}". Use hashtags: ${r.hashtags}.`);
+                                    setChatPlatform((['instagram','tiktok','linkedin'].includes(r.platform) ? r.platform : 'all') as Platform);
+                                    setTab('brief');
+                                  }}
+                                  style={{ flexShrink: 0, padding: '7px 14px', background: C.violet, border: 'none', borderRadius: 8, color: '#fff', fontFamily: C.body, fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                                  Use this →
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
                     {/* Hashtags + peak times row */}
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>

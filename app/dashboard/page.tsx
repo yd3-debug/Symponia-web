@@ -228,9 +228,12 @@ interface ResearchResult {
   timingWindow: string;
   hashtags: string;
   topRedditTitles: string[];
+  topNewsTitles?: string[];
+  topHNTitles?: string[];
   topSubreddits: string[];
   avgVelocity: number;
   rankedPostCount: number;
+  totalSources?: number;
   searchQuery?: string;
   summary?: string;
   bestFormat?: string;
@@ -1174,35 +1177,71 @@ export default function Dashboard() {
                         ))}
                       </div>
 
-                      {/* Reddit findings */}
+                      {/* Multi-source intelligence */}
                       <div style={{ padding: '18px 20px', background: C.bgCard, border: `1px solid ${C.border}`, borderRadius: 12 }}>
-                        <div style={{ fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.orange, marginBottom: 12 }}>Reddit Intelligence</div>
-                        {r.topRedditTitles?.length > 0 ? (
-                          <>
-                            <div style={{ fontSize: '0.62rem', fontWeight: 600, color: C.dim, marginBottom: 8 }}>Top Posts</div>
-                            {r.topRedditTitles.slice(0, 5).map((title, i) => (
-                              <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 8, alignItems: 'flex-start' }}>
-                                <span style={{ fontSize: '0.68rem', color: C.orange, fontWeight: 700, flexShrink: 0, marginTop: 2 }}>{i + 1}</span>
-                                <span style={{ fontSize: '0.78rem', color: C.sub, lineHeight: 1.5 }}>{title}</span>
-                              </div>
-                            ))}
-                          </>
-                        ) : (
-                          <div style={{ fontSize: '0.78rem', color: C.dim, fontStyle: 'italic' }}>No Reddit data returned — try a broader topic or check the research webhook.</div>
-                        )}
-                        {r.topSubreddits?.length > 0 && (
-                          <div style={{ marginTop: 10 }}>
-                            <div style={{ fontSize: '0.62rem', fontWeight: 600, color: C.dim, marginBottom: 6 }}>Active Subreddits</div>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
-                              {r.topSubreddits.slice(0, 6).map(sub => (
-                                <span key={sub} style={{ fontSize: '0.68rem', padding: '3px 9px', borderRadius: 10, background: dark ? 'rgba(251,146,60,0.12)' : '#fff3e0', color: C.orange, fontWeight: 500 }}>r/{sub}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                          <div style={{ fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.orange }}>Live Research</div>
+                          {r.totalSources != null && (
+                            <span style={{ fontSize: '0.62rem', color: C.dim, background: dark ? 'rgba(255,255,255,0.06)' : '#f0f0f5', padding: '2px 8px', borderRadius: 8 }}>
+                              {r.totalSources} results scraped
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Reddit */}
+                        {r.topRedditTitles?.length > 0 && (
+                          <div style={{ marginBottom: 14 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                              <span style={{ fontSize: '0.62rem', fontWeight: 700, color: C.orange, background: dark ? 'rgba(251,146,60,0.12)' : '#fff3e0', padding: '2px 7px', borderRadius: 6 }}>Reddit</span>
+                              {r.topSubreddits?.slice(0,3).map(sub => (
+                                <span key={sub} style={{ fontSize: '0.6rem', color: C.dim }}>r/{sub}</span>
                               ))}
                             </div>
+                            {r.topRedditTitles.slice(0, 4).map((title, i) => (
+                              <div key={i} style={{ display: 'flex', gap: 7, marginBottom: 6, alignItems: 'flex-start' }}>
+                                <span style={{ fontSize: '0.65rem', color: C.orange, fontWeight: 700, flexShrink: 0, marginTop: 2 }}>{i + 1}</span>
+                                <span style={{ fontSize: '0.77rem', color: C.sub, lineHeight: 1.45 }}>{title}</span>
+                              </div>
+                            ))}
                           </div>
                         )}
+
+                        {/* Internet / News */}
+                        {r.topNewsTitles?.length > 0 && (
+                          <div style={{ marginBottom: 14 }}>
+                            <div style={{ marginBottom: 6 }}>
+                              <span style={{ fontSize: '0.62rem', fontWeight: 700, color: C.teal, background: dark ? 'rgba(45,212,191,0.1)' : '#e6faf8', padding: '2px 7px', borderRadius: 6 }}>Internet / News</span>
+                            </div>
+                            {r.topNewsTitles.slice(0, 4).map((title, i) => (
+                              <div key={i} style={{ display: 'flex', gap: 7, marginBottom: 6, alignItems: 'flex-start' }}>
+                                <span style={{ fontSize: '0.65rem', color: C.teal, fontWeight: 700, flexShrink: 0, marginTop: 2 }}>{i + 1}</span>
+                                <span style={{ fontSize: '0.77rem', color: C.sub, lineHeight: 1.45 }}>{title}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Hacker News */}
+                        {r.topHNTitles?.length > 0 && (
+                          <div>
+                            <div style={{ marginBottom: 6 }}>
+                              <span style={{ fontSize: '0.62rem', fontWeight: 700, color: C.dim, background: dark ? 'rgba(255,255,255,0.06)' : '#f0f0f5', padding: '2px 7px', borderRadius: 6 }}>Hacker News</span>
+                            </div>
+                            {r.topHNTitles.map((title, i) => (
+                              <div key={i} style={{ display: 'flex', gap: 7, marginBottom: 6, alignItems: 'flex-start' }}>
+                                <span style={{ fontSize: '0.65rem', color: C.dim, flexShrink: 0, marginTop: 2 }}>·</span>
+                                <span style={{ fontSize: '0.77rem', color: C.sub, lineHeight: 1.45 }}>{title}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {!r.topRedditTitles?.length && !r.topNewsTitles?.length && (
+                          <div style={{ fontSize: '0.78rem', color: C.dim, fontStyle: 'italic' }}>No live results found — agents will use evergreen angle.</div>
+                        )}
                         {r.avgVelocity > 0 && (
-                          <div style={{ marginTop: 10, fontSize: '0.72rem', color: C.dim }}>
-                            Avg velocity: <strong style={{ color: C.fg }}>{r.avgVelocity}</strong> · Posts scanned: <strong style={{ color: C.fg }}>{r.rankedPostCount}</strong>
+                          <div style={{ marginTop: 8, fontSize: '0.7rem', color: C.dim, borderTop: `1px solid ${C.border}`, paddingTop: 8 }}>
+                            Reddit velocity: <strong style={{ color: C.fg }}>{r.avgVelocity}</strong> upvotes/hr avg
                           </div>
                         )}
                       </div>

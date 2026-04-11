@@ -396,7 +396,7 @@ export default function Dashboard() {
   }, [authed, token]);
 
   useEffect(() => { if (authed) { loadRecords(); loadCounts(); } }, [authed, status, platform, loadRecords, loadCounts]);
-  useEffect(() => { if (!authed) return; const t = setInterval(() => { loadRecords(); loadCounts(); }, 30000); return () => clearInterval(t); }, [authed, loadRecords, loadCounts]);
+  useEffect(() => { if (!authed) return; const t = setInterval(() => { loadRecords(); loadCounts(); }, 60000); return () => clearInterval(t); }, [authed, loadRecords, loadCounts]);
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
 
   const updateStatus = async (id: string, newStatus: string) => {
@@ -451,13 +451,13 @@ export default function Dashboard() {
       const agentsRouted: string[] = res.agents ?? [];
       setMessages(m => [...m, { role: 'assistant', content: reply, agents: agentsRouted, ts: Date.now() }]);
       setPipelineStarted(Date.now());
-      // Poll for new content — n8n pipeline takes 30-90s
+      // Poll for new content — n8n pipeline takes 30-90s; 15s × 12 polls = 3 min
       let polls = 0;
       const poll = setInterval(() => {
         polls++;
         loadRecords(); loadCounts();
-        if (polls >= 18) { clearInterval(poll); setPipelineStarted(null); }
-      }, 10000);
+        if (polls >= 12) { clearInterval(poll); setPipelineStarted(null); }
+      }, 15000);
     } catch {
       setMessages(m => [...m, { role: 'assistant', content: 'Failed to reach the agent team. Please try again.', ts: Date.now() }]);
     } finally { setChatLoading(false); }

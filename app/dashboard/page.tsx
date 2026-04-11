@@ -1381,44 +1381,73 @@ export default function Dashboard() {
 
               {/* AI-Recommended Times */}
               <div style={{ marginBottom: 20 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-                  <span style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: C.violet }}>◉ AI-Recommended Times</span>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <span style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: C.violet }}>◉ Pick a time</span>
+                  <span style={{ fontSize: '0.65rem', color: C.dim }}>
+                    {recPlat === 'instagram' ? 'DM-share windows · Explore algorithm' : recPlat === 'tiktok' ? 'FYP peak times' : 'LinkedIn dwell signals'}
+                  </span>
                 </div>
-                <div style={{ fontSize: '0.72rem', color: C.dim, marginBottom: 12 }}>
-                  Based on {recPlat === 'instagram' ? 'DM-share windows & Explore algorithm' : recPlat === 'tiktok' ? 'completion rate peaks & FYP distribution' : 'dwell-time signals & 360Brew AI patterns'}
+                <div style={{ fontSize: '0.72rem', color: C.violet, marginBottom: 10, opacity: 0.7 }}>
+                  Tap a slot below to select it
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                   {slots.map((slot, i) => {
                     const val = nextOccurrence(slot.day, slot.hour, slot.minute);
                     const selected = schedDate === val;
                     return (
-                      <button key={i} onClick={() => setSchedDate(val)}
-                        style={{ padding: '12px 14px', background: selected ? `${C.violet}18` : dark ? 'rgba(255,255,255,0.03)' : '#f8f8fb', border: `1px solid ${selected ? C.violet : C.border}`, borderRadius: 10, cursor: 'pointer', textAlign: 'left', transition: 'all .15s', fontFamily: C.body }}>
-                        <div style={{ fontSize: '0.82rem', fontWeight: 700, color: selected ? C.violet : C.fg, marginBottom: 4 }}>{slot.label}</div>
-                        <div style={{ fontSize: '0.68rem', color: C.dim, lineHeight: 1.4 }}>{slot.reason}</div>
+                      <button key={i} onClick={() => setSchedDate(selected ? '' : val)}
+                        style={{
+                          padding: '14px 16px',
+                          background: selected
+                            ? `linear-gradient(135deg, ${C.violet}22, ${C.pink}11)`
+                            : dark ? 'rgba(255,255,255,0.03)' : '#f8f8fb',
+                          border: `2px solid ${selected ? C.violet : C.border}`,
+                          borderRadius: 12, cursor: 'pointer', textAlign: 'left',
+                          transition: 'all .15s', fontFamily: C.body,
+                          boxShadow: selected ? `0 0 0 3px ${C.violet}22` : 'none',
+                          position: 'relative', overflow: 'hidden',
+                        }}>
+                        {selected && (
+                          <div style={{ position: 'absolute', top: 8, right: 10, width: 18, height: 18, borderRadius: '50%', background: C.violet, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <span style={{ fontSize: '0.55rem', color: '#fff', fontWeight: 700 }}>✓</span>
+                          </div>
+                        )}
+                        <div style={{ fontSize: '0.88rem', fontWeight: 700, color: selected ? C.violet : C.fg, marginBottom: 4 }}>{slot.label}</div>
+                        <div style={{ fontSize: '0.67rem', color: selected ? C.sub : C.dim, lineHeight: 1.4 }}>{slot.reason}</div>
                       </button>
                     );
                   })}
                 </div>
               </div>
 
+              {/* Selected time confirmation */}
+              {schedDate && (
+                <div style={{ padding: '10px 14px', background: `${C.violet}10`, border: `1px solid ${C.violet}33`, borderRadius: 10, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{ fontSize: '0.75rem', color: C.violet, fontWeight: 700 }}>✓ Selected:</span>
+                  <span style={{ fontSize: '0.78rem', color: C.sub, flex: 1 }}>
+                    {new Date(schedDate).toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                  <button onClick={() => setSchedDate('')} style={{ background: 'none', border: 'none', color: C.dim, cursor: 'pointer', fontSize: '0.72rem', padding: '2px 6px', fontFamily: C.body }}>✕ Clear</button>
+                </div>
+              )}
+
               {/* Divider */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
                 <div style={{ flex: 1, height: 1, background: C.border }} />
-                <span style={{ fontSize: '0.65rem', color: C.dim, textTransform: 'uppercase', letterSpacing: '0.1em' }}>or pick a custom time</span>
+                <span style={{ fontSize: '0.62rem', color: C.dim, textTransform: 'uppercase', letterSpacing: '0.1em' }}>or pick a custom time</span>
                 <div style={{ flex: 1, height: 1, background: C.border }} />
               </div>
 
               {/* Custom datetime */}
               <input type="datetime-local" value={schedDate} onChange={e => setSchedDate(e.target.value)}
-                style={{ width: '100%', padding: '10px 12px', background: dark ? 'rgba(255,255,255,0.04)' : '#f8f8fb', border: `1px solid ${C.border}`, borderRadius: 8, color: C.fg, fontFamily: C.body, fontSize: '0.85rem', outline: 'none', marginBottom: 18, boxSizing: 'border-box' }} />
+                style={{ width: '100%', padding: '10px 12px', background: dark ? 'rgba(255,255,255,0.04)' : '#f8f8fb', border: `1px solid ${C.border}`, borderRadius: 8, color: C.fg, fontFamily: C.body, fontSize: '0.85rem', outline: 'none', marginBottom: 16, boxSizing: 'border-box' }} />
 
               {/* Actions */}
               <div style={{ display: 'flex', gap: 10 }}>
                 <button onClick={() => setSchedModal(null)} style={{ flex: 1, padding: '11px', background: 'none', border: `1px solid ${C.border}`, borderRadius: 9, color: C.dim, fontFamily: C.body, fontSize: '0.82rem', cursor: 'pointer' }}>Cancel</button>
                 <button onClick={schedulePost} disabled={!schedDate}
                   style={{ flex: 2, padding: '11px', background: schedDate ? C.teal : (dark ? 'rgba(255,255,255,0.04)' : '#f0f0f5'), border: 'none', borderRadius: 9, color: schedDate ? '#fff' : C.dim, fontFamily: C.body, fontSize: '0.83rem', fontWeight: 600, cursor: schedDate ? 'pointer' : 'default', transition: 'all .15s' }}>
-                  {schedDate ? `Schedule via Blotato →` : 'Select a time above'}
+                  {schedDate ? 'Schedule via Blotato →' : 'Select a time above ↑'}
                 </button>
               </div>
             </div>

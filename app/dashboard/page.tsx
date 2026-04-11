@@ -517,158 +517,269 @@ export default function Dashboard() {
     );
   }
 
+  // ── Sidebar always-dark colors (marketing SaaS standard) ─────────────────
+  const S = {
+    bg:     '#0a0818',
+    bgHov:  'rgba(255,255,255,0.04)',
+    bgAct:  'rgba(167,139,250,0.12)',
+    fg:     '#eae6f8',
+    sub:    '#b8b0d8',
+    dim:    '#6b6090',
+    border: 'rgba(255,255,255,0.07)',
+  };
+
+  const NAV_ITEMS: { key: Tab; label: string; icon: string }[] = [
+    { key: 'queue',    label: 'Content Queue',  icon: '▦' },
+    { key: 'brief',    label: 'Brief Team',     icon: '◈' },
+    { key: 'research', label: 'Research',        icon: '◉' },
+    { key: 'models',   label: 'Visual Models',   icon: '◆' },
+    { key: 'agents',   label: 'Agent Team',      icon: '◻' },
+    { key: 'calendar', label: 'Calendar',        icon: '▣' },
+  ];
+
+  const currentNavItem = NAV_ITEMS.find(n => n.key === tab);
+
   // ── MAIN ──────────────────────────────────────────────────────────────────
   return (
-    <div style={{ minHeight: '100vh', background: C.bg, display: 'flex', flexDirection: 'column', fontFamily: C.body, color: C.fg }}>
+    <div style={{ minHeight: '100vh', background: C.bg, display: 'flex', fontFamily: C.body, color: C.fg }}>
 
-      {/* ── Global generating progress bar ── */}
+      <style>{`
+        @keyframes slide    { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+        @keyframes shimmer  { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+        @keyframes spin     { to { transform: rotate(360deg); } }
+        @keyframes pulse    { 0%,100%{opacity:1} 50%{opacity:0.3} }
+        @keyframes genpulse { 0%,100%{box-shadow:0 0 0 0 rgba(167,139,250,0.4)} 50%{box-shadow:0 0 0 6px rgba(167,139,250,0)} }
+        * { box-sizing: border-box; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+      `}</style>
+
+      {/* ── Global generating shimmer bar (top) ── */}
       {isGenerating && (
-        <>
-          {/* Top shimmer bar */}
-          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, height: 3, zIndex: 999, overflow: 'hidden', background: dark ? 'rgba(124,58,237,0.2)' : 'rgba(124,58,237,0.1)' }}>
-            <div style={{ height: '100%', background: `linear-gradient(90deg, transparent, ${C.violet}, ${C.pink}, ${C.cyan}, transparent)`, backgroundSize: '200% 100%', animation: 'slide 1.8s ease-in-out infinite' }} />
-          </div>
-          {/* Floating pill bottom-right */}
-          <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 500, display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 18px', background: dark ? 'rgba(13,11,34,0.95)' : 'rgba(255,255,255,0.97)', border: `1px solid ${C.violet}44`, borderRadius: 14, boxShadow: `0 8px 32px rgba(0,0,0,0.2), 0 0 0 1px ${C.violet}22`, backdropFilter: 'blur(12px)' }}>
-              <div style={{ width: 28, height: 28, borderRadius: 8, background: `linear-gradient(135deg, ${C.violet}33, ${C.pink}22)`, border: `1px solid ${C.violet}44`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', flexShrink: 0 }}>◈</div>
-              <div>
-                <div style={{ fontSize: '0.8rem', fontWeight: 700, color: C.fg, marginBottom: 2 }}>Agents working…</div>
-                <div style={{ fontSize: '0.68rem', color: C.dim }}>Content appears in queue when ready</div>
-              </div>
-              <button onClick={() => { setTab('queue'); setStatus('all'); }} style={{ marginLeft: 4, padding: '5px 12px', background: C.violet, border: 'none', borderRadius: 7, color: '#fff', fontFamily: C.body, fontSize: '0.7rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>Watch queue →</button>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, height: 2, zIndex: 9999, overflow: 'hidden', background: 'rgba(124,58,237,0.15)' }}>
+          <div style={{ height: '100%', background: `linear-gradient(90deg, transparent, ${C.violet}, ${C.pink}, ${C.cyan}, transparent)`, backgroundSize: '200% 100%', animation: 'slide 1.8s ease-in-out infinite' }} />
+        </div>
+      )}
+
+      {/* ── LEFT SIDEBAR (always visible, always dark) ─────────────────────── */}
+      <aside style={{
+        width: 240, flexShrink: 0, background: S.bg,
+        borderRight: `1px solid ${S.border}`,
+        position: 'fixed', top: 0, left: 0, bottom: 0,
+        display: 'flex', flexDirection: 'column',
+        zIndex: 200, overflowY: 'auto',
+      }}>
+        {/* Accent line top */}
+        <div style={{ height: 2, background: `linear-gradient(90deg, #7c3aed, #db2777, #0ea5a0)`, flexShrink: 0 }} />
+
+        {/* Logo */}
+        <div style={{ padding: '20px 18px 16px', flexShrink: 0 }}>
+          <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 32, height: 32, borderRadius: 9, background: 'linear-gradient(135deg, #7c3aed, #db2777)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 12px rgba(124,58,237,0.4)', flexShrink: 0 }}>
+              <span style={{ fontSize: '1rem', color: '#fff', lineHeight: 1 }}>◈</span>
             </div>
-            {/* Mini progress steps */}
+            <div>
+              <div style={{ fontSize: '0.95rem', fontWeight: 700, color: S.fg, lineHeight: 1.1 }}>Symponia</div>
+              <div style={{ fontSize: '0.58rem', color: S.dim, letterSpacing: '0.18em', textTransform: 'uppercase', lineHeight: 1.2 }}>Marketing OS</div>
+            </div>
+          </a>
+        </div>
+
+        {/* ── Navigation ── */}
+        <div style={{ padding: '4px 0 8px', flexShrink: 0 }}>
+          <div style={{ padding: '0 18px 6px', fontSize: '0.58rem', fontWeight: 700, color: S.dim, letterSpacing: '0.16em', textTransform: 'uppercase' }}>Workspace</div>
+          {NAV_ITEMS.map(item => {
+            const isActive = tab === item.key;
+            const badge = item.key === 'queue' ? ((counts['review'] ?? 0) + (counts['approved'] ?? 0)) : 0;
+            return (
+              <button key={item.key} onClick={() => setTab(item.key)}
+                style={{ width: '100%', padding: '9px 18px', background: isActive ? S.bgAct : 'none', border: 'none', borderLeft: `2px solid ${isActive ? '#a78bfa' : 'transparent'}`, color: isActive ? '#a78bfa' : S.sub, fontFamily: C.body, fontSize: '0.82rem', fontWeight: isActive ? 600 : 400, textAlign: 'left', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, transition: 'all .15s' }}
+                onMouseEnter={e => { if (!isActive) { (e.currentTarget as HTMLElement).style.background = S.bgHov; (e.currentTarget as HTMLElement).style.color = S.fg; } }}
+                onMouseLeave={e => { if (!isActive) { (e.currentTarget as HTMLElement).style.background = 'none'; (e.currentTarget as HTMLElement).style.color = S.sub; } }}>
+                <span style={{ fontSize: '0.8rem', width: 16, textAlign: 'center', flexShrink: 0, opacity: isActive ? 1 : 0.7 }}>{item.icon}</span>
+                <span style={{ flex: 1 }}>{item.label}</span>
+                {badge > 0 && (
+                  <span style={{ fontSize: '0.65rem', fontWeight: 700, background: '#7c3aed', color: '#fff', borderRadius: 10, padding: '1px 7px', flexShrink: 0 }}>{badge}</span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* ── Pipeline filters (shown always, clicking goes to queue) ── */}
+        <div style={{ padding: '4px 0 8px', borderTop: `1px solid ${S.border}`, flexShrink: 0 }}>
+          <div style={{ padding: '10px 18px 6px', fontSize: '0.58rem', fontWeight: 700, color: S.dim, letterSpacing: '0.16em', textTransform: 'uppercase' }}>Pipeline</div>
+          {([
+            { key: 'generating' as Status, label: 'Generating', dotColor: '#5ce8d0' },
+            { key: 'review'     as Status, label: 'For Review',  dotColor: '#fb923c' },
+            { key: 'approved'   as Status, label: 'Approved',    dotColor: '#4ade80' },
+            { key: 'scheduled'  as Status, label: 'Scheduled',   dotColor: '#5b8df0' },
+            { key: 'posted'     as Status, label: 'Posted',      dotColor: '#a78bfa' },
+            { key: 'rejected'   as Status, label: 'Rejected',    dotColor: '#f87171' },
+          ]).map(({ key, label, dotColor }) => {
+            const count = counts[key] ?? 0;
+            const isActive = tab === 'queue' && status === key;
+            if (count === 0 && key !== 'review' && key !== 'approved') return null;
+            return (
+              <button key={key} onClick={() => { setTab('queue'); setStatus(key); }}
+                style={{ width: '100%', padding: '7px 18px', background: isActive ? S.bgAct : 'none', border: 'none', borderLeft: `2px solid ${isActive ? '#a78bfa' : 'transparent'}`, color: isActive ? '#a78bfa' : S.sub, fontFamily: C.body, fontSize: '0.78rem', fontWeight: isActive ? 600 : 400, textAlign: 'left', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, transition: 'all .15s' }}
+                onMouseEnter={e => { if (!isActive) { (e.currentTarget as HTMLElement).style.background = S.bgHov; } }}
+                onMouseLeave={e => { if (!isActive) { (e.currentTarget as HTMLElement).style.background = 'none'; } }}>
+                <div style={{ width: 6, height: 6, borderRadius: '50%', background: dotColor, flexShrink: 0, boxShadow: key === 'generating' && count > 0 ? `0 0 5px ${dotColor}` : 'none', animation: key === 'generating' && count > 0 ? 'pulse 1.2s ease infinite' : 'none' }} />
+                <span style={{ flex: 1 }}>{label}</span>
+                {count > 0 && <span style={{ fontSize: '0.65rem', fontWeight: 700, color: dotColor, background: `${dotColor}18`, borderRadius: 10, padding: '1px 6px', flexShrink: 0 }}>{count}</span>}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* ── Platform filter (shown always, clicking sets platform + goes to queue) ── */}
+        <div style={{ padding: '4px 0 8px', borderTop: `1px solid ${S.border}`, flexShrink: 0 }}>
+          <div style={{ padding: '10px 18px 6px', fontSize: '0.58rem', fontWeight: 700, color: S.dim, letterSpacing: '0.16em', textTransform: 'uppercase' }}>Platform</div>
+          {(['all','instagram','tiktok','linkedin'] as Platform[]).map(p => {
+            const pColor = p === 'instagram' ? '#e879a0' : p === 'tiktok' ? '#5ce8d0' : p === 'linkedin' ? '#5b8df0' : S.dim;
+            const isActive = tab === 'queue' && platform === p;
+            return (
+              <button key={p} onClick={() => { setTab('queue'); setPlatform(p); }}
+                style={{ width: '100%', padding: '7px 18px', background: isActive ? S.bgAct : 'none', border: 'none', borderLeft: `2px solid ${isActive ? '#a78bfa' : 'transparent'}`, color: isActive ? '#a78bfa' : S.sub, fontFamily: C.body, fontSize: '0.78rem', textAlign: 'left', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, transition: 'all .15s' }}
+                onMouseEnter={e => { if (!isActive) { (e.currentTarget as HTMLElement).style.background = S.bgHov; } }}
+                onMouseLeave={e => { if (!isActive) { (e.currentTarget as HTMLElement).style.background = 'none'; } }}>
+                {p !== 'all' && <span style={{ color: pColor, fontSize: '0.75rem', flexShrink: 0, width: 14, textAlign: 'center' }}>{PLATFORM_ICON[p]}</span>}
+                {p === 'all' && <span style={{ fontSize: '0.75rem', flexShrink: 0, width: 14, textAlign: 'center', color: S.dim }}>◈</span>}
+                {p === 'all' ? 'All Platforms' : p.charAt(0).toUpperCase() + p.slice(1)}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* ── Generating status in sidebar ── */}
+        {isGenerating && (
+          <div style={{ margin: '8px 12px', padding: '10px 12px', background: 'rgba(124,58,237,0.12)', border: '1px solid rgba(124,58,237,0.25)', borderRadius: 10, flexShrink: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#a78bfa', animation: 'genpulse 1.5s ease infinite', flexShrink: 0 }} />
+              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#a78bfa' }}>Agents working…</span>
+            </div>
             {pipelineStarted && (() => {
               const elapsed = Math.floor((Date.now() - pipelineStarted) / 1000);
               const steps = [
-                { label: 'Trend Research', done: elapsed > 8 },
+                { label: 'Trend Research',  done: elapsed > 8 },
                 { label: 'Platform Briefs', done: elapsed > 20 },
-                { label: 'Copy + Visuals', done: elapsed > 45 },
-                { label: 'Manager Review', done: elapsed > 65 },
+                { label: 'Copy + Visuals',  done: elapsed > 45 },
+                { label: 'Manager Review',  done: elapsed > 65 },
                 { label: 'Saving to queue', done: elapsed > 80 },
               ];
+              const activeIdx = steps.filter(x=>x.done).length;
               return (
-                <div style={{ padding: '10px 16px', background: dark ? 'rgba(13,11,34,0.95)' : 'rgba(255,255,255,0.97)', border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.12)', backdropFilter: 'blur(12px)', minWidth: 200 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   {steps.map((s, i) => (
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '3px 0' }}>
-                      <div style={{ width: 14, height: 14, borderRadius: '50%', flexShrink: 0, background: s.done ? C.green : (i === steps.filter(x=>x.done).length ? C.violet : 'transparent'), border: s.done ? 'none' : `2px solid ${i === steps.filter(x=>x.done).length ? C.violet : C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        {s.done && <span style={{ fontSize: '0.5rem', color: '#fff' }}>✓</span>}
-                        {!s.done && i === steps.filter(x=>x.done).length && <div style={{ width: 4, height: 4, borderRadius: '50%', background: C.violet, animation: 'pulse 1s ease infinite' }} />}
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <div style={{ width: 12, height: 12, borderRadius: '50%', flexShrink: 0, background: s.done ? '#4ade80' : (i === activeIdx ? '#a78bfa' : 'transparent'), border: s.done ? 'none' : `1.5px solid ${i === activeIdx ? '#a78bfa' : 'rgba(255,255,255,0.15)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {s.done && <span style={{ fontSize: '0.45rem', color: '#fff' }}>✓</span>}
                       </div>
-                      <span style={{ fontSize: '0.7rem', color: s.done ? C.sub : i === steps.filter(x=>x.done).length ? C.violet : C.dim, fontWeight: i === steps.filter(x=>x.done).length ? 600 : 400 }}>{s.label}</span>
+                      <span style={{ fontSize: '0.66rem', color: s.done ? '#6b6090' : i === activeIdx ? '#a78bfa' : '#6b6090', fontWeight: i === activeIdx ? 600 : 400, textDecoration: s.done ? 'line-through' : 'none', textDecorationColor: '#6b6090' }}>{s.label}</span>
                     </div>
                   ))}
                 </div>
               );
             })()}
+            <button onClick={() => { setTab('queue'); setStatus('all'); }}
+              style={{ marginTop: 8, width: '100%', padding: '5px', background: 'rgba(124,58,237,0.2)', border: '1px solid rgba(124,58,237,0.35)', borderRadius: 6, color: '#a78bfa', fontFamily: C.body, fontSize: '0.68rem', fontWeight: 600, cursor: 'pointer' }}>
+              Watch queue →
+            </button>
           </div>
-          <style>{`
-            @keyframes slide { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-            @keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
-          `}</style>
-        </>
-      )}
-
-      {/* Top bar */}
-      <header style={{ height: 56, background: C.bgMid, borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', padding: '0 20px', gap: 0, flexShrink: 0, position: 'relative' }}>
-        {/* Subtle violet gradient line at top */}
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, ${C.violet}, ${C.pink}, ${C.cyan}, transparent)`, opacity: 0.7 }} />
-
-        <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10, marginRight: 36 }}>
-          <div style={{ width: 28, height: 28, borderRadius: 7, background: `linear-gradient(135deg, ${C.violet}, ${C.pink})`, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 2px 8px ${C.violet}40` }}>
-            <span style={{ fontSize: '0.9rem', color: '#fff', lineHeight: 1 }}>◈</span>
-          </div>
-          <div>
-            <div style={{ fontSize: '0.88rem', fontWeight: 700, color: C.fg, lineHeight: 1.1 }}>Symponia</div>
-            <div style={{ fontSize: '0.55rem', color: C.dim, letterSpacing: '0.2em', textTransform: 'uppercase', lineHeight: 1 }}>Marketing OS</div>
-          </div>
-        </a>
-
-        {([
-          { key: 'queue',    label: 'Content Queue',      icon: '▦' },
-          { key: 'brief',    label: 'Brief Orchestrator', icon: '◈' },
-          { key: 'research', label: 'Research',           icon: '◉' },
-          { key: 'models',   label: 'Visual Models',      icon: '◆' },
-          { key: 'agents',   label: 'Agent Team',         icon: '◻' },
-          { key: 'calendar', label: 'Calendar',           icon: '▣' },
-        ] as { key: Tab; label: string; icon: string }[]).map(t => (
-          <button key={t.key} onClick={() => setTab(t.key)} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '0 14px', height: 56, background: 'none', border: 'none', borderBottom: `2px solid ${tab === t.key ? C.violet : 'transparent'}`, color: tab === t.key ? C.violet : C.dim, fontSize: '0.78rem', fontWeight: tab === t.key ? 600 : 400, letterSpacing: '0.02em', cursor: 'pointer', transition: 'all .15s', fontFamily: C.body }}>
-            <span style={{ fontSize: '0.7rem', opacity: 0.7 }}>{t.icon}</span>
-            {t.label}
-          </button>
-        ))}
+        )}
 
         <div style={{ flex: 1 }} />
 
-        {/* Pipeline status pills */}
-        {([
-          { key: 'generating' as Status, label: 'Generating' },
-          { key: 'review' as Status,     label: 'Review' },
-          { key: 'approved' as Status,   label: 'Approved' },
-          { key: 'scheduled' as Status,  label: 'Scheduled' },
-        ]).filter(s => (counts[s.key] ?? 0) > 0 || s.key === 'review' || s.key === 'approved').map(s => (
-          <div key={s.key} onClick={() => { setTab('queue'); setStatus(s.key); }} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px', cursor: 'pointer', borderRadius: 20, background: status === s.key && tab === 'queue' ? `${STATUS_COLOR[s.key]}18` : 'transparent', border: `1px solid ${status === s.key && tab === 'queue' ? STATUS_COLOR[s.key]+'44' : 'transparent'}`, marginRight: 4, transition: 'all .15s' }}>
-            <div style={{ width: 5, height: 5, borderRadius: '50%', background: STATUS_COLOR[s.key], boxShadow: s.key === 'generating' && (counts[s.key] ?? 0) > 0 ? `0 0 5px ${STATUS_COLOR[s.key]}` : 'none', animation: s.key === 'generating' && (counts[s.key] ?? 0) > 0 ? 'pulse 1.2s ease infinite' : 'none' }} />
-            <span style={{ fontSize: '0.7rem', fontWeight: 600, color: STATUS_COLOR[s.key], fontFamily: C.mono }}>{counts[s.key] ?? 0}</span>
-            <span style={{ fontSize: '0.62rem', color: C.dim, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</span>
+        {/* ── Sidebar bottom ── */}
+        <div style={{ borderTop: `1px solid ${S.border}`, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          <button onClick={toggleDark} title={dark ? 'Light mode' : 'Dark mode'}
+            style={{ padding: '6px 10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 6, cursor: 'pointer', fontSize: '0.72rem', color: S.sub, fontFamily: C.body, transition: 'all .15s' }}>
+            {dark ? '☀' : '☾'}
+          </button>
+          <button onClick={() => { loadRecords(); loadCounts(); }}
+            style={{ padding: '6px 10px', background: 'none', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 6, cursor: 'pointer', fontSize: '0.72rem', color: S.dim, fontFamily: C.body, transition: 'all .15s' }}>
+            ↺
+          </button>
+          <button onClick={() => { clearToken(); setAuthed(false); }}
+            style={{ flex: 1, fontSize: '0.72rem', color: S.dim, background: 'none', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 6, cursor: 'pointer', padding: '6px 10px', fontFamily: C.body, textAlign: 'center', transition: 'all .15s' }}>
+            Sign out
+          </button>
+        </div>
+      </aside>
+
+      {/* ── RIGHT SIDE: top bar + main content ─────────────────────────────── */}
+      <div style={{ marginLeft: 240, flex: 1, display: 'flex', flexDirection: 'column', minHeight: '100vh', minWidth: 0 }}>
+
+        {/* ── Slim top bar ── */}
+        <header style={{ height: 52, background: C.bgMid, borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', padding: '0 24px', gap: 0, flexShrink: 0, position: 'sticky', top: 0, zIndex: 100 }}>
+          {/* Breadcrumb */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: '0.72rem', color: C.dim }}>Symponia</span>
+            <span style={{ fontSize: '0.68rem', color: C.dim, opacity: 0.5 }}>›</span>
+            <span style={{ fontSize: '0.82rem', fontWeight: 600, color: C.fg }}>{currentNavItem?.label ?? ''}</span>
           </div>
-        ))}
 
-        <div style={{ width: 1, height: 20, background: C.border, margin: '0 8px' }} />
+          <div style={{ flex: 1 }} />
 
-        <button onClick={toggleDark} title={dark ? 'Light mode' : 'Dark mode'}
-          style={{ padding: '5px 10px', background: 'transparent', border: `1px solid ${C.border}`, borderRadius: 6, cursor: 'pointer', fontSize: '0.72rem', color: C.dim, fontFamily: C.body }}>
-          {dark ? '☀' : '☾'}
-        </button>
+          {/* Quick KPI pills */}
+          {([
+            { key: 'generating' as Status, label: 'Generating', color: '#5ce8d0' },
+            { key: 'review'     as Status, label: 'Review',     color: '#fb923c' },
+            { key: 'approved'   as Status, label: 'Approved',   color: '#4ade80' },
+            { key: 'scheduled'  as Status, label: 'Scheduled',  color: '#5b8df0' },
+          ]).filter(s => (counts[s.key] ?? 0) > 0 || s.key === 'review').map(s => (
+            <div key={s.key} onClick={() => { setTab('queue'); setStatus(s.key); }} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px', cursor: 'pointer', borderRadius: 20, background: status === s.key && tab === 'queue' ? `${s.color}14` : 'transparent', marginRight: 2, transition: 'all .15s' }}>
+              <div style={{ width: 5, height: 5, borderRadius: '50%', background: s.color, boxShadow: s.key === 'generating' && (counts[s.key] ?? 0) > 0 ? `0 0 5px ${s.color}` : 'none', animation: s.key === 'generating' && (counts[s.key] ?? 0) > 0 ? 'pulse 1.2s ease infinite' : 'none' }} />
+              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: s.color, fontFamily: C.mono }}>{counts[s.key] ?? 0}</span>
+              <span style={{ fontSize: '0.62rem', color: C.dim, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{s.label}</span>
+            </div>
+          ))}
+        </header>
 
-        <button onClick={() => { clearToken(); setAuthed(false); }}
-          style={{ marginLeft: 8, fontSize: '0.72rem', color: C.dim, background: 'none', border: `1px solid ${C.border}`, borderRadius: 6, cursor: 'pointer', padding: '5px 10px', fontFamily: C.body }}>
-          Sign out
-        </button>
-      </header>
-
-      {/* Body */}
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-
-        {/* Sidebar — queue only */}
-        {tab === 'queue' && (
-          <aside style={{ width: 192, background: C.bgMid, borderRight: `1px solid ${C.border}`, padding: '16px 0', flexShrink: 0, overflowY: 'auto' }}>
-            <div style={{ padding: '0 14px 10px', fontSize: '0.6rem', fontWeight: 600, color: C.dim, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Pipeline</div>
-            {([
-              { key: 'review'    as Status, label: 'For Review' },
-              { key: 'approved'  as Status, label: 'Approved' },
-              { key: 'scheduled' as Status, label: 'Scheduled' },
-              { key: 'posted'    as Status, label: 'Posted' },
-              { key: 'all'       as Status, label: 'All Content' },
-              { key: 'draft'     as Status, label: 'Draft' },
-              { key: 'rejected'  as Status, label: 'Rejected' },
-            ]).map(({ key, label }) => (
-              <button key={key} onClick={() => setStatus(key)} style={{ width: '100%', padding: '8px 14px', background: status === key ? C.bgActive : 'none', border: 'none', borderLeft: `2px solid ${status === key ? C.violet : 'transparent'}`, color: status === key ? C.violet : C.sub, fontFamily: C.body, fontSize: '0.8rem', fontWeight: status === key ? 600 : 400, textAlign: 'left', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span>{label}</span>
-                {counts[key] ? <span style={{ fontSize: '0.68rem', color: STATUS_COLOR[key] ?? C.dim, background: dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', borderRadius: 10, padding: '1px 6px', fontWeight: 600 }}>{counts[key]}</span> : null}
-              </button>
-            ))}
-
-            <div style={{ padding: '16px 14px 8px', fontSize: '0.6rem', fontWeight: 600, color: C.dim, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Platform</div>
-            {(['all','instagram','tiktok','linkedin'] as Platform[]).map(p => (
-              <button key={p} onClick={() => setPlatform(p)} style={{ width: '100%', padding: '7px 14px', background: platform === p ? C.bgActive : 'none', border: 'none', borderLeft: `2px solid ${platform === p ? (PLATFORM_COLOR[p] ?? C.violet) : 'transparent'}`, color: platform === p ? C.fg : C.sub, fontFamily: C.body, fontSize: '0.8rem', textAlign: 'left', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
-                {p !== 'all' && <span style={{ color: PLATFORM_COLOR[p], fontSize: '0.7rem' }}>{PLATFORM_ICON[p]}</span>}
-                {p === 'all' ? 'All Platforms' : p.charAt(0).toUpperCase() + p.slice(1)}
-              </button>
-            ))}
-
-            <div style={{ padding: '16px 14px 8px', fontSize: '0.6rem', fontWeight: 600, color: C.dim, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Actions</div>
-            <button onClick={() => { loadRecords(); loadCounts(); }} style={{ width: '100%', padding: '7px 14px', background: 'none', border: 'none', color: C.sub, fontFamily: C.body, fontSize: '0.8rem', textAlign: 'left', cursor: 'pointer' }}>↺ Refresh</button>
-          </aside>
-        )}
-
-        {/* Main */}
-        <main style={{ flex: 1, overflowY: 'auto', padding: tab === 'brief' ? 0 : tab === 'research' || tab === 'models' ? '24px 32px' : 24 }}>
+        {/* ── Main content ── */}
+        <main style={{ flex: 1, overflowY: 'auto', padding: tab === 'brief' ? 0 : tab === 'research' || tab === 'models' ? '28px 36px' : '24px' }}>
 
           {/* ── QUEUE TAB ── */}
           {tab === 'queue' && (
             <>
+              {/* KPI stats bar */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
+                {([
+                  { key: 'review'    as Status, label: 'For Review',  icon: '◎', color: '#fb923c', desc: 'Needs decision' },
+                  { key: 'approved'  as Status, label: 'Approved',    icon: '✓', color: '#4ade80', desc: 'Ready to schedule' },
+                  { key: 'scheduled' as Status, label: 'Scheduled',   icon: '▣', color: '#5b8df0', desc: 'Going out soon' },
+                  { key: 'posted'    as Status, label: 'Published',   icon: '◉', color: '#a78bfa', desc: 'Live content' },
+                ]).map(stat => (
+                  <div key={stat.key} onClick={() => setStatus(stat.key)}
+                    style={{ padding: '16px 18px', background: status === stat.key ? `${stat.color}10` : C.bgCard, border: `1px solid ${status === stat.key ? stat.color+'33' : C.border}`, borderRadius: 12, cursor: 'pointer', transition: 'all .15s', position: 'relative', overflow: 'hidden' }}
+                    onMouseEnter={e => { if (status !== stat.key) { (e.currentTarget as HTMLElement).style.borderColor = stat.color+'33'; (e.currentTarget as HTMLElement).style.background = `${stat.color}08`; } }}
+                    onMouseLeave={e => { if (status !== stat.key) { (e.currentTarget as HTMLElement).style.borderColor = C.border; (e.currentTarget as HTMLElement).style.background = C.bgCard; } }}>
+                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, ${stat.color}, transparent)`, opacity: status === stat.key ? 1 : 0.4 }} />
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8 }}>
+                      <span style={{ fontSize: '1.5rem', fontWeight: 800, color: stat.color, fontFamily: C.mono, lineHeight: 1 }}>{counts[stat.key] ?? 0}</span>
+                      <span style={{ fontSize: '0.85rem', color: stat.color, opacity: 0.7 }}>{stat.icon}</span>
+                    </div>
+                    <div style={{ fontSize: '0.78rem', fontWeight: 600, color: C.fg, marginBottom: 2 }}>{stat.label}</div>
+                    <div style={{ fontSize: '0.65rem', color: C.dim }}>{stat.desc}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Filter label */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+                <div style={{ fontSize: '0.78rem', fontWeight: 600, color: C.fg }}>
+                  {status === 'all' ? 'All Content' : status === 'review' ? 'For Review' : status.charAt(0).toUpperCase() + status.slice(1)}
+                  {platform !== 'all' && <span style={{ color: C.dim, fontWeight: 400 }}> · {platform.charAt(0).toUpperCase() + platform.slice(1)}</span>}
+                </div>
+                {records.length > 0 && <span style={{ fontSize: '0.65rem', color: C.dim, background: dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', padding: '2px 8px', borderRadius: 10 }}>{records.length} items</span>}
+                <div style={{ flex: 1 }} />
+                <button onClick={() => { setTab('brief'); }} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 14px', background: C.violet, border: 'none', borderRadius: 8, color: '#fff', fontFamily: C.body, fontSize: '0.76rem', fontWeight: 600, cursor: 'pointer' }}>
+                  + Brief Team
+                </button>
+              </div>
+
               {loading && (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
                   {[1,2,3].map(i => (

@@ -134,101 +134,38 @@ const OPTIMAL_TIMES: Record<string, TimeSlot[]> = {
   ],
 };
 
-// ── Visual AI model library ───────────────────────────────────────────────────
-// Each entry: id = param sent to Kie.ai, sample = representative output image URL
+// ── Visual AI model library — 28 models ──────────────────────────────────────
 const MODEL_LIBRARY = [
   // ── IMAGE MODELS ──
-  {
-    id: 'flux-pro', type: 'image' as const,
-    name: 'FLUX.1 Pro', provider: 'Black Forest Labs',
-    tagline: 'Hyper-realistic · Studio-grade detail',
-    description: 'The gold standard for photorealistic AI imagery. Exceptional at human faces, textures, and dramatic lighting. Best for cinematic visuals and editorial-quality stills.',
-    bestFor: ['Portraits', 'Cinematic stills', 'Dark aesthetic', 'Reels covers'],
-    speed: 'medium' as const, quality: 5,
-    sample: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=480&q=85&fit=crop',
-  },
-  {
-    id: 'flux-dev', type: 'image' as const,
-    name: 'FLUX.1 Dev', provider: 'Black Forest Labs',
-    tagline: 'Fast · Open-weight · Creative freedom',
-    description: 'Open-weight sibling of FLUX Pro — 2× faster with slightly softer rendering. Great for high-volume generation and iterating quickly on creative concepts.',
-    bestFor: ['Quick iterations', 'Concept drafts', 'High volume', 'Abstract'],
-    speed: 'fast' as const, quality: 4,
-    sample: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=480&q=85&fit=crop',
-  },
-  {
-    id: 'seedream-2', type: 'image' as const,
-    name: 'SeaDream 2', provider: 'ByteDance',
-    tagline: 'Dreamlike · Painterly · Cinematic depth',
-    description: 'ByteDance\'s flagship image model. Exceptional at dreamlike, surreal compositions with rich colour depth and painterly quality. Ideal for Symponia\'s mystical aesthetic.',
-    bestFor: ['Mystical scenes', 'Painterly art', 'Surreal concepts', 'Carousels'],
-    speed: 'medium' as const, quality: 5,
-    sample: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=480&q=85&fit=crop',
-  },
-  {
-    id: 'ideogram-v3', type: 'image' as const,
-    name: 'Ideogram v3', provider: 'Ideogram',
-    tagline: 'Text in images · Typography-aware',
-    description: 'Best-in-class for generating images with legible text overlays, logos, and graphic design elements. Use when the visual needs words baked in.',
-    bestFor: ['Quote cards', 'Text overlays', 'Slide graphics', 'Branded visuals'],
-    speed: 'fast' as const, quality: 4,
-    sample: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=480&q=85&fit=crop',
-  },
-  {
-    id: 'recraft-v3', type: 'image' as const,
-    name: 'Recraft v3', provider: 'Recraft',
-    tagline: 'Vector-clean · Brand-consistent · Illustration',
-    description: 'Purpose-built for brand assets and illustration. Produces clean, scalable visuals with consistent style — ideal for carousel slides and infographic-style content.',
-    bestFor: ['Illustration', 'Brand assets', 'Consistent style', 'Carousels'],
-    speed: 'fast' as const, quality: 4,
-    sample: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=480&q=85&fit=crop',
-  },
-  {
-    id: 'sd3', type: 'image' as const,
-    name: 'Stable Diffusion 3', provider: 'Stability AI',
-    tagline: 'Versatile · Creative · Open',
-    description: 'Highly versatile foundation model with strong community fine-tunes. Good all-rounder for artistic and abstract work, especially when using detailed style prompts.',
-    bestFor: ['Artistic', 'Abstract', 'Fine-tuned styles', 'Experimental'],
-    speed: 'fast' as const, quality: 3,
-    sample: 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=480&q=85&fit=crop',
-  },
+  { id: 'flux-pro',        type: 'image' as const, name: 'FLUX.1 Pro',           provider: 'Black Forest Labs', tagline: 'Hyper-realistic · Studio-grade detail',         description: 'The gold standard for photorealistic AI imagery. Exceptional at human faces, textures, and dramatic lighting. Industry default for editorial-quality visuals.', bestFor: ['Portraits','Cinematic stills','Dark aesthetic','Reels covers'], speed: 'medium' as const, quality: 5, sample: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=480&q=85&fit=crop' },
+  { id: 'flux-dev',        type: 'image' as const, name: 'FLUX.1 Dev',            provider: 'Black Forest Labs', tagline: 'Fast · Open-weight · Creative freedom',          description: 'Open-weight sibling of FLUX Pro — 2× faster, slightly softer. Great for high-volume drafting and iterating quickly on creative concepts.', bestFor: ['Quick iterations','Concept drafts','High volume','Abstract'], speed: 'fast' as const, quality: 4, sample: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=480&q=85&fit=crop' },
+  { id: 'flux-schnell',    type: 'image' as const, name: 'FLUX.1 Schnell',        provider: 'Black Forest Labs', tagline: 'Ultra-fast · Instant preview · 4-step gen',       description: 'Distilled 4-step model — generates in under 2 seconds. Perfect for real-time previews and rapid A/B testing before committing to full quality.', bestFor: ['Instant preview','A/B testing','Bulk drafts','Mockups'], speed: 'fast' as const, quality: 3, sample: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=480&q=85&fit=crop' },
+  { id: 'seedream-2',      type: 'image' as const, name: 'SeaDream 2',            provider: 'ByteDance',         tagline: 'Dreamlike · Painterly · Cinematic depth',        description: 'ByteDance flagship. Exceptional dreamlike compositions with rich colour depth and painterly quality. Perfect fit for Symponia\'s mystical dark aesthetic.', bestFor: ['Mystical scenes','Painterly art','Surreal','Carousels'], speed: 'medium' as const, quality: 5, sample: 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=480&q=85&fit=crop' },
+  { id: 'ideogram-v3',     type: 'image' as const, name: 'Ideogram v3',           provider: 'Ideogram',          tagline: 'Text in images · Typography-aware · Design',     description: 'Best-in-class for generating images with legible text overlays and graphic design elements. Use when visuals need words or typographic elements baked in.', bestFor: ['Quote cards','Text overlays','Slide graphics','Branded'], speed: 'fast' as const, quality: 4, sample: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=480&q=85&fit=crop' },
+  { id: 'recraft-v3',      type: 'image' as const, name: 'Recraft v3',            provider: 'Recraft',           tagline: 'Vector-clean · Brand-consistent · Illustration', description: 'Purpose-built for brand assets. Clean, scalable visuals with consistent style — ideal for carousel slide art and infographic-style content.', bestFor: ['Illustration','Brand assets','Consistent style','Carousels'], speed: 'fast' as const, quality: 4, sample: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=480&q=85&fit=crop' },
+  { id: 'midjourney-style',type: 'image' as const, name: 'Midjourney Aesthetic',  provider: 'MJ-style finetune', tagline: 'Artistic · Rich textures · MJ aesthetic',        description: 'Fine-tuned to reproduce Midjourney\'s signature aesthetic — rich textures, dramatic composition, elevated painterly realism. Great for premium editorial looks.', bestFor: ['Artistic editorial','Rich textures','Premium look','Dark themes'], speed: 'medium' as const, quality: 5, sample: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=480&q=85&fit=crop' },
+  { id: 'dalle3',          type: 'image' as const, name: 'DALL-E 3',              provider: 'OpenAI',            tagline: 'Prompt-adherent · Clean · Versatile',            description: 'Follows complex prompts with exceptional accuracy. Best-in-class for conceptual scenes that need to precisely match the brief. Very consistent output quality.', bestFor: ['Conceptual scenes','Precise prompts','Concept art','Clean visuals'], speed: 'fast' as const, quality: 4, sample: 'https://images.unsplash.com/photo-1549692520-acc6669e2f0c?w=480&q=85&fit=crop' },
+  { id: 'imagen3',         type: 'image' as const, name: 'Imagen 3',              provider: 'Google DeepMind',   tagline: 'Photorealistic · Detail-rich · Google-quality',  description: 'Google DeepMind\'s flagship image model. Outstanding photorealism with exceptional fine detail in textures, lighting, and depth. Strong for product and nature shots.', bestFor: ['Photorealism','Fine detail','Nature','Landscape'], speed: 'medium' as const, quality: 5, sample: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=480&q=85&fit=crop' },
+  { id: 'aurora',          type: 'image' as const, name: 'Aurora',                provider: 'xAI',               tagline: 'Grok-native · Cinematic · High contrast',        description: 'xAI\'s image model — dramatic high-contrast aesthetic with a distinctly cinematic feel. Strong at mysterious, dark, and powerful imagery.', bestFor: ['High contrast','Dramatic','Dark themes','Cinematic'], speed: 'fast' as const, quality: 4, sample: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=480&q=85&fit=crop' },
+  { id: 'playground-v3',   type: 'image' as const, name: 'Playground v3',         provider: 'Playground AI',     tagline: 'Design-focused · Aesthetic · UI-grade visuals',  description: 'Designed for design professionals. Exceptional colour harmony, composition awareness, and aesthetic sensitivity. Great for marketing visuals and social content.', bestFor: ['Marketing visuals','Aesthetic','Colour harmony','Social media'], speed: 'fast' as const, quality: 4, sample: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=480&q=85&fit=crop' },
+  { id: 'leonardo-phoenix',type: 'image' as const, name: 'Leonardo Phoenix',       provider: 'Leonardo AI',       tagline: 'Creative · Character-strong · Concept art',      description: 'Leonardo\'s most advanced model. Strong character design, concept art aesthetics, and dynamic compositions. Great for spiritual and mythological themed imagery.', bestFor: ['Character design','Concept art','Mythological','Fantasy'], speed: 'medium' as const, quality: 5, sample: 'https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?w=480&q=85&fit=crop' },
+  { id: 'adobe-firefly3',  type: 'image' as const, name: 'Adobe Firefly 3',       provider: 'Adobe',             tagline: 'Commercially safe · Brand-clean · Stock-grade',  description: 'Trained entirely on licensed content — 100% commercially safe output. Adobe\'s best model for clean, professional brand visuals without IP concerns.', bestFor: ['Brand-safe','Commercial use','Clean aesthetic','Professional'], speed: 'fast' as const, quality: 4, sample: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=480&q=85&fit=crop' },
+  { id: 'sd35',            type: 'image' as const, name: 'Stable Diffusion 3.5',  provider: 'Stability AI',      tagline: 'Versatile · Open · Community fine-tunes',        description: 'Latest Stability AI foundation model. Good all-rounder for artistic and abstract work, especially powerful when using community fine-tunes for specific aesthetics.', bestFor: ['Artistic','Abstract','Fine-tuned','Experimental'], speed: 'fast' as const, quality: 4, sample: 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=480&q=85&fit=crop' },
+  { id: 'juggernaut-xl',   type: 'image' as const, name: 'Juggernaut XL',         provider: 'RunDiffusion',      tagline: 'Photorealistic people · Skin detail · Portrait',  description: 'Fine-tuned SDXL model with exceptional human likeness and skin texture rendering. Go-to when the content features real-looking people or faces.', bestFor: ['Human portraits','Skin texture','Realistic people','Lifestyle'], speed: 'medium' as const, quality: 4, sample: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=480&q=85&fit=crop' },
   // ── VIDEO MODELS ──
-  {
-    id: 'kling-pro', type: 'video' as const,
-    name: 'Kling 1.6 Pro', provider: 'Kuaishou',
-    tagline: 'Cinematic motion · 10s clips · Highest quality',
-    description: 'Top-tier video generation with smooth cinematic camera moves, realistic physics, and consistent subjects. The go-to for Reels and TikTok hero visuals.',
-    bestFor: ['Reels hero clips', 'Cinematic scenes', 'Nature & abstract', 'Brand videos'],
-    speed: 'slow' as const, quality: 5,
-    sample: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=480&q=85&fit=crop',
-  },
-  {
-    id: 'wan-pro', type: 'video' as const,
-    name: 'Wan 2.1 Pro', provider: 'Alibaba',
-    tagline: 'Fast video · Strong motion · Text-to-video',
-    description: 'Alibaba\'s open-source video model — excellent motion quality at faster generation speeds. Great for abstract and concept-driven animations.',
-    bestFor: ['Abstract motion', 'Fast turnaround', 'Concept clips', 'B-roll'],
-    speed: 'medium' as const, quality: 4,
-    sample: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=480&q=85&fit=crop',
-  },
-  {
-    id: 'hailuo', type: 'video' as const,
-    name: 'Hailuo / MiniMax', provider: 'MiniMax',
-    tagline: 'Stylised · Consistent characters · Smooth',
-    description: 'Strong character consistency across frames and a distinctive stylised aesthetic. Well-suited for narrative-driven short clips and Symponia\'s mystical visual language.',
-    bestFor: ['Character scenes', 'Mystical aesthetic', 'Storytelling', 'TikTok'],
-    speed: 'medium' as const, quality: 4,
-    sample: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=480&q=85&fit=crop',
-  },
-  {
-    id: 'veo3', type: 'video' as const,
-    name: 'Veo 3', provider: 'Google DeepMind',
-    tagline: 'Photorealistic video · Audio-native · 4K',
-    description: 'Google\'s state-of-the-art video model with native audio generation. Produces photorealistic clips with natural sound. Ideal when the visual needs to feel completely real.',
-    bestFor: ['Photorealism', 'Native audio', 'Premium output', 'Ads-quality'],
-    speed: 'slow' as const, quality: 5,
-    sample: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=480&q=85&fit=crop',
-  },
+  { id: 'kling-2-master',  type: 'video' as const, name: 'Kling 2.0 Master',      provider: 'Kuaishou',          tagline: 'Best-in-class motion · Cinematic physics',       description: 'Kling\'s most advanced model. Smooth cinematic camera movement, realistic physics simulation, and exceptional subject consistency across 10-second clips.', bestFor: ['Cinematic hero','Camera moves','Physics sim','Brand hero'], speed: 'slow' as const, quality: 5, sample: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=480&q=85&fit=crop' },
+  { id: 'kling-pro',       type: 'video' as const, name: 'Kling 1.6 Pro',         provider: 'Kuaishou',          tagline: 'Cinematic motion · 10s clips · Reliable',        description: 'Proven, reliable video generation with smooth camera moves and strong quality. The go-to for Reels and TikTok hero clips with a cinematic look.', bestFor: ['Reels','TikTok hero','Cinematic scenes','Abstract'], speed: 'slow' as const, quality: 5, sample: 'https://images.unsplash.com/photo-1574169208507-84376144848b?w=480&q=85&fit=crop' },
+  { id: 'wan-pro',         type: 'video' as const, name: 'Wan 2.1 Pro',           provider: 'Alibaba',           tagline: 'Fast video · Strong motion · Open-source',       description: 'Alibaba\'s flagship open-source video model. Excellent motion quality at faster speeds. Strong for abstract and concept animations.', bestFor: ['Abstract motion','Fast turnaround','Concept clips','B-roll'], speed: 'medium' as const, quality: 4, sample: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=480&q=85&fit=crop' },
+  { id: 'hailuo',          type: 'video' as const, name: 'Hailuo v2',             provider: 'MiniMax',           tagline: 'Character-consistent · Stylised · Smooth',       description: 'Strong character consistency across frames with a distinctive stylised aesthetic. Well-suited for narrative-driven clips and Symponia\'s mystical visual language.', bestFor: ['Characters','Mystical','Storytelling','TikTok'], speed: 'medium' as const, quality: 4, sample: 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=480&q=85&fit=crop' },
+  { id: 'veo3',            type: 'video' as const, name: 'Veo 3',                 provider: 'Google DeepMind',   tagline: 'Photorealistic · Audio-native · 4K quality',     description: 'Google\'s state-of-the-art video model with native audio generation. Produces photorealistic clips with natural sound — ideal for premium ad-quality content.', bestFor: ['Photorealism','Native audio','Premium ads','Full realism'], speed: 'slow' as const, quality: 5, sample: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=480&q=85&fit=crop' },
+  { id: 'sora',            type: 'video' as const, name: 'Sora',                  provider: 'OpenAI',            tagline: 'Long-form · Scene coherent · Cinematic',         description: 'OpenAI\'s video model — exceptional scene coherence for longer clips. Strong physical simulation, diverse environments, and cinematic quality storytelling.', bestFor: ['Long-form','Scene coherence','Physical sim','Storytelling'], speed: 'slow' as const, quality: 5, sample: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=480&q=85&fit=crop' },
+  { id: 'dream-machine',   type: 'video' as const, name: 'Dream Machine',         provider: 'Luma AI',           tagline: 'Smooth motion · Dreamlike · Creative',           description: 'Luma AI\'s model known for silky smooth motion and dreamlike transitions. Excellent for abstract, ambient, and mood-driven visuals with an otherworldly feel.', bestFor: ['Smooth motion','Abstract','Ambient','Mood visuals'], speed: 'medium' as const, quality: 4, sample: 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=480&q=85&fit=crop' },
+  { id: 'runway-gen4',     type: 'video' as const, name: 'Runway Gen-4',          provider: 'Runway',            tagline: 'Consistent subjects · Director-quality · Pro',   description: 'Runway\'s flagship model. Industry-leading subject consistency across scenes, director-quality camera language, and professional editing capabilities baked in.', bestFor: ['Subject consistency','Director quality','VFX','Professional'], speed: 'slow' as const, quality: 5, sample: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=480&q=85&fit=crop' },
+  { id: 'pika-22',         type: 'video' as const, name: 'Pika 2.2',              provider: 'Pika Labs',         tagline: 'Dynamic effects · Explode/grow FX · Creative',   description: 'Pika\'s latest model with signature generative effects — explode, grow, squish. Great for eye-catching social content with dramatic visual moments.', bestFor: ['Visual FX','Dynamic effects','Social hook','Viral potential'], speed: 'fast' as const, quality: 4, sample: 'https://images.unsplash.com/photo-1549692520-acc6669e2f0c?w=480&q=85&fit=crop' },
+  { id: 'cogvideox',       type: 'video' as const, name: 'CogVideoX-5B',          provider: 'Zhipu AI',          tagline: 'Open-source · Text-to-video · Research-grade',   description: 'Open-source video model with strong text-to-video capability. Good for experimental content and when you want full control over generation parameters.', bestFor: ['Experimental','Open-source','Custom params','B-roll'], speed: 'medium' as const, quality: 3, sample: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=480&q=85&fit=crop' },
+  { id: 'mochi',           type: 'video' as const, name: 'Mochi 1',               provider: 'Genmo',             tagline: 'Fluid motion · Open-source · Smooth transitions', description: 'Open-source model specialised in extremely fluid motion and natural-looking transitions. Particularly strong at smooth camera pans and organic movement.', bestFor: ['Fluid motion','Camera pans','Organic movement','Ambient'], speed: 'medium' as const, quality: 4, sample: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=480&q=85&fit=crop' },
+  { id: 'ltx-video',       type: 'video' as const, name: 'LTX Video',             provider: 'Lightricks',        tagline: 'Real-time · Fastest video gen · Interactive',    description: 'World\'s first real-time video generation model. Generates at video frame rate — ideal for rapid previewing and interactive content creation workflows.', bestFor: ['Real-time preview','Rapid iteration','Interactive','Bulk gen'], speed: 'fast' as const, quality: 3, sample: 'https://images.unsplash.com/photo-1574169208507-84376144848b?w=480&q=85&fit=crop' },
+  { id: 'stable-video',    type: 'video' as const, name: 'Stable Video Diffusion',provider: 'Stability AI',      tagline: 'Image-to-video · Animate stills · Open',         description: 'Animates existing images into short video clips. Use to bring Symponia\'s generated stills to life — turn a striking image into a looping Reels or TikTok asset.', bestFor: ['Animate stills','Image-to-video','Looping','Reels'], speed: 'medium' as const, quality: 3, sample: 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=480&q=85&fit=crop' },
 ] as const;
 
 type ModelId = typeof MODEL_LIBRARY[number]['id'];
@@ -273,7 +210,7 @@ const F = {
   topic:        'Topic',
 };
 
-type Tab      = 'queue' | 'brief' | 'research' | 'agents' | 'calendar';
+type Tab      = 'queue' | 'brief' | 'research' | 'models' | 'agents' | 'calendar';
 
 interface ResearchResult {
   ok: boolean;
@@ -579,7 +516,8 @@ export default function Dashboard() {
           { key: 'queue',    label: 'Content Queue',      icon: '▦' },
           { key: 'brief',    label: 'Brief Orchestrator', icon: '◈' },
           { key: 'research', label: 'Research',           icon: '◉' },
-          { key: 'agents',   label: 'Agent Team',         icon: '◆' },
+          { key: 'models',   label: 'Visual Models',      icon: '◆' },
+          { key: 'agents',   label: 'Agent Team',         icon: '◻' },
           { key: 'calendar', label: 'Calendar',           icon: '▣' },
         ] as { key: Tab; label: string; icon: string }[]).map(t => (
           <button key={t.key} onClick={() => setTab(t.key)} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '0 14px', height: 56, background: 'none', border: 'none', borderBottom: `2px solid ${tab === t.key ? C.violet : 'transparent'}`, color: tab === t.key ? C.violet : C.dim, fontSize: '0.78rem', fontWeight: tab === t.key ? 600 : 400, letterSpacing: '0.02em', cursor: 'pointer', transition: 'all .15s', fontFamily: C.body }}>
@@ -652,7 +590,7 @@ export default function Dashboard() {
         )}
 
         {/* Main */}
-        <main style={{ flex: 1, overflowY: 'auto', padding: tab === 'brief' ? 0 : tab === 'research' ? '24px 32px' : 24 }}>
+        <main style={{ flex: 1, overflowY: 'auto', padding: tab === 'brief' ? 0 : tab === 'research' || tab === 'models' ? '24px 32px' : 24 }}>
 
           {/* ── QUEUE TAB ── */}
           {tab === 'queue' && (
@@ -794,7 +732,7 @@ export default function Dashboard() {
                   <div style={{ width: 1, height: 16, background: C.border, margin: '0 4px', flexShrink: 0 }} />
 
                   {/* Model picker button — shows selected model, opens library */}
-                  <button onClick={() => setModelLibraryOpen(true)}
+                  <button onClick={() => setTab('models')}
                     style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 11px', background: dark ? 'rgba(255,255,255,0.05)' : '#f4f3f9', border: `1px solid ${C.borderMid}`, borderRadius: 20, color: C.sub, fontFamily: C.body, fontSize: '0.7rem', fontWeight: 500, cursor: 'pointer', transition: 'all .15s', whiteSpace: 'nowrap' }}
                     onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = C.violet; (e.currentTarget as HTMLElement).style.color = C.violet; }}
                     onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = C.borderMid; (e.currentTarget as HTMLElement).style.color = C.sub; }}>
@@ -1059,6 +997,79 @@ export default function Dashboard() {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* ── MODELS TAB ── */}
+          {tab === 'models' && (
+            <div style={{ maxWidth: 1100, margin: '0 auto', paddingBottom: 48 }}>
+              <div style={{ marginBottom: 28 }}>
+                <div style={{ fontSize: '1.3rem', fontWeight: 700, color: C.fg, marginBottom: 6, letterSpacing: '-0.01em' }}>Visual AI Library</div>
+                <div style={{ fontSize: '0.82rem', color: C.dim, lineHeight: 1.7, maxWidth: 620 }}>
+                  {MODEL_LIBRARY.filter(m=>m.type==='image').length} image models · {MODEL_LIBRARY.filter(m=>m.type==='video').length} video models. Click a card to read full specs. Select a model to use it when briefing your team.
+                </div>
+              </div>
+
+              {/* Filter bar */}
+              <div style={{ display: 'flex', gap: 6, marginBottom: 24 }}>
+                {(['all','image','video'] as const).map(t => {
+                  const count = t === 'all' ? MODEL_LIBRARY.length : MODEL_LIBRARY.filter(m=>m.type===t).length;
+                  const active = modelTypeFilter === t;
+                  return (
+                    <button key={t} onClick={() => setModelTypeFilter(t)}
+                      style={{ padding: '7px 18px', background: active ? C.violet : (dark ? 'rgba(255,255,255,0.05)' : '#f4f3f9'), border: `1px solid ${active ? C.violet : C.border}`, borderRadius: 20, color: active ? '#fff' : C.sub, fontFamily: C.body, fontSize: '0.78rem', fontWeight: active ? 600 : 400, cursor: 'pointer', transition: 'all .15s' }}>
+                      {t === 'all' ? `All (${count})` : t === 'image' ? `◆ Images (${count})` : `▶ Video (${count})`}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
+                {(modelTypeFilter === 'all' ? MODEL_LIBRARY : MODEL_LIBRARY.filter(m => m.type === modelTypeFilter)).map(model => {
+                  const isSelected = model.id === selectedModel;
+                  return (
+                    <div key={model.id} style={{ background: isSelected ? (dark ? `${C.violet}12` : '#f5f0ff') : C.bgCard, border: `1.5px solid ${isSelected ? C.violet : C.border}`, borderRadius: 14, overflow: 'hidden', transition: 'all .18s', boxShadow: isSelected ? `0 4px 20px ${C.violet}22` : C.shadow }}>
+
+                      {/* Sample image */}
+                      <div style={{ position: 'relative', height: 170, overflow: 'hidden', background: '#000' }}>
+                        <img src={model.sample} alt={model.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', filter: 'brightness(0.85)' }} />
+                        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.7) 100%)' }} />
+                        <div style={{ position: 'absolute', top: 8, left: 8, fontSize: '0.58rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', background: model.type === 'video' ? `${C.cyan}dd` : `${C.violet}dd`, color: '#fff', padding: '3px 8px', borderRadius: 5 }}>
+                          {model.type === 'video' ? '▶ Video' : '◆ Image'}
+                        </div>
+                        {isSelected && (
+                          <div style={{ position: 'absolute', top: 8, right: 8, width: 22, height: 22, borderRadius: '50%', background: C.violet, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', color: '#fff', fontWeight: 700 }}>✓</div>
+                        )}
+                        <div style={{ position: 'absolute', bottom: 10, left: 12, right: 12 }}>
+                          <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#fff', marginBottom: 2 }}>{model.name}</div>
+                          <div style={{ fontSize: '0.62rem', color: 'rgba(255,255,255,0.65)' }}>{model.provider}</div>
+                        </div>
+                      </div>
+
+                      {/* Card body */}
+                      <div style={{ padding: '14px 16px 16px' }}>
+                        <div style={{ fontSize: '0.72rem', color: C.dim, marginBottom: 10, lineHeight: 1.4 }}>{model.tagline}</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                          <span style={{ fontSize: '0.6rem', fontWeight: 600, color: model.speed === 'fast' ? C.green : model.speed === 'medium' ? C.yellow : C.orange, background: `${model.speed === 'fast' ? C.green : model.speed === 'medium' ? C.yellow : C.orange}18`, padding: '2px 7px', borderRadius: 10, textTransform: 'capitalize' }}>{model.speed}</span>
+                          <div style={{ display: 'flex', gap: 2 }}>
+                            {[1,2,3,4,5].map(i => <div key={i} style={{ width: 5, height: 5, borderRadius: '50%', background: i <= model.quality ? C.violet : (dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)') }} />)}
+                          </div>
+                          <span style={{ fontSize: '0.58rem', color: C.dim }}>quality</span>
+                        </div>
+                        <div style={{ fontSize: '0.75rem', color: C.sub, lineHeight: 1.6, marginBottom: 12 }}>{model.description}</div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 14 }}>
+                          {model.bestFor.map(tag => <span key={tag} style={{ fontSize: '0.62rem', padding: '3px 8px', borderRadius: 8, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)', color: C.dim }}>{tag}</span>)}
+                        </div>
+                        <button onClick={() => { setSelectedModel(model.id as ModelId); showToast(`${model.name} selected — your next brief will use this model`, 'success'); }}
+                          style={{ width: '100%', padding: '9px', background: isSelected ? C.violet : (dark ? 'rgba(255,255,255,0.05)' : '#f4f3f9'), border: `1px solid ${isSelected ? C.violet : C.border}`, borderRadius: 8, color: isSelected ? '#fff' : C.sub, fontFamily: C.body, fontSize: '0.76rem', fontWeight: 600, cursor: 'pointer', transition: 'all .15s' }}>
+                          {isSelected ? '✓ Active model' : 'Use this model'}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
 

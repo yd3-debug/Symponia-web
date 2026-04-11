@@ -450,12 +450,13 @@ export default function Dashboard() {
       const reply = res.message ?? 'Team briefed — content will appear in queue shortly.';
       const agentsRouted: string[] = res.agents ?? [];
       setMessages(m => [...m, { role: 'assistant', content: reply, agents: agentsRouted, ts: Date.now() }]);
+      setPipelineStarted(Date.now());
       // Poll for new content — n8n pipeline takes 30-90s
       let polls = 0;
       const poll = setInterval(() => {
         polls++;
         loadRecords(); loadCounts();
-        if (polls >= 12) clearInterval(poll); // stop after ~2 min
+        if (polls >= 18) { clearInterval(poll); setPipelineStarted(null); }
       }, 10000);
     } catch {
       setMessages(m => [...m, { role: 'assistant', content: 'Failed to reach the agent team. Please try again.', ts: Date.now() }]);
@@ -480,6 +481,10 @@ export default function Dashboard() {
   const score = (r: AirtableRecord) => Number(f(r, F.viralScore)) || 0;
   const scoreColor = (n: number) => n >= 8 ? C.green : n >= 6 ? C.orange : C.dim;
   const calendarRecords = records.filter(r => f(r, F.scheduledAt));
+
+  // Track when pipeline was last triggered (for progress bar timing)
+  const [pipelineStarted, setPipelineStarted] = useState<number | null>(null);
+  const isGenerating = (counts['generating'] ?? 0) > 0 || pipelineStarted !== null;
 
   // ── LOGIN ──────────────────────────────────────────────────────────────────
   if (!authed) {
@@ -516,6 +521,55 @@ export default function Dashboard() {
   return (
     <div style={{ minHeight: '100vh', background: C.bg, display: 'flex', flexDirection: 'column', fontFamily: C.body, color: C.fg }}>
 
+      {/* ── Global generating progress bar ── */}
+      {isGenerating && (
+        <>
+          {/* Top shimmer bar */}
+          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, height: 3, zIndex: 999, overflow: 'hidden', background: dark ? 'rgba(124,58,237,0.2)' : 'rgba(124,58,237,0.1)' }}>
+            <div style={{ height: '100%', background: `linear-gradient(90deg, transparent, ${C.violet}, ${C.pink}, ${C.cyan}, transparent)`, backgroundSize: '200% 100%', animation: 'slide 1.8s ease-in-out infinite' }} />
+          </div>
+          {/* Floating pill bottom-right */}
+          <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 500, display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 18px', background: dark ? 'rgba(13,11,34,0.95)' : 'rgba(255,255,255,0.97)', border: `1px solid ${C.violet}44`, borderRadius: 14, boxShadow: `0 8px 32px rgba(0,0,0,0.2), 0 0 0 1px ${C.violet}22`, backdropFilter: 'blur(12px)' }}>
+              <div style={{ width: 28, height: 28, borderRadius: 8, background: `linear-gradient(135deg, ${C.violet}33, ${C.pink}22)`, border: `1px solid ${C.violet}44`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', flexShrink: 0 }}>◈</div>
+              <div>
+                <div style={{ fontSize: '0.8rem', fontWeight: 700, color: C.fg, marginBottom: 2 }}>Agents working…</div>
+                <div style={{ fontSize: '0.68rem', color: C.dim }}>Content appears in queue when ready</div>
+              </div>
+              <button onClick={() => { setTab('queue'); setStatus('all'); }} style={{ marginLeft: 4, padding: '5px 12px', background: C.violet, border: 'none', borderRadius: 7, color: '#fff', fontFamily: C.body, fontSize: '0.7rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>Watch queue →</button>
+            </div>
+            {/* Mini progress steps */}
+            {pipelineStarted && (() => {
+              const elapsed = Math.floor((Date.now() - pipelineStarted) / 1000);
+              const steps = [
+                { label: 'Trend Research', done: elapsed > 8 },
+                { label: 'Platform Briefs', done: elapsed > 20 },
+                { label: 'Copy + Visuals', done: elapsed > 45 },
+                { label: 'Manager Review', done: elapsed > 65 },
+                { label: 'Saving to queue', done: elapsed > 80 },
+              ];
+              return (
+                <div style={{ padding: '10px 16px', background: dark ? 'rgba(13,11,34,0.95)' : 'rgba(255,255,255,0.97)', border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.12)', backdropFilter: 'blur(12px)', minWidth: 200 }}>
+                  {steps.map((s, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '3px 0' }}>
+                      <div style={{ width: 14, height: 14, borderRadius: '50%', flexShrink: 0, background: s.done ? C.green : (i === steps.filter(x=>x.done).length ? C.violet : 'transparent'), border: s.done ? 'none' : `2px solid ${i === steps.filter(x=>x.done).length ? C.violet : C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {s.done && <span style={{ fontSize: '0.5rem', color: '#fff' }}>✓</span>}
+                        {!s.done && i === steps.filter(x=>x.done).length && <div style={{ width: 4, height: 4, borderRadius: '50%', background: C.violet, animation: 'pulse 1s ease infinite' }} />}
+                      </div>
+                      <span style={{ fontSize: '0.7rem', color: s.done ? C.sub : i === steps.filter(x=>x.done).length ? C.violet : C.dim, fontWeight: i === steps.filter(x=>x.done).length ? 600 : 400 }}>{s.label}</span>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
+          </div>
+          <style>{`
+            @keyframes slide { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+            @keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+          `}</style>
+        </>
+      )}
+
       {/* Top bar */}
       <header style={{ height: 56, background: C.bgMid, borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', padding: '0 20px', gap: 0, flexShrink: 0, position: 'relative' }}>
         {/* Subtle violet gradient line at top */}
@@ -549,12 +603,13 @@ export default function Dashboard() {
 
         {/* Pipeline status pills */}
         {([
-          { key: 'review' as Status,    label: 'Review' },
-          { key: 'approved' as Status,  label: 'Approved' },
-          { key: 'scheduled' as Status, label: 'Scheduled' },
-        ]).map(s => (
+          { key: 'generating' as Status, label: 'Generating' },
+          { key: 'review' as Status,     label: 'Review' },
+          { key: 'approved' as Status,   label: 'Approved' },
+          { key: 'scheduled' as Status,  label: 'Scheduled' },
+        ]).filter(s => (counts[s.key] ?? 0) > 0 || s.key === 'review' || s.key === 'approved').map(s => (
           <div key={s.key} onClick={() => { setTab('queue'); setStatus(s.key); }} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px', cursor: 'pointer', borderRadius: 20, background: status === s.key && tab === 'queue' ? `${STATUS_COLOR[s.key]}18` : 'transparent', border: `1px solid ${status === s.key && tab === 'queue' ? STATUS_COLOR[s.key]+'44' : 'transparent'}`, marginRight: 4, transition: 'all .15s' }}>
-            <div style={{ width: 5, height: 5, borderRadius: '50%', background: STATUS_COLOR[s.key] }} />
+            <div style={{ width: 5, height: 5, borderRadius: '50%', background: STATUS_COLOR[s.key], boxShadow: s.key === 'generating' && (counts[s.key] ?? 0) > 0 ? `0 0 5px ${STATUS_COLOR[s.key]}` : 'none', animation: s.key === 'generating' && (counts[s.key] ?? 0) > 0 ? 'pulse 1.2s ease infinite' : 'none' }} />
             <span style={{ fontSize: '0.7rem', fontWeight: 600, color: STATUS_COLOR[s.key], fontFamily: C.mono }}>{counts[s.key] ?? 0}</span>
             <span style={{ fontSize: '0.62rem', color: C.dim, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</span>
           </div>
@@ -614,14 +669,41 @@ export default function Dashboard() {
           {/* ── QUEUE TAB ── */}
           {tab === 'queue' && (
             <>
-              {loading && <div style={{ color: C.dim, fontSize: '0.82rem', padding: '48px 0', textAlign: 'center' }}>Loading…</div>}
+              {loading && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
+                  {[1,2,3].map(i => (
+                    <div key={i} style={{ background: C.bgCard, border: `1px solid ${C.border}`, borderRadius: 12, padding: 18, overflow: 'hidden', position: 'relative' }}>
+                      <div style={{ height: 3, background: C.border, borderRadius: 2, marginBottom: 14 }} />
+                      {[60, 100, 80, 40].map((w, j) => (
+                        <div key={j} style={{ height: j === 0 ? 10 : 8, width: `${w}%`, background: dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', borderRadius: 4, marginBottom: 10, position: 'relative', overflow: 'hidden' }}>
+                          <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(90deg, transparent, ${dark ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.8)'}, transparent)`, animation: `shimmer ${1.2 + i * 0.2}s ease infinite` }} />
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              )}
               {!loading && records.length === 0 && (
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 0', gap: 12 }}>
-                  <div style={{ fontSize: '2.5rem', opacity: 0.15 }}>◈</div>
-                  <div style={{ fontSize: '1.1rem', fontWeight: 600, color: C.sub }}>Nothing here yet</div>
-                  <div style={{ fontSize: '0.82rem', color: C.dim, textAlign: 'center', maxWidth: 300, lineHeight: 1.7 }}>
-                    Switch to <strong style={{ cursor: 'pointer', color: C.violet }} onClick={() => setTab('brief')}>Brief Orchestrator</strong> to brief the agent team.
+                  <div style={{ fontSize: '2.5rem', opacity: 0.15 }}>
+                    {status === 'review' ? '◎' : status === 'approved' ? '✓' : status === 'scheduled' ? '▣' : '◈'}
                   </div>
+                  <div style={{ fontSize: '1rem', fontWeight: 600, color: C.sub }}>
+                    {status === 'review' ? 'Nothing to review' : status === 'approved' ? 'Nothing approved yet' : status === 'scheduled' ? 'Nothing scheduled' : status === 'posted' ? 'Nothing posted yet' : 'No content yet'}
+                  </div>
+                  <div style={{ fontSize: '0.8rem', color: C.dim, textAlign: 'center', maxWidth: 320, lineHeight: 1.8 }}>
+                    {status === 'review'
+                      ? isGenerating ? 'Agents are working — content will appear here shortly.' : 'Brief the team to generate content for review.'
+                      : status === 'approved'
+                      ? 'Approve content from the Review queue first.'
+                      : status === 'scheduled'
+                      ? 'Schedule approved content using the calendar.'
+                      : <><strong style={{ cursor: 'pointer', color: C.violet }} onClick={() => setTab('brief')}>Brief the team</strong> to start generating content.</>
+                    }
+                  </div>
+                  {status === 'review' && !isGenerating && (
+                    <button onClick={() => setTab('brief')} style={{ marginTop: 8, padding: '9px 20px', background: C.violet, border: 'none', borderRadius: 9, color: '#fff', fontFamily: C.body, fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>Brief the team →</button>
+                  )}
                 </div>
               )}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
@@ -653,11 +735,11 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
-                  {counts['generating'] > 0 && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 12px', borderRadius: 20, background: `${C.cyan}18`, border: `1px solid ${C.cyan}44` }}>
-                      <div style={{ width: 6, height: 6, borderRadius: '50%', background: C.cyan, boxShadow: `0 0 6px ${C.cyan}`, animation: 'pulse 1.5s ease infinite' }} />
-                      <span style={{ fontSize: '0.68rem', color: C.cyan, fontWeight: 600 }}>{counts['generating']} generating…</span>
-                      <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }`}</style>
+                  {isGenerating && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 12px', borderRadius: 20, background: `${C.violet}18`, border: `1px solid ${C.violet}44` }}>
+                      <div style={{ width: 6, height: 6, borderRadius: '50%', background: C.violet, boxShadow: `0 0 6px ${C.violet}`, animation: 'pulse 1.2s ease infinite' }} />
+                      <span style={{ fontSize: '0.68rem', color: C.violet, fontWeight: 600 }}>Generating…</span>
+                      <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }`}</style>
                     </div>
                   )}
                   {([
@@ -732,6 +814,20 @@ export default function Dashboard() {
                     <div style={{ padding: '12px 16px', borderRadius: '4px 16px 16px 16px', background: dark ? 'rgba(255,255,255,0.05)' : '#ffffff', border: `1px solid ${C.border}`, fontSize: '0.85rem', color: C.dim, boxShadow: dark ? 'none' : C.shadow }}>
                       Thinking…
                     </div>
+                  </div>
+                )}
+                {/* Generating status banner */}
+                {isGenerating && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: dark ? `${C.violet}10` : '#faf7ff', border: `1px solid ${C.violet}33`, borderRadius: 12, margin: '0 0 8px' }}>
+                    <div style={{ width: 32, height: 32, borderRadius: 8, background: `${C.violet}22`, border: `1px solid ${C.violet}33`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <div style={{ width: 10, height: 10, borderRadius: '50%', border: `2px solid ${C.violet}`, borderTopColor: 'transparent', animation: 'spin 0.8s linear infinite' }} />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: '0.8rem', fontWeight: 600, color: C.violet, marginBottom: 2 }}>Agents are generating your content</div>
+                      <div style={{ fontSize: '0.68rem', color: C.dim }}>This takes 60–90 seconds. Content will appear in your queue automatically.</div>
+                    </div>
+                    <button onClick={() => { setTab('queue'); setStatus('all'); }} style={{ padding: '6px 14px', background: C.violet, border: 'none', borderRadius: 7, color: '#fff', fontFamily: C.body, fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>Watch queue →</button>
+                    <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
                   </div>
                 )}
                 <div ref={chatEndRef} />

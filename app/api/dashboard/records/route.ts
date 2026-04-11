@@ -92,3 +92,23 @@ export async function PATCH(req: NextRequest) {
 
   return NextResponse.json(await res.json());
 }
+
+// ── DELETE: delete a record from Airtable ─────────────────────────────────────
+export async function DELETE(req: NextRequest) {
+  if (!checkAuth(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const { id } = await req.json();
+  if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
+
+  const res = await fetch(`${AIR_BASE}/${id}`, {
+    method:  'DELETE',
+    headers: airHeaders(),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    return NextResponse.json({ error: err }, { status: res.status });
+  }
+
+  return NextResponse.json({ ok: true, deleted: id });
+}

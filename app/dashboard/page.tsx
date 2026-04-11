@@ -245,6 +245,7 @@ function clearToken()         { localStorage.removeItem(TOKEN_KEY); }
 async function apiGet(path: string, token: string)                 { const r = await fetch(path, { headers: { 'x-dashboard-token': token } }); if (r.status === 401) throw new Error('UNAUTHORIZED'); if (!r.ok) throw new Error(await r.text()); return r.json(); }
 async function apiPatch(path: string, body: object, token: string) { const r = await fetch(path, { method: 'PATCH',  headers: { 'Content-Type': 'application/json', 'x-dashboard-token': token }, body: JSON.stringify(body) }); if (r.status === 401) throw new Error('UNAUTHORIZED'); if (!r.ok) throw new Error(await r.text()); return r.json(); }
 async function apiPost(path: string,  body: object, token: string) { const r = await fetch(path, { method: 'POST',   headers: { 'Content-Type': 'application/json', 'x-dashboard-token': token }, body: JSON.stringify(body) }); if (r.status === 401) throw new Error('UNAUTHORIZED'); if (!r.ok) throw new Error(await r.text()); return r.json(); }
+async function apiDelete(path: string, body: object, token: string) { const r = await fetch(path, { method: 'DELETE', headers: { 'Content-Type': 'application/json', 'x-dashboard-token': token }, body: JSON.stringify(body) }); if (r.status === 401) throw new Error('UNAUTHORIZED'); if (!r.ok) throw new Error(await r.text()); return r.json(); }
 
 export default function Dashboard() {
   const [authed,   setAuthed]   = useState(false);
@@ -300,6 +301,7 @@ export default function Dashboard() {
   const [researchResult,   setResearchResult]   = useState<ResearchResult | null>(null);
   const [researchError,    setResearchError]    = useState('');
 
+  const [confirmDelete, setConfirmDelete] = useState<AirtableRecord | null>(null);
   const [toast, setToast] = useState<{ msg: string; type?: string } | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
@@ -407,6 +409,17 @@ export default function Dashboard() {
     } catch { showToast('Update failed', 'error'); }
   };
 
+  const deleteRecord = async (id: string) => {
+    try {
+      await apiDelete('/api/dashboard/records', { id }, token);
+      setRecords(rs => rs.filter(r => r.id !== id));
+      setDetail(null);
+      setConfirmDelete(null);
+      showToast('Deleted', 'success');
+      loadCounts();
+    } catch { showToast('Delete failed', 'error'); }
+  };
+
   const schedulePost = async () => {
     if (!schedModal || !schedDate) return;
     try {
@@ -437,7 +450,13 @@ export default function Dashboard() {
       const reply = res.message ?? 'Team briefed — content will appear in queue shortly.';
       const agentsRouted: string[] = res.agents ?? [];
       setMessages(m => [...m, { role: 'assistant', content: reply, agents: agentsRouted, ts: Date.now() }]);
-      setTimeout(() => { loadRecords(); loadCounts(); }, 3000);
+      // Poll for new content — n8n pipeline takes 30-90s
+      let polls = 0;
+      const poll = setInterval(() => {
+        polls++;
+        loadRecords(); loadCounts();
+        if (polls >= 12) clearInterval(poll); // stop after ~2 min
+      }, 10000);
     } catch {
       setMessages(m => [...m, { role: 'assistant', content: 'Failed to reach the agent team. Please try again.', ts: Date.now() }]);
     } finally { setChatLoading(false); }
@@ -613,6 +632,7 @@ export default function Dashboard() {
                     onApprove={() => updateStatus(r.id, 'approved')}
                     onReject={() => updateStatus(r.id, 'rejected')}
                     onSchedule={() => { setSchedModal({ record: r }); setSchedDate(''); }}
+                    onDelete={() => setConfirmDelete(r)}
                   />
                 ))}
               </div>
@@ -632,13 +652,23 @@ export default function Dashboard() {
                     Online · Marketing Director · 8 agents ready
                   </div>
                 </div>
-                <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
-                  {(['instagram','tiktok','linkedin'] as Platform[]).map(p => (
-                    <div key={p} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '3px 9px', borderRadius: 20, background: dark ? 'rgba(255,255,255,0.04)' : '#f4f3f9', border: `1px solid ${C.border}` }}>
-                      <span style={{ color: p === 'instagram' ? C.pink : p === 'tiktok' ? C.cyan : C.teal, fontSize: '0.65rem' }}>{PLATFORM_ICON[p]}</span>
-                      <span style={{ fontSize: '0.63rem', color: C.dim, textTransform: 'capitalize' }}>{p}</span>
+                <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  {counts['generating'] > 0 && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 12px', borderRadius: 20, background: `${C.cyan}18`, border: `1px solid ${C.cyan}44` }}>
+                      <div style={{ width: 6, height: 6, borderRadius: '50%', background: C.cyan, boxShadow: `0 0 6px ${C.cyan}`, animation: 'pulse 1.5s ease infinite' }} />
+                      <span style={{ fontSize: '0.68rem', color: C.cyan, fontWeight: 600 }}>{counts['generating']} generating…</span>
+                      <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }`}</style>
                     </div>
-                  ))}
+                  )}
+                  {([
+                    { key: 'review' as Status, color: C.orange },
+                    { key: 'approved' as Status, color: C.green },
+                  ]).map(s => counts[s.key] > 0 ? (
+                    <div key={s.key} onClick={() => { setTab('queue'); setStatus(s.key); }} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '3px 10px', borderRadius: 20, background: `${s.color}12`, border: `1px solid ${s.color}33`, cursor: 'pointer' }}>
+                      <span style={{ fontSize: '0.7rem', fontWeight: 700, color: s.color }}>{counts[s.key]}</span>
+                      <span style={{ fontSize: '0.62rem', color: C.dim, textTransform: 'capitalize' }}>{s.key}</span>
+                    </div>
+                  ) : null)}
                 </div>
               </div>
 
@@ -1105,6 +1135,7 @@ export default function Dashboard() {
               onReject={() => updateStatus(detail.id, 'rejected')}
               onSchedule={() => { setSchedModal({ record: detail }); setSchedDate(''); }}
               onClose={() => setDetail(null)}
+              onDelete={() => setConfirmDelete(detail)}
             />
           </div>
         </div>
@@ -1187,6 +1218,25 @@ export default function Dashboard() {
           </div>
         );
       })()}
+
+      {/* Confirm Delete Modal */}
+      {confirmDelete && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 400, backdropFilter: 'blur(4px)' }}
+          onClick={() => setConfirmDelete(null)}>
+          <div style={{ width: 400, background: C.bgMid, border: `1px solid ${C.borderMid}`, borderRadius: 16, padding: 28, boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}
+            onClick={e => e.stopPropagation()}>
+            <div style={{ fontSize: '1rem', fontWeight: 700, color: C.fg, marginBottom: 8 }}>Delete this content?</div>
+            <div style={{ fontSize: '0.82rem', color: C.dim, lineHeight: 1.7, marginBottom: 6 }}>
+              <strong style={{ color: C.sub }}>"{(confirmDelete.fields['Hook'] || confirmDelete.fields['Caption'] || 'This record') as string}"</strong>
+            </div>
+            <div style={{ fontSize: '0.78rem', color: C.dim, marginBottom: 24 }}>This will permanently delete it from Airtable. This cannot be undone.</div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={() => setConfirmDelete(null)} style={{ flex: 1, padding: '10px', background: 'none', border: `1px solid ${C.border}`, borderRadius: 8, color: C.dim, fontFamily: C.body, fontSize: '0.82rem', cursor: 'pointer' }}>Cancel</button>
+              <button onClick={() => deleteRecord(confirmDelete.id)} style={{ flex: 1, padding: '10px', background: C.red, border: 'none', borderRadius: 8, color: '#fff', fontFamily: C.body, fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>Delete permanently</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Model Library Modal */}
       {modelLibraryOpen && (
@@ -1364,10 +1414,10 @@ function ModelLibraryModal({ selectedModel, onSelect, onClose, C, dark, typeFilt
 // ─────────────────────────────────────────────────────────────────────────────
 // CONTENT CARD
 // ─────────────────────────────────────────────────────────────────────────────
-function ContentCard({ r, f, score, scoreColor, C, STATUS_COLOR, PLATFORM_COLOR, onClick, onApprove, onReject, onSchedule }: {
+function ContentCard({ r, f, score, scoreColor, C, STATUS_COLOR, PLATFORM_COLOR, onClick, onApprove, onReject, onSchedule, onDelete }: {
   r: AirtableRecord; f: any; score: any; scoreColor: any; C: typeof LIGHT;
   STATUS_COLOR: Record<string, string>; PLATFORM_COLOR: Record<string, string>;
-  onClick: () => void; onApprove: () => void; onReject: () => void; onSchedule: () => void;
+  onClick: () => void; onApprove: () => void; onReject: () => void; onSchedule: () => void; onDelete: () => void;
 }) {
   const plat      = (f(r, 'Platform') as string)?.toLowerCase() ?? '';
   const status    = (f(r, 'Status')   as string)?.toLowerCase() ?? '';
@@ -1418,11 +1468,18 @@ function ContentCard({ r, f, score, scoreColor, C, STATUS_COLOR, PLATFORM_COLOR,
             <ActionBtn label="✓ Approve" color={C.green}  onClick={onApprove} />
             <ActionBtn label="✗ Reject"  color={C.red}    onClick={onReject} />
             <ActionBtn label="Schedule"  color={C.teal}   onClick={onSchedule} />
+            <ActionBtn label="🗑" color={C.dim} onClick={onDelete} />
           </div>
         )}
         {status === 'approved' && (
-          <div onClick={e => e.stopPropagation()}>
+          <div style={{ display: 'flex', gap: 5 }} onClick={e => e.stopPropagation()}>
             <ActionBtn label="Schedule →" color={C.teal} onClick={onSchedule} />
+            <ActionBtn label="🗑" color={C.dim} onClick={onDelete} />
+          </div>
+        )}
+        {(status === 'rejected' || status === 'draft') && (
+          <div onClick={e => e.stopPropagation()}>
+            <ActionBtn label="🗑 Delete" color={C.dim} onClick={onDelete} />
           </div>
         )}
       </div>
@@ -1473,10 +1530,10 @@ function AgentCard({ agent, C, dark }: { agent: typeof AGENTS[number]; C: typeof
 // ─────────────────────────────────────────────────────────────────────────────
 // DETAIL PANEL
 // ─────────────────────────────────────────────────────────────────────────────
-function DetailPanel({ r, f, score, scoreColor, C, STATUS_COLOR, PLATFORM_COLOR, onApprove, onReject, onSchedule, onClose }: {
+function DetailPanel({ r, f, score, scoreColor, C, STATUS_COLOR, PLATFORM_COLOR, onApprove, onReject, onSchedule, onClose, onDelete }: {
   r: AirtableRecord; f: any; score: any; scoreColor: any; C: typeof LIGHT;
   STATUS_COLOR: Record<string, string>; PLATFORM_COLOR: Record<string, string>;
-  onApprove: () => void; onReject: () => void; onSchedule: () => void; onClose: () => void;
+  onApprove: () => void; onReject: () => void; onSchedule: () => void; onClose: () => void; onDelete: () => void;
 }) {
   const plat      = (f(r, 'Platform') as string)?.toLowerCase() ?? '';
   const status    = (f(r, 'Status')   as string)?.toLowerCase() ?? '';
@@ -1529,14 +1586,20 @@ function DetailPanel({ r, f, score, scoreColor, C, STATUS_COLOR, PLATFORM_COLOR,
 
       {/* ── Decision buttons pinned at top for review items ── */}
       {status === 'review' && (
-        <div style={{ display: 'flex', gap: 8, marginBottom: 24, padding: '16px', background: 'rgba(124,58,237,0.05)', border: `1px solid ${C.border}`, borderRadius: 12 }}>
-          <button onClick={onApprove} style={{ flex: 1, padding: '11px', background: C.green, border: 'none', borderRadius: 8, color: '#fff', fontFamily: C.body, fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>✓ Approve</button>
-          <button onClick={onReject}  style={{ flex: 1, padding: '11px', background: 'none', border: `1px solid ${C.red}`, borderRadius: 8, color: C.red, fontFamily: C.body, fontSize: '0.82rem', cursor: 'pointer' }}>✗ Reject</button>
-          <button onClick={onSchedule} style={{ flex: 1, padding: '11px', background: C.teal, border: 'none', borderRadius: 8, color: '#fff', fontFamily: C.body, fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>Schedule →</button>
+        <div style={{ marginBottom: 24, padding: '16px', background: 'rgba(124,58,237,0.05)', border: `1px solid ${C.border}`, borderRadius: 12 }}>
+          <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+            <button onClick={onApprove} style={{ flex: 1, padding: '11px', background: C.green, border: 'none', borderRadius: 8, color: '#fff', fontFamily: C.body, fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>✓ Approve</button>
+            <button onClick={onReject}  style={{ flex: 1, padding: '11px', background: 'none', border: `1px solid ${C.red}`, borderRadius: 8, color: C.red, fontFamily: C.body, fontSize: '0.82rem', cursor: 'pointer' }}>✗ Reject</button>
+            <button onClick={onSchedule} style={{ flex: 1, padding: '11px', background: C.teal, border: 'none', borderRadius: 8, color: '#fff', fontFamily: C.body, fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>Schedule →</button>
+          </div>
+          <button onClick={onDelete} style={{ width: '100%', padding: '8px', background: 'none', border: `1px solid ${C.border}`, borderRadius: 7, color: C.dim, fontFamily: C.body, fontSize: '0.74rem', cursor: 'pointer' }}>🗑 Delete this content</button>
         </div>
       )}
       {status === 'approved' && (
-        <button onClick={onSchedule} style={{ width: '100%', padding: '11px', background: C.teal, border: 'none', borderRadius: 8, color: '#fff', fontFamily: C.body, fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', marginBottom: 24 }}>Schedule via Blotato →</button>
+        <div style={{ marginBottom: 24, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <button onClick={onSchedule} style={{ width: '100%', padding: '11px', background: C.teal, border: 'none', borderRadius: 8, color: '#fff', fontFamily: C.body, fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>Schedule via Blotato →</button>
+          <button onClick={onDelete} style={{ width: '100%', padding: '8px', background: 'none', border: `1px solid ${C.border}`, borderRadius: 7, color: C.dim, fontFamily: C.body, fontSize: '0.74rem', cursor: 'pointer' }}>🗑 Delete this content</button>
+        </div>
       )}
 
       <Row label="Hook"          value={f(r, 'Hook')} />

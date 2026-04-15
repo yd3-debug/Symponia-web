@@ -1,30 +1,39 @@
 import type { Metadata, Viewport } from 'next';
-import { Cormorant_Garamond, Inter } from 'next/font/google';
+import { Inter, JetBrains_Mono } from 'next/font/google';
+import localFont from 'next/font/local';
 import './globals.css';
 
-const cormorant = Cormorant_Garamond({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600'],
-  style: ['normal', 'italic'],
-  variable: '--font-cormorant',
+// Cal Sans SemiBold — download CalSans-SemiBold.woff2 from
+// https://github.com/calcom/font and place at public/fonts/CalSans-SemiBold.woff2
+const calSans = localFont({
+  src: '../public/fonts/CalSans-SemiBold.woff2',
+  variable: '--font-cal-sans',
+  weight: '600',
   display: 'swap',
 });
 
 const inter = Inter({
   subsets: ['latin'],
-  weight: ['300', '400', '500'],
+  weight: ['300', '400', '500', '600'],
   variable: '--font-inter',
+  display: 'swap',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500'],
+  variable: '--font-jetbrains-mono',
   display: 'swap',
 });
 
 const BASE_URL = 'https://symponia.io';
 const TITLE = 'Symponia — Hear Yourself Again';
 const DESCRIPTION =
-  'An AI oracle that speaks in the language of your soul. Daily readings, animal archetypes, zodiac guidance, and deep conversation — crafted for those who sense there is more.';
+  'An AI companion that speaks in the language of your soul. Daily reflections, animal archetypes, and deep conversation — crafted for those who sense there is more.';
 const OG_IMAGE = `${BASE_URL}/logo.jpg`;
 
 export const viewport: Viewport = {
-  themeColor: '#08061c',
+  themeColor: '#08080F',
   colorScheme: 'dark',
   width: 'device-width',
   initialScale: 1,
@@ -39,14 +48,14 @@ export const metadata: Metadata = {
   },
   description: DESCRIPTION,
   keywords: [
-    'oracle app',
-    'AI oracle',
+    'AI companion',
+    'self-discovery app',
     'spiritual app',
     'animal archetypes',
-    'daily readings',
+    'daily reflections',
     'self-discovery',
     'soul guidance',
-    'zodiac',
+    'inner work',
     'moon phases',
     'iOS spiritual app',
     'mindfulness',
@@ -155,7 +164,7 @@ const jsonLd = [
         name: 'Free starter credits',
         price: '0',
         priceCurrency: 'USD',
-        description: '10 free oracle credits included on first install',
+        description: '10 free conversations included on first install',
       },
       {
         '@type': 'Offer',
@@ -171,16 +180,16 @@ const jsonLd = [
     image: OG_IMAGE,
     screenshot: OG_IMAGE,
     featureList: [
-      'Daily planetary readings',
+      'Daily personalised reflections',
       'Animal archetype discovery',
-      'Zodiac compass readings',
+      'Six reflective conversation modes',
       'Frequency tuning',
       'AI-powered deep conversations',
-      'Moon phase guidance',
-      'Chinese Heavenly Stem cycle integration',
-      'Personalised oracle identity',
+      'Dream and shadow work',
+      'Moon phase and planetary guidance',
+      'Personalised companion identity',
     ],
-    keywords: 'oracle, AI oracle, spiritual app, animal archetypes, zodiac, moon phases, self-discovery, daily readings',
+    keywords: 'self-discovery app, AI companion, animal archetypes, daily reflections, inner work, iOS wellness app',
     inLanguage: 'en',
     publisher: {
       '@type': 'Organization',
@@ -218,7 +227,7 @@ const jsonLd = [
         name: 'What is Symponia?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Symponia is an AI oracle app for iOS that provides daily spiritual readings, animal archetype discovery, zodiac guidance, and deep self-reflective conversations. It combines planetary day rulers, moon phases, Chinese Heavenly Stem cycles, and personal archetypes into a single contemplative experience.',
+          text: 'Symponia is an AI-powered self-reflection app for iOS. It uses animal archetypes, daily personalised reflections, and six conversation modes to help you explore your inner life. It is powered by Claude, Anthropic\'s AI.',
         },
       },
       {
@@ -226,7 +235,7 @@ const jsonLd = [
         name: 'How does Symponia work?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Symponia uses AI to offer personalised oracle readings based on your animal archetypes, zodiac sign, moon phases, and planetary day rulers. You select symbolic animals (archetypes) that represent your nature, enter your birth date, choose your resonance frequency, and receive daily readings and deep conversation tailored to your unique pattern.',
+          text: 'You select seven spirit animals that represent facets of your nature. Symponia uses these archetypes along with your resonance frequency to personalise all reflections and conversations. Each session draws on your unique animal constellation.',
         },
       },
       {
@@ -234,7 +243,7 @@ const jsonLd = [
         name: 'Is Symponia free?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Symponia is free to download on the App Store. New users receive 10 free oracle credits to begin. Additional credits are available as one-time token pack purchases — there is no subscription.',
+          text: 'Symponia is free to download on the App Store. New users receive 10 free credits to begin. Additional credits are available as one-time token pack purchases — there is no subscription required.',
         },
       },
       {
@@ -242,15 +251,15 @@ const jsonLd = [
         name: 'What are animal archetypes in Symponia?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Animal archetypes are symbolic animals you select to represent different facets of your nature. The oracle weaves these into your readings, offering guidance rooted in your unique energy pattern. Unlike quiz-assigned results, you choose your archetypes deliberately.',
+          text: 'Animal archetypes are symbolic animals you choose to represent different facets of your nature. Unlike quiz-assigned results, you select them deliberately. Symponia weaves these animals into all reflections and conversations.',
         },
       },
       {
         '@type': 'Question',
-        name: 'What is frequency tuning in Symponia?',
+        name: 'Is Symponia therapy or a medical service?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Frequency tuning lets you choose how the oracle speaks to you: Quiet (sparse, minimal, contemplative), Intellectual (conceptual and philosophically precise), or Deeply Emotional (rich, feeling-forward, and metaphorical). You can change your frequency at any time.',
+          text: 'No. Symponia is a reflective and contemplative tool, not a medical, therapeutic, or psychological service. Nothing in the app constitutes professional advice or diagnosis. If you need mental health support, please consult a qualified professional.',
         },
       },
       {
@@ -267,7 +276,7 @@ const jsonLd = [
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${cormorant.variable} ${inter.variable}`}>
+    <html lang="en" className={`${calSans.variable} ${inter.variable} ${jetbrainsMono.variable}`}>
       <head>
         {/* LLM/AI crawler discovery */}
         <link rel="alternate" type="text/plain" title="LLMs.txt" href="/llms.txt" />

@@ -6,7 +6,7 @@ import './globals.css';
 // Cal Sans SemiBold — download CalSans-SemiBold.woff2 from
 // https://github.com/calcom/font and place at public/fonts/CalSans-SemiBold.woff2
 const calSans = localFont({
-  src: '../public/fonts/CalSans-SemiBold.woff2',
+  src: '../public/CalSans-SemiBold.woff2',
   variable: '--font-cal-sans',
   weight: '600',
   display: 'swap',

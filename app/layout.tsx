@@ -1,30 +1,39 @@
 import type { Metadata, Viewport } from 'next';
-import { Cormorant_Garamond, Inter } from 'next/font/google';
+import { Inter, JetBrains_Mono } from 'next/font/google';
+import localFont from 'next/font/local';
 import './globals.css';
 
-const cormorant = Cormorant_Garamond({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600'],
-  style: ['normal', 'italic'],
-  variable: '--font-cormorant',
+// Cal Sans SemiBold — download CalSans-SemiBold.woff2 from
+// https://github.com/calcom/font and place at public/fonts/CalSans-SemiBold.woff2
+const calSans = localFont({
+  src: '../public/fonts/CalSans-SemiBold.woff2',
+  variable: '--font-cal-sans',
+  weight: '600',
   display: 'swap',
 });
 
 const inter = Inter({
   subsets: ['latin'],
-  weight: ['300', '400', '500'],
+  weight: ['300', '400', '500', '600'],
   variable: '--font-inter',
+  display: 'swap',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500'],
+  variable: '--font-jetbrains-mono',
   display: 'swap',
 });
 
 const BASE_URL = 'https://symponia.io';
 const TITLE = 'Symponia — Hear Yourself Again';
 const DESCRIPTION =
-  'An AI oracle that speaks in the language of your soul. Daily readings, animal archetypes, zodiac guidance, and deep conversation — crafted for those who sense there is more.';
+  'An AI companion that speaks in the language of your soul. Daily reflections, animal archetypes, and deep conversation — crafted for those who sense there is more.';
 const OG_IMAGE = `${BASE_URL}/logo.jpg`;
 
 export const viewport: Viewport = {
-  themeColor: '#08061c',
+  themeColor: '#08080F',
   colorScheme: 'dark',
   width: 'device-width',
   initialScale: 1,
@@ -39,14 +48,14 @@ export const metadata: Metadata = {
   },
   description: DESCRIPTION,
   keywords: [
-    'oracle app',
-    'AI oracle',
+    'AI companion',
+    'self-discovery app',
     'spiritual app',
     'animal archetypes',
-    'daily readings',
+    'daily reflections',
     'self-discovery',
     'soul guidance',
-    'zodiac',
+    'inner work',
     'moon phases',
     'iOS spiritual app',
     'mindfulness',
@@ -132,6 +141,14 @@ const jsonLd = [
     name: 'Symponia',
     url: BASE_URL,
     description: DESCRIPTION,
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${BASE_URL}/?q={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
   },
   {
     '@context': 'https://schema.org',
@@ -141,25 +158,65 @@ const jsonLd = [
     url: BASE_URL,
     applicationCategory: 'LifestyleApplication',
     operatingSystem: 'iOS',
-    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    offers: [
+      {
+        '@type': 'Offer',
+        name: 'Free starter credits',
+        price: '0',
+        priceCurrency: 'USD',
+        description: '10 free conversations included on first install',
+      },
+      {
+        '@type': 'Offer',
+        name: 'Token packs',
+        price: '0',
+        priceCurrency: 'USD',
+        description: 'Additional one-time token packs available in-app',
+        availability: 'https://schema.org/InStock',
+      },
+    ],
     installUrl: 'https://apps.apple.com/app/symponia/id6744058607',
+    downloadUrl: 'https://apps.apple.com/app/symponia/id6744058607',
     image: OG_IMAGE,
+    screenshot: OG_IMAGE,
     featureList: [
-      'Daily planetary readings',
+      'Daily personalised reflections',
       'Animal archetype discovery',
-      'Zodiac compass readings',
+      'Six reflective conversation modes',
       'Frequency tuning',
       'AI-powered deep conversations',
-      'Moon phase guidance',
+      'Dream and shadow work',
+      'Moon phase and planetary guidance',
+      'Personalised companion identity',
     ],
+    keywords: 'self-discovery app, AI companion, animal archetypes, daily reflections, inner work, iOS wellness app',
+    inLanguage: 'en',
+    publisher: {
+      '@type': 'Organization',
+      name: 'Symponia',
+      url: BASE_URL,
+    },
   },
   {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'Symponia',
+    legalName: 'Symponia Ltd',
     url: BASE_URL,
-    logo: OG_IMAGE,
-    sameAs: ['https://apps.apple.com/app/symponia/id6744058607'],
+    logo: {
+      '@type': 'ImageObject',
+      url: OG_IMAGE,
+      width: 1200,
+      height: 630,
+    },
+    sameAs: [
+      'https://apps.apple.com/app/symponia/id6744058607',
+    ],
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'customer support',
+      availableLanguage: 'English',
+    },
   },
   {
     '@context': 'https://schema.org',
@@ -170,7 +227,7 @@ const jsonLd = [
         name: 'What is Symponia?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Symponia is an AI oracle app for iOS that provides daily spiritual readings, animal archetype discovery, zodiac guidance, and deep self-reflective conversations.',
+          text: 'Symponia is an AI-powered self-reflection app for iOS. It uses animal archetypes, daily personalised reflections, and six conversation modes to help you explore your inner life. It is powered by Claude, Anthropic\'s AI.',
         },
       },
       {
@@ -178,7 +235,7 @@ const jsonLd = [
         name: 'How does Symponia work?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Symponia uses AI to offer personalised oracle readings based on your animal archetypes, zodiac sign, moon phases, and planetary day rulers. You can ask questions, receive daily readings, and explore your inner landscape through guided conversation.',
+          text: 'You select seven spirit animals that represent facets of your nature. Symponia uses these archetypes along with your resonance frequency to personalise all reflections and conversations. Each session draws on your unique animal constellation.',
         },
       },
       {
@@ -186,7 +243,7 @@ const jsonLd = [
         name: 'Is Symponia free?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Symponia is free to download on the App Store. It includes a starter token balance and offers optional token packs for continued use.',
+          text: 'Symponia is free to download on the App Store. New users receive 10 free credits to begin. Additional credits are available as one-time token pack purchases — there is no subscription required.',
         },
       },
       {
@@ -194,7 +251,23 @@ const jsonLd = [
         name: 'What are animal archetypes in Symponia?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Animal archetypes are symbolic animals you select to represent different facets of your nature. The oracle weaves these into your readings, offering guidance rooted in your unique energy pattern.',
+          text: 'Animal archetypes are symbolic animals you choose to represent different facets of your nature. Unlike quiz-assigned results, you select them deliberately. Symponia weaves these animals into all reflections and conversations.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Is Symponia therapy or a medical service?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'No. Symponia is a reflective and contemplative tool, not a medical, therapeutic, or psychological service. Nothing in the app constitutes professional advice or diagnosis. If you need mental health support, please consult a qualified professional.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Is Symponia available on Android?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Symponia is currently only available on iOS via the Apple App Store.',
         },
       },
     ],
@@ -203,8 +276,11 @@ const jsonLd = [
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${cormorant.variable} ${inter.variable}`}>
+    <html lang="en" className={`${calSans.variable} ${inter.variable} ${jetbrainsMono.variable}`}>
       <head>
+        {/* LLM/AI crawler discovery */}
+        <link rel="alternate" type="text/plain" title="LLMs.txt" href="/llms.txt" />
+        <link rel="alternate" type="text/plain" title="LLMs-full.txt" href="/llms-full.txt" />
         {jsonLd.map((schema, i) => (
           <script
             key={i}

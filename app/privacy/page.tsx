@@ -1,9 +1,9 @@
 import { PageShell } from '@/components/PageShell';
 
 const C = {
-  fg: '#eae6f8', sub: '#cac4e0', dim: '#a89ec8', cyan: '#5ce8d0',
-  border: 'rgba(255,255,255,0.07)',
-  heading: "var(--font-cormorant), 'Georgia', serif",
+  fg: '#F1F0FF', sub: '#8B8BA8', dim: '#4A4A6A', cyan: '#06B6D4',
+  border: '#1A1A30',
+  heading: "var(--font-cal-sans), 'Inter', sans-serif",
   body: "var(--font-inter), 'Helvetica Neue', sans-serif",
 };
 
@@ -37,13 +37,13 @@ export default function PrivacyPage() {
             <li>Your seven spirit animals</li>
             <li>Your name and gender (if provided during onboarding)</li>
             <li>Your resonance frequency preference</li>
-            <li>Conversation history per Oracle mode</li>
+            <li>Conversation history per mode</li>
             <li>Token balance</li>
             <li>Notification preferences</li>
           </ul>
           <p style={{ marginTop: 16 }}><strong style={{ color: C.fg, fontWeight: 400 }}>Data transmitted during a session:</strong></p>
           <ul style={{ marginTop: 10, paddingLeft: 20, lineHeight: 2 }}>
-            <li>Your message text (to generate Oracle responses)</li>
+            <li>Your message text (to generate Symponia responses)</li>
             <li>Your animal data and preferences (to personalise responses)</li>
           </ul>
           <p style={{ marginTop: 16 }}>Messages are sent to our secure backend (Supabase Edge Functions) and then to Anthropic's Claude API to generate responses. We do not store the content of your conversations on our servers after the session ends.</p>
@@ -51,8 +51,8 @@ export default function PrivacyPage() {
 
         <Section title="How we use your data">
           <ul style={{ paddingLeft: 20, lineHeight: 2 }}>
-            <li>To generate personalised Oracle responses</li>
-            <li>To deliver your daily reading</li>
+            <li>To generate personalised Symponia responses</li>
+            <li>To deliver your daily reflection</li>
             <li>To maintain your session during a conversation</li>
             <li>To process token and subscription purchases (via Stripe)</li>
             <li>To send optional push notifications (if you have enabled them)</li>

@@ -5,12 +5,12 @@ import { motion } from 'framer-motion';
 import React from 'react';
 
 const C = {
-  bg: '#08061c', bgCard: 'rgba(255,255,255,0.03)',
-  fg: '#eae6f8', sub: '#cac4e0', dim: '#a89ec8',
-  cyan: '#5ce8d0', violet: '#a78bfa',
-  border: 'rgba(255,255,255,0.07)',
-  borderStrong: 'rgba(255,255,255,0.13)',
-  heading: "var(--font-cormorant), 'Georgia', serif",
+  bg: '#08080F', bgCard: 'rgba(15,15,26,0.85)',
+  fg: '#F1F0FF', sub: '#8B8BA8', dim: '#4A4A6A',
+  cyan: '#06B6D4', violet: '#9F67FF',
+  border: '#1A1A30',
+  borderStrong: '#2D2D50',
+  heading: "var(--font-cal-sans), 'Inter', sans-serif",
   body: "var(--font-inter), 'Helvetica Neue', sans-serif",
 };
 
@@ -20,8 +20,8 @@ const PACKS = [
     name: 'New arrivals',
     tokens: 10,
     price: 'Free',
-    desc: 'Experience the oracle.',
-    detail: '10 free readings to begin',
+    desc: 'Begin your journey.',
+    detail: '10 free conversations to begin',
     accent: C.dim,
     popular: false,
   },
@@ -124,7 +124,7 @@ export default function CreditsPage() {
             Choose your depth
           </h1>
           <p style={{ fontFamily: C.body, fontSize: '0.95rem', fontWeight: 300, color: C.sub, maxWidth: 480, margin: '0 auto', lineHeight: 1.85 }}>
-            New to Symponia? You get 10 free readings to experience the oracle. When you're ready to go deeper, top up with tokens or subscribe — all from within the app.
+            New to Symponia? You get 10 free conversations to explore the app. When you're ready to go deeper, top up with tokens or subscribe — all from within the app.
           </p>
         </div>
 
@@ -137,10 +137,10 @@ export default function CreditsPage() {
 
         {/* How readings work */}
         <div style={{ maxWidth: 640, margin: '0 auto' }}>
-          <h2 style={{ fontFamily: C.heading, fontSize: '1.8rem', fontWeight: 300, color: C.fg, marginBottom: 32, textAlign: 'center' }}>How readings work</h2>
+          <h2 style={{ fontFamily: C.heading, fontSize: '1.8rem', fontWeight: 300, color: C.fg, marginBottom: 32, textAlign: 'center' }}>How it works</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {[
-              { icon: '◎', title: 'One token per exchange', body: 'Each conversation exchange uses 1 token — roughly 2 messages back and forth with the Oracle, regardless of mode.' },
+              { icon: '◎', title: 'One token per exchange', body: 'Each conversation exchange uses 1 token — roughly 2 messages back and forth with Symponia, regardless of mode.' },
               { icon: '∞', title: 'Tokens never expire', body: 'Your tokens stay in your account indefinitely. No resets, no monthly fees — just tokens when you need them.' },
               { icon: '📱', title: 'Purchase inside the app', body: 'Tokens and subscriptions are purchased directly within the Symponia iOS app. Your balance is stored on your device.' },
               { icon: '🔒', title: 'Secure payment via Stripe', body: 'All payments are processed by Stripe, the world\'s leading payment platform. We never see or store your card details.' },

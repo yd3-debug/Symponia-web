@@ -29,7 +29,7 @@ The 7-animal selection is the most shareable mechanic.
 Hook: curiosity about self-knowledge. What does your animal say about you?
 
 ### 2. Daily philosophical quotes
-Short. From the oracle's voice. Speak to the inner life.
+Short. From Symponia's voice. Speak to the inner life.
 Feel like something you'd write in a journal, not a motivational poster.
 
 ### 3. Shadow work
@@ -67,4 +67,4 @@ Why slowing down in conversation changes what emerges.
 - Carousels for deeper philosophical content (swipe = depth)
 - Single quote cards for daily content
 - Reels: same approach as TikTok
-- Stories: daily reading previews, "what's your dominant animal?"
+- Stories: daily reflection previews, "what's your dominant animal?"

@@ -657,7 +657,7 @@ function Footer() {
           <div style={{ display: 'flex', gap: 52, flexWrap: 'wrap' }}>
             {[
               { title: 'App', links: [['App Store', APP_STORE_URL], ['How it works', '#how-it-works'], ['Modes', '#modes'], ['Pricing', '/credits']] },
-              { title: 'Legal', links: [['Privacy Policy', '/privacy'], ['Terms of Service', '/terms'], ['EULA', '/eula'], ['GDPR', '/privacy#gdpr'], ['Contact', 'mailto:hello@symponia.io']] },
+              { title: 'Legal', links: [['Privacy Policy', '/privacy'], ['Terms of Service', '/terms'], ['EULA', '/eula'], ['Credits', '/credits'], ['Contact', 'mailto:hello@symponia.io']] },
             ].map(col => (
               <div key={col.title}>
                 <div style={{ fontFamily: C.body, fontSize: '0.66rem', letterSpacing: '0.2em', color: C.dim, textTransform: 'uppercase', marginBottom: 16 }}>{col.title}</div>
@@ -671,7 +671,12 @@ function Footer() {
           </div>
         </div>
         <div style={{ borderTop: `0.5px solid ${C.border}`, marginTop: 48, paddingTop: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <p style={{ fontFamily: C.body, fontSize: '0.7rem', fontWeight: 300, color: C.dim, opacity: 0.5 }}>© {new Date().getFullYear()} Symponia. All rights reserved.</p>
+          <div>
+            <p style={{ fontFamily: C.body, fontSize: '0.7rem', fontWeight: 300, color: C.dim, opacity: 0.5, margin: 0 }}>© {new Date().getFullYear()} Symponia. All rights reserved.</p>
+            <a href="https://yektad.com" target="_blank" rel="noopener noreferrer"
+              style={{ fontFamily: C.body, fontSize: '0.68rem', color: C.dim, opacity: 0.35, textDecoration: 'none', display: 'block', marginTop: 4 }}
+            >Built by YD</a>
+          </div>
           <a href="/dashboard" style={{ fontFamily: C.body, fontSize: '0.75rem', color: C.dim, opacity: 0.18, textDecoration: 'none', lineHeight: 1, userSelect: 'none' }}>›</a>
         </div>
       </div>

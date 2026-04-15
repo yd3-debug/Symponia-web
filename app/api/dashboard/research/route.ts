@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({ topic, platform, command: topic }),
-      signal:  AbortSignal.timeout(25000),   // 25s max
+      signal:  AbortSignal.timeout(75000),   // 75s — Exa+Perplexity+Claude ~45s cache miss, ~20s cache hit
     });
 
     const text = await res.text();

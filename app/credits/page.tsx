@@ -1,8 +1,9 @@
 'use client';
 
 import { PageShell } from '@/components/PageShell';
+import { getPricingForLocale, fmt, type RegionalPricing } from '@/lib/pricing';
 import { motion } from 'framer-motion';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 const C = {
   bg: '#08061c', bgCard: 'rgba(255,255,255,0.03)',
@@ -14,50 +15,54 @@ const C = {
   body: "var(--font-inter), 'Helvetica Neue', sans-serif",
 };
 
-const PACKS = [
-  {
-    id: 'free',
-    name: 'New arrivals',
-    tokens: 10,
-    price: 'Free',
-    desc: 'Experience the oracle.',
-    detail: '10 free readings to begin',
-    accent: C.dim,
-    popular: false,
-  },
-  {
-    id: 'starter',
-    name: 'Tokens',
-    tokens: 50,
-    price: '£4.99',
-    desc: 'Yours to keep, forever.',
-    detail: '~100 messages · never expire',
-    accent: C.cyan,
-    popular: false,
-  },
-  {
-    id: 'deeper',
-    name: 'Tokens',
-    tokens: 150,
-    price: '£9.99',
-    desc: 'Yours to keep, forever.',
-    detail: '~300 messages · never expire',
-    accent: C.cyan,
-    popular: true,
-  },
-  {
-    id: 'monthly',
-    name: 'Monthly',
-    tokens: 350,
-    price: '£12.99',
-    desc: '350 tokens per month. Unused tokens reset at renewal.',
-    detail: 'per month · cancel anytime',
-    accent: C.violet,
-    popular: false,
-  },
-];
+function buildPacks(p: RegionalPricing) {
+  return [
+    {
+      id: 'free',
+      name: 'New arrivals',
+      tokens: 10,
+      price: 'Free',
+      desc: 'Experience Symponia.',
+      detail: '10 free readings to begin',
+      accent: C.dim,
+      popular: false,
+    },
+    {
+      id: 'starter',
+      name: 'Tokens',
+      tokens: 50,
+      price: fmt(p, p.pack50),
+      desc: 'Yours to keep, forever.',
+      detail: '~100 messages · never expire',
+      accent: C.cyan,
+      popular: false,
+    },
+    {
+      id: 'deeper',
+      name: 'Tokens',
+      tokens: 150,
+      price: fmt(p, p.pack150),
+      desc: 'Yours to keep, forever.',
+      detail: '~300 messages · never expire',
+      accent: C.cyan,
+      popular: true,
+    },
+    {
+      id: 'monthly',
+      name: 'Monthly',
+      tokens: null,
+      price: fmt(p, p.monthly),
+      desc: 'Unlimited readings. Auto-renews monthly — cancel anytime in App Store Settings.',
+      detail: `per month · ${p.code} · cancel anytime`,
+      accent: C.violet,
+      popular: false,
+    },
+  ];
+}
 
-function PricingCard({ pack }: { pack: typeof PACKS[0] }) {
+type Pack = ReturnType<typeof buildPacks>[number];
+
+function PricingCard({ pack }: { pack: Pack }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -94,8 +99,12 @@ function PricingCard({ pack }: { pack: typeof PACKS[0] }) {
 
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 0', borderTop: `0.5px solid ${C.border}`, borderBottom: `0.5px solid ${C.border}` }}>
-          <span style={{ fontFamily: C.heading, fontSize: '2rem', fontWeight: 300, color: pack.accent }}>{pack.tokens}</span>
-          <span style={{ fontFamily: C.body, fontSize: '0.75rem', fontWeight: 300, color: C.dim, letterSpacing: '0.08em' }}>tokens</span>
+          <span style={{ fontFamily: C.heading, fontSize: '2rem', fontWeight: 300, color: pack.accent }}>
+            {pack.tokens === null ? '∞' : pack.tokens}
+          </span>
+          <span style={{ fontFamily: C.body, fontSize: '0.75rem', fontWeight: 300, color: C.dim, letterSpacing: '0.08em' }}>
+            {pack.tokens === null ? 'readings' : 'tokens'}
+          </span>
         </div>
         <p style={{ fontFamily: C.body, fontSize: '0.82rem', fontWeight: 300, color: C.sub, marginTop: 14, lineHeight: 1.7 }}>{pack.desc}</p>
       </div>
@@ -108,6 +117,12 @@ function PricingCard({ pack }: { pack: typeof PACKS[0] }) {
 }
 
 export default function CreditsPage() {
+  const [packs, setPacks] = useState(() => buildPacks(getPricingForLocale(undefined)));
+
+  useEffect(() => {
+    setPacks(buildPacks(getPricingForLocale(navigator.language)));
+  }, []);
+
   return (
     <PageShell>
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '80px 28px 120px' }}>
@@ -118,13 +133,13 @@ export default function CreditsPage() {
             Choose your depth
           </h1>
           <p style={{ fontFamily: C.body, fontSize: '0.95rem', fontWeight: 300, color: C.sub, maxWidth: 480, margin: '0 auto', lineHeight: 1.85 }}>
-            New to Symponia? You get 10 free readings to experience the oracle. When you're ready to go deeper, top up with tokens or subscribe — all from within the app.
+            New to Symponia? You get free readings to experience the app. When you're ready to go deeper, top up with tokens or subscribe — all from within the app.
           </p>
         </div>
 
         {/* Cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 18, marginBottom: 80, maxWidth: 1000, margin: '0 auto 80px' }}>
-          {PACKS.map(pack => (
+          {packs.map(pack => (
             <PricingCard key={pack.id} pack={pack} />
           ))}
         </div>

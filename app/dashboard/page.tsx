@@ -217,10 +217,12 @@ interface ResearchIdea {
   hook: string;
   format: string;
   pillar: string;
+  emotionalTrigger?: string;
   whyItWorks: string;
 }
 interface ResearchResult {
   ok: boolean;
+  cached?: boolean;
   platform: string;
   topic: string;
   command?: string;
@@ -228,6 +230,7 @@ interface ResearchResult {
   timingWindow: string;
   hashtags: string;
   topRedditTitles: string[];
+  topPerplexityTitles?: string[];
   topNewsTitles?: string[];
   topHNTitles?: string[];
   topSubreddits: string[];
@@ -237,6 +240,14 @@ interface ResearchResult {
   searchQuery?: string;
   summary?: string;
   bestFormat?: string;
+  trendStatus?: string;
+  hookPatterns?: string[];
+  emotionalTrigger?: string;
+  contentGap?: string;
+  competitorBlindSpot?: string;
+  viralMechanism?: string;
+  winningFormat?: string;
+  topAngles?: string[];
   ideas?: ResearchIdea[];
   algoTopSignals: string;
   algoFormatWinner: string;
@@ -725,7 +736,7 @@ export default function Dashboard() {
       </aside>
 
       {/* ── RIGHT SIDE: top bar + main content ─────────────────────────────── */}
-      <div style={{ marginLeft: 240, flex: 1, display: 'flex', flexDirection: 'column', minHeight: '100vh', minWidth: 0 }}>
+      <div style={{ marginLeft: 240, flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', minWidth: 0 }}>
 
         {/* ── Slim top bar ── */}
         <header style={{ height: 52, background: C.bgMid, borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', padding: '0 24px', gap: 0, flexShrink: 0, position: 'sticky', top: 0, zIndex: 100 }}>
@@ -754,7 +765,7 @@ export default function Dashboard() {
         </header>
 
         {/* ── Main content ── */}
-        <main style={{ flex: 1, overflowY: 'auto', padding: tab === 'brief' ? 0 : tab === 'research' || tab === 'models' ? '28px 36px' : '24px' }}>
+        <main style={{ flex: 1, minHeight: 0, overflow: tab === 'brief' ? 'hidden' : 'auto', padding: tab === 'brief' ? 0 : tab === 'research' || tab === 'models' ? '28px 36px' : '24px' }}>
 
           {/* ── QUEUE TAB ── */}
           {tab === 'queue' && (
@@ -891,10 +902,10 @@ export default function Dashboard() {
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
                       {[
-                        { text: 'Create a TikTok video about shadow work trends',     icon: '▶', platform: 'TikTok' },
+                        { text: 'Create a TikTok video about the wolf archetype and leadership',     icon: '▶', platform: 'TikTok' },
                         { text: 'Write a LinkedIn post on animal archetype psychology', icon: '◻', platform: 'LinkedIn' },
                         { text: 'Generate an Instagram carousel on the 7 spirit animals', icon: '◎', platform: 'Instagram' },
-                        { text: 'Create content on collective shadow and society',       icon: '◈', platform: 'All' },
+                        { text: 'Create content on biodynamic living and daily oracle practices',    icon: '◈', platform: 'All' },
                       ].map(s => (
                         <button key={s.text} onClick={() => setChatInput(s.text)}
                           style={{ padding: '12px 14px', background: dark ? 'rgba(255,255,255,0.03)' : '#fff', border: `1px solid ${C.border}`, borderRadius: 10, color: C.sub, fontFamily: C.body, fontSize: '0.78rem', cursor: 'pointer', textAlign: 'left', lineHeight: 1.5, transition: 'all .15s', display: 'flex', flexDirection: 'column', gap: 6 }}
@@ -1104,9 +1115,10 @@ export default function Dashboard() {
               {researchLoading && (
                 <div style={{ padding: '48px 24px', textAlign: 'center', background: dark ? 'rgba(255,255,255,0.025)' : '#fff', border: `1px solid ${C.border}`, borderRadius: 14 }}>
                   <div style={{ width: 48, height: 48, borderRadius: '50%', border: `3px solid ${C.violet}33`, borderTop: `3px solid ${C.violet}`, margin: '0 auto 16px', animation: 'spin 1s linear infinite' }} />
-                  <div style={{ fontSize: '0.9rem', fontWeight: 600, color: C.fg, marginBottom: 6 }}>Agents are scanning…</div>
+                  <div style={{ fontSize: '0.9rem', fontWeight: 600, color: C.fg, marginBottom: 6 }}>Agents are scanning the web…</div>
                   <div style={{ fontSize: '0.78rem', color: C.dim, lineHeight: 1.7 }}>
-                    Trend Researcher is checking Reddit, Google Trends, and platform signals.<br />This takes up to 25 seconds.
+                    Exa deep search · Perplexity real-time · Reddit community signals<br />
+                    First scan takes up to 45s — repeat topics return instantly from cache.
                   </div>
                   <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
                 </div>
@@ -1134,6 +1146,11 @@ export default function Dashboard() {
                         <span style={{ fontSize: '0.6rem', color: C.dim, background: dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', padding: '2px 8px', borderRadius: 10 }}>
                           {r.platform === 'all' ? 'All Platforms' : r.platform}
                         </span>
+                        {r.cached && (
+                          <span style={{ fontSize: '0.6rem', fontWeight: 600, color: C.teal, background: `${C.teal}18`, padding: '2px 8px', borderRadius: 10 }}>
+                            ⚡ cached
+                          </span>
+                        )}
                       </div>
                       <div style={{ fontSize: '1.05rem', fontWeight: 700, color: C.fg, lineHeight: 1.5, marginBottom: 10 }}>
                         {r.trendingAngle || `${r.topic}`}
@@ -1155,6 +1172,67 @@ export default function Dashboard() {
                         Brief this topic → Generate content
                       </button>
                     </div>
+
+                    {/* Viral Intelligence panel */}
+                    {(r.hookPatterns?.length || r.contentGap || r.competitorBlindSpot || r.viralMechanism) && (
+                      <div style={{ padding: '20px 22px', background: dark ? 'rgba(92,232,208,0.05)' : '#f0fdf9', border: `1px solid ${C.cyan}44`, borderRadius: 14, position: 'relative', overflow: 'hidden' }}>
+                        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, ${C.cyan}, ${C.violet})` }} />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                          <span style={{ fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.cyan }}>◉ Viral Intelligence</span>
+                          {r.trendStatus && (
+                            <span style={{ fontSize: '0.62rem', fontWeight: 700, padding: '2px 8px', borderRadius: 10, background: r.trendStatus === 'rising' ? `${C.green}22` : r.trendStatus === 'peaked' ? `${C.orange}22` : r.trendStatus === 'saturated' ? `${C.red}22` : `${C.violet}22`, color: r.trendStatus === 'rising' ? C.green : r.trendStatus === 'peaked' ? C.orange : r.trendStatus === 'saturated' ? C.red : C.violet }}>
+                              {r.trendStatus === 'rising' ? '↑ Rising' : r.trendStatus === 'peaked' ? '⚡ Peaked' : r.trendStatus === 'saturated' ? '↓ Saturated' : '◎ Evergreen'}
+                            </span>
+                          )}
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                          {r.hookPatterns && r.hookPatterns.length > 0 && (
+                            <div>
+                              <div style={{ fontSize: '0.6rem', fontWeight: 700, color: C.dim, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>Hook Patterns Working Now</div>
+                              {r.hookPatterns.map((h, i) => (
+                                <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 6, alignItems: 'flex-start' }}>
+                                  <span style={{ fontSize: '0.65rem', color: C.cyan, fontWeight: 700, flexShrink: 0, marginTop: 1 }}>{i + 1}</span>
+                                  <span style={{ fontSize: '0.78rem', color: C.sub, lineHeight: 1.45 }}>{h}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                            {r.contentGap && (
+                              <div>
+                                <div style={{ fontSize: '0.6rem', fontWeight: 700, color: C.dim, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 4 }}>Content Gap</div>
+                                <div style={{ fontSize: '0.78rem', color: C.sub, lineHeight: 1.5 }}>{r.contentGap}</div>
+                              </div>
+                            )}
+                            {r.competitorBlindSpot && (
+                              <div>
+                                <div style={{ fontSize: '0.6rem', fontWeight: 700, color: C.dim, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 4 }}>Competitor Blind Spot</div>
+                                <div style={{ fontSize: '0.78rem', color: C.sub, lineHeight: 1.5 }}>{r.competitorBlindSpot}</div>
+                              </div>
+                            )}
+                            {r.viralMechanism && (
+                              <div>
+                                <div style={{ fontSize: '0.6rem', fontWeight: 700, color: C.dim, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 4 }}>Why It Spreads</div>
+                                <div style={{ fontSize: '0.78rem', color: C.sub, lineHeight: 1.5 }}>{r.viralMechanism}</div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        {r.topAngles && r.topAngles.length > 0 && (
+                          <div style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid ${C.cyan}22` }}>
+                            <div style={{ fontSize: '0.6rem', fontWeight: 700, color: C.dim, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>Top Angles</div>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                              {r.topAngles.map((a, i) => (
+                                <button key={i} onClick={() => { setChatInput(`Create content using this angle: ${a}. Topic: ${r.topic}. Use hashtags: ${r.hashtags}.`); setChatPlatform((['instagram','tiktok','linkedin'].includes(r.platform) ? r.platform : 'all') as Platform); setTab('brief'); }}
+                                  style={{ fontSize: '0.72rem', padding: '5px 11px', borderRadius: 8, background: dark ? `${C.cyan}12` : '#f0fdf9', color: C.cyan, border: `1px solid ${C.cyan}33`, cursor: 'pointer', fontFamily: C.body }}>
+                                  {a} →
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
 
                     {/* 2-col grid: algo signals + reddit titles */}
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
@@ -1188,8 +1266,23 @@ export default function Dashboard() {
                           )}
                         </div>
 
+                        {/* Perplexity */}
+                        {r.topPerplexityTitles && r.topPerplexityTitles.length > 0 && (
+                          <div style={{ marginBottom: 14 }}>
+                            <div style={{ marginBottom: 6 }}>
+                              <span style={{ fontSize: '0.62rem', fontWeight: 700, color: C.cyan, background: dark ? 'rgba(92,232,208,0.12)' : '#e6fdf9', padding: '2px 7px', borderRadius: 6 }}>Perplexity Web</span>
+                            </div>
+                            {r.topPerplexityTitles.slice(0, 4).map((title, i) => (
+                              <div key={i} style={{ display: 'flex', gap: 7, marginBottom: 6, alignItems: 'flex-start' }}>
+                                <span style={{ fontSize: '0.65rem', color: C.cyan, fontWeight: 700, flexShrink: 0, marginTop: 2 }}>{i + 1}</span>
+                                <span style={{ fontSize: '0.77rem', color: C.sub, lineHeight: 1.45 }}>{title}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
                         {/* Reddit */}
-                        {r.topRedditTitles?.length > 0 && (
+                        {(r.topRedditTitles?.length ?? 0) > 0 && (
                           <div style={{ marginBottom: 14 }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
                               <span style={{ fontSize: '0.62rem', fontWeight: 700, color: C.orange, background: dark ? 'rgba(251,146,60,0.12)' : '#fff3e0', padding: '2px 7px', borderRadius: 6 }}>Reddit</span>
@@ -1207,7 +1300,7 @@ export default function Dashboard() {
                         )}
 
                         {/* Internet / News */}
-                        {r.topNewsTitles?.length > 0 && (
+                        {(r.topNewsTitles?.length ?? 0) > 0 && (
                           <div style={{ marginBottom: 14 }}>
                             <div style={{ marginBottom: 6 }}>
                               <span style={{ fontSize: '0.62rem', fontWeight: 700, color: C.teal, background: dark ? 'rgba(45,212,191,0.1)' : '#e6faf8', padding: '2px 7px', borderRadius: 6 }}>Internet / News</span>
@@ -1222,7 +1315,7 @@ export default function Dashboard() {
                         )}
 
                         {/* Hacker News */}
-                        {r.topHNTitles?.length > 0 && (
+                        {(r.topHNTitles?.length ?? 0) > 0 && (
                           <div>
                             <div style={{ marginBottom: 6 }}>
                               <span style={{ fontSize: '0.62rem', fontWeight: 700, color: C.dim, background: dark ? 'rgba(255,255,255,0.06)' : '#f0f0f5', padding: '2px 7px', borderRadius: 6 }}>Hacker News</span>
@@ -1264,12 +1357,15 @@ export default function Dashboard() {
                             <div key={i} style={{ padding: '18px 20px', background: C.bgCard, border: `1px solid ${C.border}`, borderRadius: 12, position: 'relative' }}>
                               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, marginBottom: 8 }}>
                                 <div style={{ flex: 1 }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 6 }}>
                                     <span style={{ fontSize: '0.62rem', fontWeight: 700, padding: '2px 8px', borderRadius: 8, background: dark ? `${C.violet}20` : '#ede9fb', color: C.violet }}>
                                       {idea.format || 'post'}
                                     </span>
                                     {idea.pillar && (
-                                      <span style={{ fontSize: '0.62rem', color: C.dim }}>{idea.pillar}</span>
+                                      <span style={{ fontSize: '0.62rem', color: C.dim, background: dark ? 'rgba(255,255,255,0.05)' : '#f4f3f9', padding: '2px 7px', borderRadius: 6 }}>{idea.pillar}</span>
+                                    )}
+                                    {idea.emotionalTrigger && (
+                                      <span style={{ fontSize: '0.6rem', color: C.cyan, background: dark ? `${C.cyan}12` : '#f0fdf9', padding: '2px 7px', borderRadius: 6 }}>↯ {idea.emotionalTrigger}</span>
                                     )}
                                   </div>
                                   <div style={{ fontSize: '0.92rem', fontWeight: 700, color: C.fg, marginBottom: 6 }}>{idea.title}</div>

@@ -1,0 +1,78 @@
+# Symponia
+
+> An AI oracle that speaks in the language of your soul.
+
+Symponia is an iOS app offering personalised spiritual guidance through AI-powered conversations. It combines animal archetypes, planetary day rulers, moon phases, Chinese Heavenly Stem cycles, and zodiac readings into a single contemplative experience.
+
+Symponia is for people who feel drawn to something deeper — not therapy, not entertainment, but a reflective practice rooted in symbolic and archetypal language.
+
+## What Symponia Does
+
+- **Daily Readings**: Every morning, a unique oracle reading generated from the day's planetary ruler, moon phase, and Chinese stem cycle — deterministic and cosmically resonant, not random.
+- **Animal Archetypes**: Users select animals that represent facets of their nature. The AI oracle weaves these animals into all readings and conversations for deep personalisation.
+- **Zodiac Compass**: Birth-date based Western and Chinese zodiac readings, integrated with the user's animal archetypes.
+- **Deep Conversation**: An AI that speaks in the register of the soul — not therapy, not horoscopes, but a third thing: oracular, poetic, grounded.
+- **Frequency Tuning**: Users set their resonance frequency (Quiet / Intellectual / Deeply Emotional) to calibrate the tone of all AI responses.
+
+## How It Works
+
+1. Download Symponia from the App Store (free).
+2. Select your animal archetypes — symbolic animals that represent your nature.
+3. Enter your birth date to unlock your zodiac compass.
+4. Choose your frequency: Quiet, Intellectual, or Deeply Emotional.
+5. Receive a daily oracle reading each morning, shaped by the day's planetary ruler and moon phase.
+6. Begin deep conversation with the AI oracle at any time.
+
+## Pricing
+
+- **Free to download**: New users receive 10 free oracle credits to begin.
+- **Token packs**: Additional credits purchased as one-time in-app purchases — no subscription required.
+- **Pricing varies by region**: The app uses regional pricing for fairness across markets.
+
+## Key Facts
+
+- Platform: iOS (App Store)
+- App Store ID: 6744058607
+- App Store URL: https://apps.apple.com/app/symponia/id6744058607
+- Website: https://symponia.io
+- Category: Lifestyle / Spiritual / Self-Discovery
+- Price: Free with optional in-app token packs
+- Developer: Symponia Ltd
+- Contact: Available via App Store listing
+
+## Frequently Asked Questions
+
+**What is Symponia?**
+Symponia is an AI oracle app for iOS that provides daily spiritual readings, animal archetype discovery, zodiac guidance, and deep self-reflective conversations.
+
+**Who is Symponia for?**
+Symponia is for people who sense there is more — those drawn to self-discovery, symbolic thinking, and contemplative practice. It is not a medical or therapeutic tool.
+
+**What are animal archetypes?**
+Animal archetypes are symbolic animals you select to represent different facets of your nature. The oracle weaves these into your readings, offering guidance rooted in your unique energy pattern.
+
+**What is frequency tuning?**
+Frequency tuning lets you choose how the oracle speaks to you: Quiet (sparse, minimal), Intellectual (conceptual, analytical), or Deeply Emotional (rich, feeling-forward). This calibrates all AI responses to your preferred register.
+
+**Is Symponia a subscription?**
+No. Symponia uses a token model. You start with free credits and can purchase additional token packs as one-time purchases.
+
+**Is Symponia available on Android?**
+Currently iOS only.
+
+**Is Symponia safe to use?**
+Yes. Symponia is a reflective tool, not a medical or therapeutic service. For mental health concerns, please consult a qualified professional.
+
+## Pages
+
+- [Home](https://symponia.io)
+- [Credits & Pricing](https://symponia.io/credits)
+- [Privacy Policy](https://symponia.io/privacy)
+- [Terms of Service](https://symponia.io/terms)
+- [EULA](https://symponia.io/eula)
+
+## Full Documentation
+
+For comprehensive AI-readable documentation including feature details, pricing structure, symbolic systems, competitive context, and brand voice guidelines, see:
+
+- [llms-full.txt](https://symponia.io/llms-full.txt)

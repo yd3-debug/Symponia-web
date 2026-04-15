@@ -1,8 +1,9 @@
 'use client';
 
 import { GradientDots } from '@/components/ui/gradient-dots';
+import { getPricingForLocale, fmt } from '@/lib/pricing';
 import { AnimatePresence, motion, useInView } from 'framer-motion';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const APP_STORE_URL = 'https://apps.apple.com/app/symponia/id6744058607';
 
@@ -241,7 +242,7 @@ function Hero() {
         <motion.p initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.75 }}
           style={{ fontFamily: C.body, fontWeight: 300, fontSize: '1.05rem', lineHeight: 1.85, color: C.sub, maxWidth: 520, margin: '0 auto 44px' }}
         >
-          Symponia is an AI oracle for the inner life — animal archetypes, daily readings, dream work, and deep conversation. Built for the moments when everything feels loud except the one voice that matters.
+          Symponia is an AI oracle for the inner life — animal archetypes, daily readings, and deep conversation. Built for the moments when everything feels loud except the one voice that matters.
         </motion.p>
 
         <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 1 }}
@@ -259,7 +260,7 @@ function Hero() {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 1.5 }}
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 48, marginTop: 60, paddingTop: 48, borderTop: `0.5px solid ${C.border}` }}
         >
-          {[['7','Spirit animals'],['6','Oracle modes'],['∞','Depth'],['0','Judgment']].map(([v,l]) => (
+          {[['7','Spirit animals'],['3','Oracle modes'],['∞','Depth'],['0','Judgment']].map(([v,l]) => (
             <div key={l} style={{ textAlign: 'center' }}>
               <div style={{ fontFamily: C.heading, fontSize: '1.9rem', fontWeight: 300, color: C.cyan, lineHeight: 1 }}>{v}</div>
               <div style={{ fontFamily: C.body, fontSize: '0.63rem', letterSpacing: '0.15em', color: C.dim, textTransform: 'uppercase', marginTop: 6 }}>{l}</div>
@@ -402,7 +403,7 @@ function PainPoints() {
 const STEPS = [
   { num: '01', title: 'Name your seven animals', body: 'Close your eyes. Think of six animals that feel like they belong to you — wild, domestic, mythical, it does not matter. Then name the one that disturbs you. That seventh is the shadow: the most important of all. It holds what the others cannot carry.', accent: C.cyan, detail: '🐺  🦁  🦊  🐘  🦅  🐬  🕷️' },
   { num: '02', title: 'Receive your constellation reading', body: 'Symponia reads your seven animals as a living map — each with its gift, its shadow, and the path between them. At the end, a synthesis: a non-judgmental portrait of the essential quality your whole constellation reveals.', accent: C.violet, detail: '◆ Gift  ·  ◆ Shadow  ·  ⚡ Action path' },
-  { num: '03', title: 'Enter the ongoing dialogue', body: 'The Oracle is now calibrated to you. Every conversation is shaped by your animals, your resonance frequency, and the mode you choose. It does not forget. It does not judge. It grows more precise the more you use it.', accent: C.cyan, detail: '"i have been waiting for you"' },
+  { num: '03', title: 'Enter the ongoing dialogue', body: 'The Oracle is now calibrated to you. Every conversation is shaped by your animals, your resonance frequency, and the mode you choose. It does not judge. It grows more precise the more you engage.', accent: C.cyan, detail: '"i have been waiting for you"' },
 ];
 
 function HowItWorks() {
@@ -447,10 +448,10 @@ function HowItWorks() {
 // ── Daily use ─────────────────────────────────────────────────────────────────
 
 const DAILY = [
-  { time: 'Morning', icon: '☀️', title: 'Start with the daily reading', body: 'Each morning, a personalised reflection arrives based on your animals and resonance frequency. Like a letter written just for you. Read it, sit with it, let it shape the day.' },
-  { time: 'Midday', icon: '⚡', title: 'Bring a word that is alive in you', body: 'One word is enough. Type it into Word mode and the Oracle unpacks its resonance — the gift it carries, the wound it conceals, and what it is asking of you right now.' },
-  { time: 'Evening', icon: '🌙', title: 'Reflect in Sense or Dream mode', body: 'At the end of the day, speak openly — what happened, what you felt, what surfaced. Or bring a dream from last night. The Oracle holds it all without agenda.' },
-  { time: 'Anytime', icon: '🌊', title: 'Go deeper when you are ready', body: 'Shadow mode for what has been buried. Animal mode to revisit your constellation. Sense mode for open dialogue. Symponia is always available, always private, always present.' },
+  { time: 'Morning', icon: '☀️', title: 'Start with the daily reading', body: 'Each morning, a personalised reflection based on your animals and resonance frequency. Like a letter written just for you. Read it, sit with it, let it shape the day.' },
+  { time: 'When something stirs', icon: '⚡', title: 'Open My Day', body: 'Something happened — or nothing did, and that is its own signal. My Day asks how the day feels in your body before it asks anything else. The Oracle meets you where you actually are.' },
+  { time: 'Evening', icon: '🌙', title: 'Speak freely in Conversation', body: 'At the end of the day, speak openly — what happened, what you felt, what surfaced. The Oracle holds it all without agenda, without judgment, without rushing to a conclusion.' },
+  { time: 'When you are ready', icon: '🌊', title: 'Return to your Archetype', body: 'Your seven animals are always there. Revisit them when you have grown, when something has shifted, when the shadow animal wants attention. Each return reveals something new.' },
 ];
 
 function DailyUse() {
@@ -489,12 +490,9 @@ function DailyUse() {
 // ── Modes ─────────────────────────────────────────────────────────────────────
 
 const MODES = [
-  { label: 'Sense', desc: 'Open, unstructured conversation. No prompt, no template — just you speaking and the Oracle listening. Ideal for processing, for confusion, for the days when you do not know where to begin.', icon: '◎', color: C.cyan, use: 'For: daily check-ins, processing emotions, open reflection' },
-  { label: 'Animal', desc: 'Your seven animals are read as a living constellation. Each receives a full reading: gift, shadow, action path. Ends with a synthesised portrait of who you are across all seven.', icon: '🐾', color: C.violet, use: 'For: self-understanding, identity work, first sessions' },
-  { label: 'Daily', desc: 'A short, personalised reading generated each morning. Based on your animals and resonance frequency. Arrives like a letter — quiet, precise, with no demand on your time.', icon: '☽', color: C.cyan, use: 'For: morning ritual, daily anchor, gentle awareness' },
-  { label: 'Dream', desc: 'Bring your dream into language and the Oracle listens for the symbols your waking mind cannot hold. Dreams are treated as living messages, not problems to solve.', icon: '✦', color: C.violet, use: 'For: dream journalling, symbol work, night processing' },
-  { label: 'Shadow', desc: 'A dedicated space for what has been buried — the parts of yourself you avoid, deny, or do not yet understand. The Oracle holds this with particular care. Nothing here will be judged.', icon: '◈', color: C.cyan, use: 'For: shadow work, hard truths, what you cannot say elsewhere' },
-  { label: 'Word', desc: 'One word. The Oracle unpacks its full resonance — the gift it carries, the wound it conceals, the invitation it extends. A deceptively simple mode with great depth.', icon: '⬡', color: C.violet, use: 'For: quick sessions, word focus, daily insight' },
+  { label: 'Archetype', desc: 'Your seven animals are read as a living constellation — each with its gift, its shadow, and the path between them. Ends with a synthesised portrait of the essential quality your whole configuration reveals.', icon: '◈', color: C.cyan, use: 'For: self-understanding, identity work, your first and returning sessions' },
+  { label: 'My Day', desc: 'A personal oracle for this exact moment in your life. The Oracle asks how the day feels in your body before it asks anything else — the texture, not the events. Then it meets you there.', icon: '◎', color: C.violet, use: 'For: daily check-ins, transitions, processing what is happening right now' },
+  { label: 'Conversation', desc: 'Open, unstructured dialogue. No prompt, no template — just you speaking and the Oracle listening. Shaped by your animals and resonance frequency, it grows more precise the more you engage.', icon: '···', color: C.cyan, use: 'For: open reflection, processing emotions, anything on your mind' },
 ];
 
 function Modes() {
@@ -502,8 +500,8 @@ function Modes() {
     <section id="modes" style={{ padding: '100px 28px' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
         <FadeIn style={{ textAlign: 'center', marginBottom: 20 }}>
-          <Label>Six ways to listen</Label>
-          <H2>Every mode is a different<br /><em style={{ fontStyle: 'italic', color: C.dim }}>kind of silence</em></H2>
+          <Label>Three ways to enter</Label>
+          <H2>Every mode is a different<br /><em style={{ fontStyle: 'italic', color: C.dim }}>kind of listening</em></H2>
         </FadeIn>
         <FadeIn delay={0.1} style={{ textAlign: 'center', marginBottom: 52 }}>
           <p style={{ fontFamily: C.body, fontSize: '0.9rem', fontWeight: 300, color: C.dim, maxWidth: 460, margin: '16px auto 0', lineHeight: 1.85 }}>
@@ -511,7 +509,7 @@ function Modes() {
           </p>
         </FadeIn>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 14 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 14 }}>
           {MODES.map((m, i) => (
             <FadeIn key={i} delay={i * 0.07}>
               <Card style={{ padding: '28px 28px', height: '100%' }}>
@@ -553,19 +551,34 @@ function PullQuote() {
 
 // ── FAQ ───────────────────────────────────────────────────────────────────────
 
-const FAQS = [
-  { q: 'What is Symponia?', a: 'Symponia is an AI oracle for self-discovery. It combines animal archetype psychology, dream reading, shadow work, and open conversation into a single intimate space. It does not replace therapy — it goes where therapy sometimes cannot.' },
+const FAQS_STATIC = [
+  { q: 'What is Symponia?', a: 'Symponia is an AI tool for self-discovery. It combines animal archetype psychology, daily personalised reflections, and open conversation into a single intimate space. It does not replace therapy — it goes where therapy sometimes cannot.' },
   { q: 'Who is it for?', a: 'Anyone who wants to understand themselves more deeply. Men and women, beginners and experienced practitioners, people in transition and people building a daily inner practice. If you sense there is more to you than the surface, Symponia is for you.' },
-  { q: 'What are the animal archetypes?', a: 'Your animals are a map of your inner world. The six you choose instinctively reveal the energies that move through you — gifts, struggles, and bridges between them. The seventh, the one that disturbs you, is the shadow: the most important of all.' },
+  { q: 'What are the animal archetypes?', a: 'Your animals are a map of your inner world. The six you choose instinctively reveal the energies that move through you — gifts, struggles, and bridges between them. The seventh — the one that disturbs you — is the shadow: the most important of all.' },
   { q: 'Is this therapy?', a: 'No. Symponia is not a medical or psychological service. It is a reflective tool — a contemplative space. If you are in crisis or need clinical support, please reach out to a licensed professional.' },
-  { q: 'How does the Oracle work?', a: "The Oracle is powered by Claude, Anthropic's AI, shaped by instructions drawn from Jungian psychology, animal symbolism, tarot, dream work, and contemplative tradition. It has been trained to never give surface answers, never rush to solutions, and never judge." },
-  { q: 'How do tokens work?', a: 'Each conversation exchange uses 1 token — roughly 2 messages back and forth. New users start with 10 free readings. Token packs (50 for £4.99, 150 for £9.99) never expire and carry over indefinitely. The monthly subscription (£12.99) gives you 350 tokens per month — these reset at each renewal, so unused subscription tokens do not roll over. All purchases are made within the app.' },
-  { q: 'Is my data private?', a: 'Your conversations are not stored on our servers beyond what is needed to maintain the session. Your animals and settings are stored locally on your device. We do not sell or share your data. See our Privacy Policy for full details.' },
+  { q: 'How does the AI work?', a: "Symponia is powered by Claude, Anthropic's AI, shaped by a system prompt drawn from Jungian psychology, animal symbolism, biodynamic principles, and contemplative tradition. It is instructed to never give surface answers, never rush to solutions, and never judge." },
+  { q: 'Is my data private?', a: 'Your conversations are not stored on our servers beyond what is needed to maintain the session. Your animals and settings are stored locally on your device. Your messages are processed by Anthropic (Claude) to generate responses — see their privacy policy at anthropic.com/privacy. We do not sell or share your data. See our Privacy Policy for full details.' },
   { q: 'Where can I download Symponia?', a: 'Symponia is available on the Apple App Store for iPhone and iPad. Tap the download button on this page or search "Symponia" in the App Store.' },
 ];
 
 function FAQ() {
   const [open, setOpen] = useState<number | null>(null);
+  const [tokenFAQ, setTokenFAQ] = useState(
+    'Each conversation exchange uses 1 token. New users start with free trial readings. Token packs never expire and carry over indefinitely. The monthly subscription gives unlimited reflections per month. Pricing is shown in your local currency in the app before purchase.'
+  );
+
+  useEffect(() => {
+    const p = getPricingForLocale(navigator.language);
+    setTokenFAQ(
+      `Each conversation exchange uses 1 token. New users start with free trial readings. Token packs (50 for ${fmt(p, p.pack50)}, 150 for ${fmt(p, p.pack150)}) never expire and carry over indefinitely. The monthly subscription (${fmt(p, p.monthly)}/${p.code} · auto-renews monthly) gives unlimited reflections per month. All purchases are made within the app. Exact price confirmed before purchase.`
+    );
+  }, []);
+
+  const FAQS = [
+    ...FAQS_STATIC.slice(0, 5),
+    { q: 'How do tokens work?', a: tokenFAQ },
+    ...FAQS_STATIC.slice(5),
+  ];
   return (
     <section id="faq" style={{ padding: '100px 28px' }}>
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
@@ -617,7 +630,7 @@ function CTA() {
           The Oracle<br /><em style={{ color: C.cyan, fontStyle: 'italic' }}>has been waiting</em>
         </h2>
         <p style={{ fontFamily: C.body, fontSize: '0.9rem', fontWeight: 300, lineHeight: 1.85, color: C.dim, marginBottom: 44 }}>
-          Available now on iPhone and iPad.<br />Free to begin. No account required.
+          Available now on iPhone and iPad.<br />Free to begin. Start with 3 free readings.
         </p>
         <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer"
           style={{ display: 'inline-flex', alignItems: 'center', gap: 12, padding: '16px 40px', borderRadius: 100, background: C.cyan, color: C.bg, fontFamily: C.body, fontSize: '0.9rem', fontWeight: 500, letterSpacing: '0.04em', textDecoration: 'none', boxShadow: '0 0 80px rgba(92,232,208,0.22)' }}

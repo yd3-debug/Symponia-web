@@ -1,21 +1,21 @@
 'use client';
 
 import { GradientDots } from '@/components/ui/gradient-dots';
-import { getPricingForLocale, fmt } from '@/lib/pricing';
 import { AnimatePresence, motion, useInView } from 'framer-motion';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 
 const APP_STORE_URL = 'https://apps.apple.com/app/symponia/id6744058607';
 
 const C = {
-  bg: '#08061c', bgMid: '#0e0b26',
-  bgCard: 'rgba(255,255,255,0.03)',
-  fg: '#eae6f8', sub: '#cac4e0', dim: '#a89ec8',
-  cyan: '#5ce8d0', violet: '#a78bfa',
-  border: 'rgba(255,255,255,0.07)',
-  borderStrong: 'rgba(255,255,255,0.13)',
-  heading: "var(--font-cormorant), 'Georgia', serif",
+  bg: '#08080F', bgMid: '#0F0F1A',
+  bgCard: 'rgba(15,15,26,0.85)',
+  fg: '#F1F0FF', sub: '#AEAECE', dim: '#7C7C9E',
+  cyan: '#06B6D4', violet: '#9F67FF',
+  border: '#1A1A30',
+  borderStrong: '#2D2D50',
+  heading: "var(--font-cal-sans), 'Inter', sans-serif",
   body: "var(--font-inter), 'Helvetica Neue', sans-serif",
+  mono: "var(--font-jetbrains-mono), 'Courier New', monospace",
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -162,7 +162,7 @@ function Nav() {
   const links = [['How it works','#how-it-works'],['Modes','#modes'],['Pricing','/credits'],['FAQ','#faq']];
   return (
     <>
-      <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, background: 'rgba(8,6,28,0.88)', backdropFilter: 'blur(24px)', borderBottom: `0.5px solid ${C.border}` }}>
+      <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, background: 'rgba(8,8,15,0.88)', backdropFilter: 'blur(24px)', borderBottom: `0.5px solid ${C.border}` }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 28px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <a href="#" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
             <img src="/logo.jpg" alt="Symponia" style={{ width: 30, height: 30, borderRadius: 8, objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).style.display='none'; }} />
@@ -191,7 +191,7 @@ function Nav() {
       <AnimatePresence>
         {open && (
           <motion.div initial={{opacity:0,y:-4}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-4}} transition={{duration:0.18}}
-            style={{position:'fixed',top:64,left:0,right:0,zIndex:49,background:'rgba(8,6,28,0.97)',backdropFilter:'blur(24px)',borderBottom:`0.5px solid ${C.border}`,padding:'24px 28px 28px'}}
+            style={{position:'fixed',top:64,left:0,right:0,zIndex:49,background:'rgba(8,8,15,0.97)',backdropFilter:'blur(24px)',borderBottom:`0.5px solid ${C.border}`,padding:'24px 28px 28px'}}
           >
             {links.map(([l,h]) => (
               <a key={l} href={h} onClick={() => setOpen(false)}
@@ -213,19 +213,19 @@ function Nav() {
 function Hero() {
   return (
     <section style={{ position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', overflow: 'hidden', padding: '120px 28px 80px' }}>
-      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 90% 90% at 50% 50%, rgba(8,6,28,0.05) 0%, rgba(8,6,28,0.75) 55%, #08061c 100%)', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 90% 90% at 50% 50%, rgba(8,8,15,0.05) 0%, rgba(8,8,15,0.75) 55%, #08080F 100%)', pointerEvents: 'none' }} />
 
       <div style={{ position: 'relative', zIndex: 1, maxWidth: 800, margin: '0 auto' }}>
         {/* Logo */}
         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, delay: 0.2 }}
           style={{ marginBottom: 32, display: 'flex', justifyContent: 'center' }}
         >
-          <img src="/logo.jpg" alt="Symponia" style={{ width: 72, height: 72, borderRadius: 20, objectFit: 'cover', boxShadow: `0 0 40px rgba(92,232,208,0.2)` }}
+          <img src="/logo.jpg" alt="Symponia" style={{ width: 72, height: 72, borderRadius: 20, objectFit: 'cover', boxShadow: `0 0 40px rgba(124,58,237,0.3)` }}
             onError={e => { (e.target as HTMLImageElement).style.display='none'; }} />
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '7px 18px', borderRadius: 100, border: `0.5px solid ${C.borderStrong}`, background: 'rgba(92,232,208,0.07)', marginBottom: 32 }}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '7px 18px', borderRadius: 100, border: `0.5px solid ${C.borderStrong}`, background: 'rgba(6,182,212,0.08)', marginBottom: 32 }}
         >
           <span style={{ width: 5, height: 5, borderRadius: '50%', background: C.cyan }} />
           <span style={{ fontFamily: C.body, fontSize: '0.68rem', letterSpacing: '0.22em', color: C.cyan, textTransform: 'uppercase' }}>Now on the App Store · Free to begin</span>
@@ -242,14 +242,14 @@ function Hero() {
         <motion.p initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.75 }}
           style={{ fontFamily: C.body, fontWeight: 300, fontSize: '1.05rem', lineHeight: 1.85, color: C.sub, maxWidth: 520, margin: '0 auto 44px' }}
         >
-          Symponia is an AI oracle for the inner life — animal archetypes, daily readings, and deep conversation. Built for the moments when everything feels loud except the one voice that matters.
+          Symponia is an AI companion for the inner life — animal archetypes, daily reflections, dream work, and deep conversation. Built for the moments when everything feels loud except the one voice that matters.
         </motion.p>
 
         <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 1 }}
           style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 14 }}
         >
           <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer"
-            style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '15px 34px', borderRadius: 100, background: C.cyan, color: C.bg, fontFamily: C.body, fontSize: '0.9rem', fontWeight: 500, letterSpacing: '0.04em', textDecoration: 'none', boxShadow: '0 0 60px rgba(92,232,208,0.22)' }}
+            style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '15px 34px', borderRadius: 100, background: C.cyan, color: C.bg, fontFamily: C.body, fontSize: '0.9rem', fontWeight: 500, letterSpacing: '0.04em', textDecoration: 'none', boxShadow: '0 0 60px rgba(6,182,212,0.2)' }}
           ><AppleIcon /> Download on the App Store</a>
           <a href="#how-it-works"
             style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '15px 28px', borderRadius: 100, border: `0.5px solid ${C.borderStrong}`, color: C.sub, fontFamily: C.body, fontSize: '0.88rem', fontWeight: 300, textDecoration: 'none', background: 'rgba(255,255,255,0.02)' }}
@@ -260,7 +260,7 @@ function Hero() {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 1.5 }}
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 48, marginTop: 60, paddingTop: 48, borderTop: `0.5px solid ${C.border}` }}
         >
-          {[['7','Spirit animals'],['3','Oracle modes'],['∞','Depth'],['0','Judgment']].map(([v,l]) => (
+          {[['7','Spirit animals'],['6','Conversation modes'],['∞','Depth'],['0','Judgment']].map(([v,l]) => (
             <div key={l} style={{ textAlign: 'center' }}>
               <div style={{ fontFamily: C.heading, fontSize: '1.9rem', fontWeight: 300, color: C.cyan, lineHeight: 1 }}>{v}</div>
               <div style={{ fontFamily: C.body, fontSize: '0.63rem', letterSpacing: '0.15em', color: C.dim, textTransform: 'uppercase', marginTop: 6 }}>{l}</div>
@@ -357,13 +357,13 @@ const PAINS = [
   {
     title: 'The help available feels shallow',
     body: 'You have tried apps, journals, maybe therapy. They help — but they speak to the surface. They offer frameworks when what you need is resonance. A space that meets you where you actually are.',
-    sub: 'The Oracle does not fix. It listens — then reflects what it hears.',
+    sub: 'Symponia does not fix. It listens — then reflects what it hears.',
     icon: '🪞',
   },
   {
     title: 'You sense there is more to you',
     body: 'Not a crisis. A persistent feeling that there are layers to yourself you have never touched — gifts you are not using, shadows you are avoiding, a pattern you have not yet seen.',
-    sub: 'Your animals reveal the pattern. Every reading is a step deeper.',
+    sub: 'Your animals reveal the pattern. Every session goes deeper.',
     icon: '🌑',
   },
 ];
@@ -402,8 +402,8 @@ function PainPoints() {
 
 const STEPS = [
   { num: '01', title: 'Name your seven animals', body: 'Close your eyes. Think of six animals that feel like they belong to you — wild, domestic, mythical, it does not matter. Then name the one that disturbs you. That seventh is the shadow: the most important of all. It holds what the others cannot carry.', accent: C.cyan, detail: '🐺  🦁  🦊  🐘  🦅  🐬  🕷️' },
-  { num: '02', title: 'Receive your constellation reading', body: 'Symponia reads your seven animals as a living map — each with its gift, its shadow, and the path between them. At the end, a synthesis: a non-judgmental portrait of the essential quality your whole constellation reveals.', accent: C.violet, detail: '◆ Gift  ·  ◆ Shadow  ·  ⚡ Action path' },
-  { num: '03', title: 'Enter the ongoing dialogue', body: 'The Oracle is now calibrated to you. Every conversation is shaped by your animals, your resonance frequency, and the mode you choose. It does not judge. It grows more precise the more you engage.', accent: C.cyan, detail: '"i have been waiting for you"' },
+  { num: '02', title: 'Receive your constellation portrait', body: 'Symponia interprets your seven animals as a living map — each with its gift, its shadow, and the path between them. At the end, a synthesis: a non-judgmental portrait of the essential quality your whole constellation reveals.', accent: C.violet, detail: '◆ Gift  ·  ◆ Shadow  ·  ⚡ Action path' },
+  { num: '03', title: 'Enter the ongoing dialogue', body: 'Symponia is now calibrated to you. Every conversation is shaped by your animals, your resonance frequency, and the mode you choose. It does not forget. It does not judge. It grows more precise the more you use it.', accent: C.cyan, detail: '"i have been waiting for you"' },
 ];
 
 function HowItWorks() {
@@ -448,10 +448,10 @@ function HowItWorks() {
 // ── Daily use ─────────────────────────────────────────────────────────────────
 
 const DAILY = [
-  { time: 'Morning', icon: '☀️', title: 'Start with the daily reading', body: 'Each morning, a personalised reflection based on your animals and resonance frequency. Like a letter written just for you. Read it, sit with it, let it shape the day.' },
-  { time: 'When something stirs', icon: '⚡', title: 'Open My Day', body: 'Something happened — or nothing did, and that is its own signal. My Day asks how the day feels in your body before it asks anything else. The Oracle meets you where you actually are.' },
-  { time: 'Evening', icon: '🌙', title: 'Speak freely in Conversation', body: 'At the end of the day, speak openly — what happened, what you felt, what surfaced. The Oracle holds it all without agenda, without judgment, without rushing to a conclusion.' },
-  { time: 'When you are ready', icon: '🌊', title: 'Return to your Archetype', body: 'Your seven animals are always there. Revisit them when you have grown, when something has shifted, when the shadow animal wants attention. Each return reveals something new.' },
+  { time: 'Morning', icon: '☀️', title: 'Start with your daily reflection', body: 'Each morning, a personalised reflection arrives based on your animals and resonance frequency. Like a letter written just for you. Read it, sit with it, let it shape the day.' },
+  { time: 'Midday', icon: '⚡', title: 'Bring a word that is alive in you', body: 'One word is enough. Type it into Word mode and Symponia unpacks its resonance — the gift it carries, the wound it conceals, and what it is asking of you right now.' },
+  { time: 'Evening', icon: '🌙', title: 'Reflect in Sense or Dream mode', body: 'At the end of the day, speak openly — what happened, what you felt, what surfaced. Or bring a dream from last night. Symponia holds it all without agenda.' },
+  { time: 'Anytime', icon: '🌊', title: 'Go deeper when you are ready', body: 'Shadow mode for what has been buried. Animal mode to revisit your constellation. Sense mode for open dialogue. Symponia is always available, always private, always present.' },
 ];
 
 function DailyUse() {
@@ -490,9 +490,12 @@ function DailyUse() {
 // ── Modes ─────────────────────────────────────────────────────────────────────
 
 const MODES = [
-  { label: 'Archetype', desc: 'Your seven animals are read as a living constellation — each with its gift, its shadow, and the path between them. Ends with a synthesised portrait of the essential quality your whole configuration reveals.', icon: '◈', color: C.cyan, use: 'For: self-understanding, identity work, your first and returning sessions' },
-  { label: 'My Day', desc: 'A personal oracle for this exact moment in your life. The Oracle asks how the day feels in your body before it asks anything else — the texture, not the events. Then it meets you there.', icon: '◎', color: C.violet, use: 'For: daily check-ins, transitions, processing what is happening right now' },
-  { label: 'Conversation', desc: 'Open, unstructured dialogue. No prompt, no template — just you speaking and the Oracle listening. Shaped by your animals and resonance frequency, it grows more precise the more you engage.', icon: '···', color: C.cyan, use: 'For: open reflection, processing emotions, anything on your mind' },
+  { label: 'Sense', desc: 'Open, unstructured conversation. No prompt, no template — just you speaking and Symponia listening. Ideal for processing, for confusion, for the days when you do not know where to begin.', icon: '◎', color: C.cyan, use: 'For: daily check-ins, processing emotions, open reflection' },
+  { label: 'Animal', desc: 'Your seven animals are read as a living constellation. Each receives a full portrait: gift, shadow, action path. Ends with a synthesis of who you are across all seven.', icon: '🐾', color: C.violet, use: 'For: self-understanding, identity work, first sessions' },
+  { label: 'Daily', desc: 'A short, personalised reflection generated each morning. Based on your animals and resonance frequency. Arrives like a letter — quiet, precise, with no demand on your time.', icon: '☽', color: C.cyan, use: 'For: morning ritual, daily anchor, gentle awareness' },
+  { label: 'Dream', desc: 'Bring your dream into language and Symponia listens for the symbols your waking mind cannot hold. Dreams are treated as living messages, not problems to solve.', icon: '✦', color: C.violet, use: 'For: dream journalling, symbol work, night processing' },
+  { label: 'Shadow', desc: 'A dedicated space for what has been buried — the parts of yourself you avoid, deny, or do not yet understand. Symponia holds this with particular care. Nothing here will be judged.', icon: '◈', color: C.cyan, use: 'For: shadow work, hard truths, what you cannot say elsewhere' },
+  { label: 'Word', desc: 'One word. Symponia unpacks its full resonance — the gift it carries, the wound it conceals, the invitation it extends. A deceptively simple mode with great depth.', icon: '⬡', color: C.violet, use: 'For: quick sessions, word focus, daily insight' },
 ];
 
 function Modes() {
@@ -500,8 +503,8 @@ function Modes() {
     <section id="modes" style={{ padding: '100px 28px' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
         <FadeIn style={{ textAlign: 'center', marginBottom: 20 }}>
-          <Label>Three ways to enter</Label>
-          <H2>Every mode is a different<br /><em style={{ fontStyle: 'italic', color: C.dim }}>kind of listening</em></H2>
+          <Label>Six ways to listen</Label>
+          <H2>Every mode is a different<br /><em style={{ fontStyle: 'italic', color: C.dim }}>kind of silence</em></H2>
         </FadeIn>
         <FadeIn delay={0.1} style={{ textAlign: 'center', marginBottom: 52 }}>
           <p style={{ fontFamily: C.body, fontSize: '0.9rem', fontWeight: 300, color: C.dim, maxWidth: 460, margin: '16px auto 0', lineHeight: 1.85 }}>
@@ -509,7 +512,7 @@ function Modes() {
           </p>
         </FadeIn>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 14 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 14 }}>
           {MODES.map((m, i) => (
             <FadeIn key={i} delay={i * 0.07}>
               <Card style={{ padding: '28px 28px', height: '100%' }}>
@@ -533,7 +536,7 @@ function Modes() {
 function PullQuote() {
   return (
     <section style={{ padding: '80px 28px', position: 'relative', overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 50% 60% at 50% 50%, rgba(167,139,250,0.06) 0%, transparent 70%)', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 50% 60% at 50% 50%, rgba(124,58,237,0.08) 0%, transparent 70%)', pointerEvents: 'none' }} />
       <FadeIn style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center' }}>
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 36 }}>
           <SacredCircleSVG />
@@ -543,7 +546,7 @@ function PullQuote() {
           <br />It told me what I already knew —
           <br /><span style={{ color: C.cyan }}>but had been afraid to say."</span>
         </blockquote>
-        <p style={{ fontFamily: C.body, fontSize: '0.68rem', letterSpacing: '0.22em', color: C.dim, textTransform: 'uppercase', marginTop: 28 }}>— from inside the Oracle</p>
+        <p style={{ fontFamily: C.body, fontSize: '0.68rem', letterSpacing: '0.22em', color: C.dim, textTransform: 'uppercase', marginTop: 28 }}>— from inside Symponia</p>
       </FadeIn>
     </section>
   );
@@ -551,34 +554,19 @@ function PullQuote() {
 
 // ── FAQ ───────────────────────────────────────────────────────────────────────
 
-const FAQS_STATIC = [
-  { q: 'What is Symponia?', a: 'Symponia is an AI tool for self-discovery. It combines animal archetype psychology, daily personalised reflections, and open conversation into a single intimate space. It does not replace therapy — it goes where therapy sometimes cannot.' },
+const FAQS = [
+  { q: 'What is Symponia?', a: 'Symponia is an AI companion for self-discovery. It combines animal archetype psychology, dream reflection, shadow work, and open conversation into a single intimate space. It does not replace therapy — it goes where therapy sometimes cannot.' },
   { q: 'Who is it for?', a: 'Anyone who wants to understand themselves more deeply. Men and women, beginners and experienced practitioners, people in transition and people building a daily inner practice. If you sense there is more to you than the surface, Symponia is for you.' },
-  { q: 'What are the animal archetypes?', a: 'Your animals are a map of your inner world. The six you choose instinctively reveal the energies that move through you — gifts, struggles, and bridges between them. The seventh — the one that disturbs you — is the shadow: the most important of all.' },
+  { q: 'What are the animal archetypes?', a: 'Your animals are a map of your inner world. The six you choose instinctively reveal the energies that move through you — gifts, struggles, and bridges between them. The seventh, the one that disturbs you, is the shadow: the most important of all.' },
   { q: 'Is this therapy?', a: 'No. Symponia is not a medical or psychological service. It is a reflective tool — a contemplative space. If you are in crisis or need clinical support, please reach out to a licensed professional.' },
-  { q: 'How does the AI work?', a: "Symponia is powered by Claude, Anthropic's AI, shaped by a system prompt drawn from Jungian psychology, animal symbolism, biodynamic principles, and contemplative tradition. It is instructed to never give surface answers, never rush to solutions, and never judge." },
-  { q: 'Is my data private?', a: 'Your conversations are not stored on our servers beyond what is needed to maintain the session. Your animals and settings are stored locally on your device. Your messages are processed by Anthropic (Claude) to generate responses — see their privacy policy at anthropic.com/privacy. We do not sell or share your data. See our Privacy Policy for full details.' },
+  { q: 'How does Symponia work?', a: "Symponia is powered by Claude, Anthropic's AI, shaped by instructions drawn from Jungian psychology, animal symbolism, dream work, and contemplative tradition. It has been trained to never give surface answers, never rush to solutions, and never judge." },
+  { q: 'How do tokens work?', a: 'Each conversation exchange uses 1 token — roughly 2 messages back and forth. New users start with 10 free credits. Top up with token packs available in the app. Tokens never expire.' },
+  { q: 'Is my data private?', a: 'Your conversations are not stored on our servers beyond what is needed to maintain the session. Your animals and settings are stored locally on your device. We do not sell or share your data. See our Privacy Policy for full details.' },
   { q: 'Where can I download Symponia?', a: 'Symponia is available on the Apple App Store for iPhone and iPad. Tap the download button on this page or search "Symponia" in the App Store.' },
 ];
 
 function FAQ() {
   const [open, setOpen] = useState<number | null>(null);
-  const [tokenFAQ, setTokenFAQ] = useState(
-    'Each conversation exchange uses 1 token. New users start with free trial readings. Token packs never expire and carry over indefinitely. The monthly subscription gives unlimited reflections per month. Pricing is shown in your local currency in the app before purchase.'
-  );
-
-  useEffect(() => {
-    const p = getPricingForLocale(navigator.language);
-    setTokenFAQ(
-      `Each conversation exchange uses 1 token. New users start with free trial readings. Token packs (50 for ${fmt(p, p.pack50)}, 150 for ${fmt(p, p.pack150)}) never expire and carry over indefinitely. The monthly subscription (${fmt(p, p.monthly)}/${p.code} · auto-renews monthly) gives unlimited reflections per month. All purchases are made within the app. Exact price confirmed before purchase.`
-    );
-  }, []);
-
-  const FAQS = [
-    ...FAQS_STATIC.slice(0, 5),
-    { q: 'How do tokens work?', a: tokenFAQ },
-    ...FAQS_STATIC.slice(5),
-  ];
   return (
     <section id="faq" style={{ padding: '100px 28px' }}>
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
@@ -589,7 +577,7 @@ function FAQ() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {FAQS.map((faq, i) => (
             <FadeIn key={i} delay={i * 0.03}>
-              <div style={{ borderRadius: 14, overflow: 'hidden', border: `0.5px solid ${open===i?'rgba(92,232,208,0.22)':C.border}`, background: open===i?'rgba(20,16,50,0.95)':'rgba(16,13,40,0.9)', transition: 'all 0.25s' }}>
+              <div style={{ borderRadius: 14, overflow: 'hidden', border: `0.5px solid ${open===i?'rgba(6,182,212,0.22)':C.border}`, background: open===i?'rgba(20,20,40,0.95)':'rgba(15,15,26,0.9)', transition: 'all 0.25s' }}>
                 <button onClick={() => setOpen(open===i?null:i)}
                   style={{ width: '100%', textAlign: 'left', padding: '18px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, background: 'none', border: 'none', cursor: 'pointer' }}
                 >
@@ -619,21 +607,21 @@ function FAQ() {
 function CTA() {
   return (
     <section style={{ padding: '100px 28px', position: 'relative', overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 60% 60% at 50% 50%, rgba(92,232,208,0.05) 0%, transparent 70%)', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 60% 60% at 50% 50%, rgba(6,182,212,0.06) 0%, transparent 70%)', pointerEvents: 'none' }} />
       <FadeIn style={{ position: 'relative', zIndex: 1, maxWidth: 600, margin: '0 auto', textAlign: 'center' }}>
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 36 }}>
-          <img src="/logo.jpg" alt="Symponia" style={{ width: 64, height: 64, borderRadius: 18, objectFit: 'cover', boxShadow: '0 0 40px rgba(92,232,208,0.18)' }}
+          <img src="/logo.jpg" alt="Symponia" style={{ width: 64, height: 64, borderRadius: 18, objectFit: 'cover', boxShadow: '0 0 40px rgba(124,58,237,0.25)' }}
             onError={e => { (e.target as HTMLImageElement).style.display='none'; }} />
         </div>
         <Label>Begin</Label>
         <h2 style={{ fontFamily: C.heading, fontWeight: 300, fontSize: 'clamp(2.6rem, 6vw, 4rem)', lineHeight: 1.1, color: C.fg, marginBottom: 20 }}>
-          The Oracle<br /><em style={{ color: C.cyan, fontStyle: 'italic' }}>has been waiting</em>
+          Symponia<br /><em style={{ color: C.cyan, fontStyle: 'italic' }}>has been waiting</em>
         </h2>
         <p style={{ fontFamily: C.body, fontSize: '0.9rem', fontWeight: 300, lineHeight: 1.85, color: C.dim, marginBottom: 44 }}>
-          Available now on iPhone and iPad.<br />Free to begin. Start with 3 free readings.
+          Available now on iPhone and iPad.<br />Free to begin. No account required.
         </p>
         <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 12, padding: '16px 40px', borderRadius: 100, background: C.cyan, color: C.bg, fontFamily: C.body, fontSize: '0.9rem', fontWeight: 500, letterSpacing: '0.04em', textDecoration: 'none', boxShadow: '0 0 80px rgba(92,232,208,0.22)' }}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 12, padding: '16px 40px', borderRadius: 100, background: C.cyan, color: C.bg, fontFamily: C.body, fontSize: '0.9rem', fontWeight: 500, letterSpacing: '0.04em', textDecoration: 'none', boxShadow: '0 0 80px rgba(6,182,212,0.2)' }}
         ><AppleIcon /> Download on the App Store</a>
       </FadeIn>
     </section>
@@ -652,12 +640,12 @@ function Footer() {
               <img src="/logo.jpg" alt="Symponia" style={{ width: 28, height: 28, borderRadius: 7, objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).style.display='none'; }} />
               <span style={{ fontFamily: C.heading, fontSize: '1.3rem', fontWeight: 300, color: C.fg }}>Symponia</span>
             </a>
-            <p style={{ fontFamily: C.body, fontSize: '0.78rem', fontWeight: 300, color: C.dim, lineHeight: 1.7, maxWidth: 200 }}>An oracle for the inner life.<br />Available on iOS.</p>
+            <p style={{ fontFamily: C.body, fontSize: '0.78rem', fontWeight: 300, color: C.sub, lineHeight: 1.7, maxWidth: 200 }}>A companion for the inner life.<br />Available on iOS.</p>
           </div>
           <div style={{ display: 'flex', gap: 52, flexWrap: 'wrap' }}>
             {[
               { title: 'App', links: [['App Store', APP_STORE_URL], ['How it works', '#how-it-works'], ['Modes', '#modes'], ['Pricing', '/credits']] },
-              { title: 'Legal', links: [['Privacy Policy', '/privacy'], ['Terms of Service', '/terms'], ['EULA', '/eula'], ['Credits', '/credits'], ['Contact', 'mailto:hello@symponia.io']] },
+              { title: 'Legal', links: [['Privacy Policy', '/privacy'], ['Terms of Service', '/terms'], ['EULA', '/eula'], ['GDPR', '/privacy#gdpr'], ['Contact', 'mailto:hello@symponia.io']] },
             ].map(col => (
               <div key={col.title}>
                 <div style={{ fontFamily: C.body, fontSize: '0.66rem', letterSpacing: '0.2em', color: C.dim, textTransform: 'uppercase', marginBottom: 16 }}>{col.title}</div>
@@ -671,13 +659,13 @@ function Footer() {
           </div>
         </div>
         <div style={{ borderTop: `0.5px solid ${C.border}`, marginTop: 48, paddingTop: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div>
-            <p style={{ fontFamily: C.body, fontSize: '0.7rem', fontWeight: 300, color: C.dim, opacity: 0.5, margin: 0 }}>© {new Date().getFullYear()} Symponia. All rights reserved.</p>
+          <p style={{ fontFamily: C.body, fontSize: '0.7rem', fontWeight: 300, color: C.sub }}>© {new Date().getFullYear()} Symponia. All rights reserved.</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
             <a href="https://yektad.com" target="_blank" rel="noopener noreferrer"
-              style={{ fontFamily: C.body, fontSize: '0.68rem', color: C.dim, opacity: 0.35, textDecoration: 'none', display: 'block', marginTop: 4 }}
+              style={{ fontFamily: C.body, fontSize: '0.7rem', fontWeight: 300, color: C.dim, textDecoration: 'none' }}
             >Built by YD</a>
+            <a href="/dashboard" style={{ fontFamily: C.body, fontSize: '0.75rem', color: C.sub, opacity: 0.4, textDecoration: 'none', lineHeight: 1, userSelect: 'none' }}>›</a>
           </div>
-          <a href="/dashboard" style={{ fontFamily: C.body, fontSize: '0.75rem', color: C.dim, opacity: 0.18, textDecoration: 'none', lineHeight: 1, userSelect: 'none' }}>›</a>
         </div>
       </div>
     </footer>
@@ -691,7 +679,7 @@ export default function Home() {
     <main style={{ position: 'relative', background: C.bg }}>
       <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
         <GradientDots duration={50} colorCycleDuration={14} dotSize={5} spacing={13} backgroundColor={C.bg} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(8,6,28,0.84)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(8,8,15,0.84)' }} />
       </div>
       <div style={{ position: 'relative', zIndex: 1 }}>
         <Nav />

@@ -1272,7 +1272,7 @@ export default function Dashboard() {
                             <div style={{ marginBottom: 6 }}>
                               <span style={{ fontSize: '0.62rem', fontWeight: 700, color: C.cyan, background: dark ? 'rgba(92,232,208,0.12)' : '#e6fdf9', padding: '2px 7px', borderRadius: 6 }}>Perplexity Web</span>
                             </div>
-                            {r.topPerplexityTitles.slice(0, 4).map((title, i) => (
+                            {r.topPerplexityTitles?.slice(0, 4).map((title, i) => (
                               <div key={i} style={{ display: 'flex', gap: 7, marginBottom: 6, alignItems: 'flex-start' }}>
                                 <span style={{ fontSize: '0.65rem', color: C.cyan, fontWeight: 700, flexShrink: 0, marginTop: 2 }}>{i + 1}</span>
                                 <span style={{ fontSize: '0.77rem', color: C.sub, lineHeight: 1.45 }}>{title}</span>
@@ -1290,7 +1290,7 @@ export default function Dashboard() {
                                 <span key={sub} style={{ fontSize: '0.6rem', color: C.dim }}>r/{sub}</span>
                               ))}
                             </div>
-                            {r.topRedditTitles.slice(0, 4).map((title, i) => (
+                            {r.topRedditTitles?.slice(0, 4).map((title, i) => (
                               <div key={i} style={{ display: 'flex', gap: 7, marginBottom: 6, alignItems: 'flex-start' }}>
                                 <span style={{ fontSize: '0.65rem', color: C.orange, fontWeight: 700, flexShrink: 0, marginTop: 2 }}>{i + 1}</span>
                                 <span style={{ fontSize: '0.77rem', color: C.sub, lineHeight: 1.45 }}>{title}</span>
@@ -1305,7 +1305,7 @@ export default function Dashboard() {
                             <div style={{ marginBottom: 6 }}>
                               <span style={{ fontSize: '0.62rem', fontWeight: 700, color: C.teal, background: dark ? 'rgba(45,212,191,0.1)' : '#e6faf8', padding: '2px 7px', borderRadius: 6 }}>Internet / News</span>
                             </div>
-                            {r.topNewsTitles.slice(0, 4).map((title, i) => (
+                            {r.topNewsTitles?.slice(0, 4).map((title, i) => (
                               <div key={i} style={{ display: 'flex', gap: 7, marginBottom: 6, alignItems: 'flex-start' }}>
                                 <span style={{ fontSize: '0.65rem', color: C.teal, fontWeight: 700, flexShrink: 0, marginTop: 2 }}>{i + 1}</span>
                                 <span style={{ fontSize: '0.77rem', color: C.sub, lineHeight: 1.45 }}>{title}</span>
@@ -1320,7 +1320,7 @@ export default function Dashboard() {
                             <div style={{ marginBottom: 6 }}>
                               <span style={{ fontSize: '0.62rem', fontWeight: 700, color: C.dim, background: dark ? 'rgba(255,255,255,0.06)' : '#f0f0f5', padding: '2px 7px', borderRadius: 6 }}>Hacker News</span>
                             </div>
-                            {r.topHNTitles.map((title, i) => (
+                            {r.topHNTitles?.map((title, i) => (
                               <div key={i} style={{ display: 'flex', gap: 7, marginBottom: 6, alignItems: 'flex-start' }}>
                                 <span style={{ fontSize: '0.65rem', color: C.dim, flexShrink: 0, marginTop: 2 }}>·</span>
                                 <span style={{ fontSize: '0.77rem', color: C.sub, lineHeight: 1.45 }}>{title}</span>

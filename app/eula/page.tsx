@@ -1,4 +1,12 @@
+import type { Metadata } from 'next';
 import { PageShell } from '@/components/PageShell';
+
+export const metadata: Metadata = {
+  title: 'End User License Agreement',
+  description: 'Apple-standard EULA for Symponia iOS app. Governs your license to use the Symponia application downloaded from the App Store.',
+  alternates: { canonical: 'https://symponia.io/eula' },
+  robots: { index: true, follow: true },
+};
 
 const C = {
   fg: '#eae6f8', sub: '#cac4e0', dim: '#a89ec8', cyan: '#5ce8d0',

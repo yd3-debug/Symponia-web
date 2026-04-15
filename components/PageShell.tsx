@@ -79,7 +79,12 @@ export function PageShell({ children }: { children: React.ReactNode }) {
               <a key={l} href={h} style={{ fontFamily: C.body, fontSize: '0.78rem', fontWeight: 300, color: C.dim, textDecoration: 'none' }}>{l}</a>
             ))}
           </div>
-          <p style={{ fontFamily: C.body, fontSize: '0.7rem', color: C.dim, opacity: 0.4 }}>© {new Date().getFullYear()} Symponia</p>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+            <p style={{ fontFamily: C.body, fontSize: '0.7rem', color: C.dim, opacity: 0.4, margin: 0 }}>© {new Date().getFullYear()} Symponia</p>
+            <a href="https://yektad.com" target="_blank" rel="noopener noreferrer"
+              style={{ fontFamily: C.body, fontSize: '0.68rem', color: C.dim, opacity: 0.35, textDecoration: 'none' }}
+            >Built by YD</a>
+          </div>
         </div>
       </footer>
     </div>

@@ -1,13 +1,15 @@
 // ── /api/dashboard/research ───────────────────────────────────────────────────
-// Calls n8n /webhook/research synchronously and returns agent findings.
-// Used by the Research tab to show trend data before committing to generation.
+// Calls Exa.ai + Claude directly — bypasses n8n to avoid proxy timeouts.
+// n8n's reverse proxy has a ~60s inactivity timeout; Exa+Claude takes ~15-25s.
 
 import { NextRequest, NextResponse } from 'next/server';
+import Anthropic from '@anthropic-ai/sdk';
 
 const DASHBOARD_USER = process.env.DASHBOARD_USERNAME ?? 'admin';
 const DASHBOARD_PASS = process.env.DASHBOARD_PASSWORD;
-const N8N_RESEARCH_URL = process.env.N8N_RESEARCH_URL
-  ?? (process.env.N8N_WEBHOOK_URL ?? '').replace('/webhook/generate', '/webhook/research');
+const EXA_BASE       = 'https://api.exa.ai';
+
+const claude = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 function checkAuth(req: NextRequest): boolean {
   if (!DASHBOARD_PASS) return true;
@@ -20,46 +22,142 @@ function checkAuth(req: NextRequest): boolean {
   } catch { return false; }
 }
 
+function daysAgo(n: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  return d.toISOString().split('T')[0];
+}
+
+async function exaSearch(query: string, opts: {
+  numResults?: number;
+  includeDomains?: string[];
+  startPublishedDate?: string;
+  contents?: { highlights?: { numSentences?: number; highlightsPerUrl?: number } };
+}): Promise<Array<{ title: string; url: string; snippet: string }>> {
+  const res = await fetch(`${EXA_BASE}/search`, {
+    method:  'POST',
+    headers: { 'x-api-key': process.env.EXA_API_KEY!, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      query,
+      numResults:       opts.numResults ?? 8,
+      type:             'auto',
+      useAutoprompt:    true,
+      startPublishedDate: opts.startPublishedDate,
+      includeDomains:   opts.includeDomains,
+      contents: opts.contents ?? { highlights: { numSentences: 3, highlightsPerUrl: 2 } },
+    }),
+    signal: AbortSignal.timeout(20000),
+  });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return (data.results ?? []).map((r: any) => ({
+    title:   r.title ?? '',
+    url:     r.url   ?? '',
+    snippet: r.highlights?.[0] ?? r.text?.slice(0, 200) ?? '',
+  }));
+}
+
 export async function POST(req: NextRequest) {
   if (!checkAuth(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const body = await req.json();
   const topic    = (body.topic    ?? '').trim();
   const platform = (body.platform ?? 'all').trim();
-
   if (!topic) return NextResponse.json({ error: 'topic required' }, { status: 400 });
 
-  if (!N8N_RESEARCH_URL || N8N_RESEARCH_URL.endsWith('/webhook/')) {
-    return NextResponse.json({ error: 'Research webhook not configured' }, { status: 503 });
-  }
+  const platformLabel = platform === 'all' ? 'social media' : platform;
 
+  // Run Exa searches in parallel
+  const [trendRes, redditRes, newsRes] = await Promise.allSettled([
+    exaSearch(`trending ${topic} ${platformLabel} content strategy 2025`, {
+      numResults: 8, startPublishedDate: daysAgo(14),
+    }),
+    exaSearch(`site:reddit.com ${topic}`, {
+      numResults: 8, includeDomains: ['reddit.com'], startPublishedDate: daysAgo(30),
+    }),
+    exaSearch(`${topic} news viral marketing ${new Date().getFullYear()}`, {
+      numResults: 6, startPublishedDate: daysAgo(7),
+    }),
+  ]);
+
+  const trends = trendRes.status  === 'fulfilled' ? trendRes.value  : [];
+  const reddit = redditRes.status === 'fulfilled' ? redditRes.value : [];
+  const news   = newsRes.status   === 'fulfilled' ? newsRes.value   : [];
+
+  const totalSources = trends.length + reddit.length + news.length;
+
+  // Extract subreddits from reddit URLs
+  const subreddits = [...new Set(
+    reddit.map(r => {
+      const m = r.url.match(/reddit\.com\/r\/([^/]+)/);
+      return m ? `r/${m[1]}` : null;
+    }).filter(Boolean)
+  )].slice(0, 6) as string[];
+
+  const prompt = `You are a world-class social media strategist. Analyse this research data and return a JSON object with actionable marketing intelligence.
+
+TOPIC: "${topic}"
+PLATFORM: ${platform === 'all' ? 'All platforms (Instagram, TikTok, LinkedIn)' : platform}
+
+TRENDING CONTENT (last 14 days):
+${trends.map((t, i) => `${i + 1}. "${t.title}" — ${t.snippet}`).join('\n') || 'No data'}
+
+REDDIT DISCUSSIONS (last 30 days):
+${reddit.map((r, i) => `${i + 1}. "${r.title}" — ${r.snippet}`).join('\n') || 'No data'}
+
+RECENT NEWS:
+${news.map((n, i) => `${i + 1}. "${n.title}" — ${n.snippet}`).join('\n') || 'No data'}
+
+Return ONLY this JSON object (no markdown, no extra text):
+{
+  "trendingAngle": "The single best content angle for this topic right now — specific, punchy, 10-15 words",
+  "timingWindow": "Best days and times to post (e.g. 'Tue-Thu, 9am-11am and 6pm-8pm EST')",
+  "hashtags": "8-12 hashtags separated by spaces starting with #",
+  "summary": "2-3 sentence analysis of why this topic is trending and what angle has the most potential",
+  "bestFormat": "Best content format (e.g. 'Short-form video (60-90s)', 'Carousel', 'Long-form post')",
+  "trendStatus": "rising|peaked|saturated|evergreen",
+  "hookPatterns": ["3-4 proven hook templates for this topic e.g. 'The secret about X nobody tells you'"],
+  "emotionalTrigger": "Primary emotional trigger driving engagement (e.g. 'Fear of missing out', 'Aspiration')",
+  "contentGap": "What's missing in current content about this topic — the opportunity",
+  "competitorBlindSpot": "What competitors are NOT covering that the audience wants",
+  "viralMechanism": "Why content about this topic goes viral — the psychological driver",
+  "winningFormat": "The specific format winning right now with an example",
+  "topAngles": ["5 specific content angle ideas, each 1 sentence"],
+  "algoTopSignals": "What the algorithm rewards for this topic right now",
+  "algoFormatWinner": "Which content format the algorithm is boosting most",
+  "algoHashtagRule": "Hashtag strategy for maximum reach",
+  "algoHookTiming": "How long the hook needs to be to retain viewers / readers",
+  "algoPeakTimes": "Exact peak posting times for maximum algorithm boost",
+  "algoAvoid": "What to avoid that kills reach for this topic",
+  "algoSeoNote": "SEO / search optimisation tip for this topic"
+}`;
+
+  let result: any;
   try {
-    const res = await fetch(N8N_RESEARCH_URL, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ topic, platform, command: topic }),
-      signal:  AbortSignal.timeout(75000),   // 75s — Exa+Perplexity+Claude ~45s cache miss, ~20s cache hit
+    const msg = await claude.messages.create({
+      model:      'claude-sonnet-4-6',
+      max_tokens: 2000,
+      messages:   [{ role: 'user', content: prompt }],
     });
 
-    const text = await res.text();
-
-    if (!res.ok) {
-      return NextResponse.json({ error: text || `n8n returned ${res.status}` }, { status: 502 });
-    }
-
-    if (!text.trim()) {
-      return NextResponse.json({ error: 'Research webhook returned empty response — make sure the n8n Research workflow is active and the Respond to Webhook node is wired up.' }, { status: 502 });
-    }
-
-    let data: any;
-    try {
-      data = JSON.parse(text);
-    } catch {
-      return NextResponse.json({ error: `Research webhook returned non-JSON: ${text.slice(0, 300)}` }, { status: 502 });
-    }
-
-    return NextResponse.json(data);
+    const raw = (msg.content[0] as any).text ?? '';
+    const match = raw.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error('Claude returned no JSON');
+    result = JSON.parse(match[0]);
   } catch (e: any) {
-    return NextResponse.json({ error: e.message ?? 'Research failed' }, { status: 502 });
+    return NextResponse.json({ error: `Research synthesis failed: ${e.message}` }, { status: 502 });
   }
+
+  return NextResponse.json({
+    ok:             true,
+    topic,
+    platform,
+    totalSources,
+    rankedPostCount: reddit.length,
+    avgVelocity:     Math.min(reddit.length * 12 + trends.length * 8, 100),
+    topRedditTitles: reddit.slice(0, 5).map(r => r.title),
+    topSubreddits:   subreddits,
+    searchQuery:     topic,
+    ...result,
+  });
 }

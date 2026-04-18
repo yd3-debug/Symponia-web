@@ -1,15 +1,14 @@
 // ── /api/dashboard/research ───────────────────────────────────────────────────
 // Calls Exa.ai + Claude directly — bypasses n8n to avoid proxy timeouts.
 // n8n's reverse proxy has a ~60s inactivity timeout; Exa+Claude takes ~15-25s.
+// Uses raw fetch (no SDK) so no extra npm dependencies are required.
 
 import { NextRequest, NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
 
 const DASHBOARD_USER = process.env.DASHBOARD_USERNAME ?? 'admin';
 const DASHBOARD_PASS = process.env.DASHBOARD_PASSWORD;
 const EXA_BASE       = 'https://api.exa.ai';
-
-const claude = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const ANTHROPIC_BASE = 'https://api.anthropic.com/v1';
 
 function checkAuth(req: NextRequest): boolean {
   if (!DASHBOARD_PASS) return true;
@@ -32,19 +31,18 @@ async function exaSearch(query: string, opts: {
   numResults?: number;
   includeDomains?: string[];
   startPublishedDate?: string;
-  contents?: { highlights?: { numSentences?: number; highlightsPerUrl?: number } };
 }): Promise<Array<{ title: string; url: string; snippet: string }>> {
   const res = await fetch(`${EXA_BASE}/search`, {
     method:  'POST',
     headers: { 'x-api-key': process.env.EXA_API_KEY!, 'Content-Type': 'application/json' },
     body: JSON.stringify({
       query,
-      numResults:       opts.numResults ?? 8,
-      type:             'auto',
-      useAutoprompt:    true,
+      numResults:         opts.numResults ?? 8,
+      type:               'auto',
+      useAutoprompt:      true,
       startPublishedDate: opts.startPublishedDate,
-      includeDomains:   opts.includeDomains,
-      contents: opts.contents ?? { highlights: { numSentences: 3, highlightsPerUrl: 2 } },
+      includeDomains:     opts.includeDomains,
+      contents: { highlights: { numSentences: 3, highlightsPerUrl: 2 } },
     }),
     signal: AbortSignal.timeout(20000),
   });
@@ -57,6 +55,29 @@ async function exaSearch(query: string, opts: {
   }));
 }
 
+async function askClaude(prompt: string): Promise<string> {
+  const res = await fetch(`${ANTHROPIC_BASE}/messages`, {
+    method:  'POST',
+    headers: {
+      'x-api-key':         process.env.ANTHROPIC_API_KEY!,
+      'anthropic-version': '2023-06-01',
+      'Content-Type':      'application/json',
+    },
+    body: JSON.stringify({
+      model:      'claude-sonnet-4-6',
+      max_tokens: 2000,
+      messages:   [{ role: 'user', content: prompt }],
+    }),
+    signal: AbortSignal.timeout(40000),
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Claude API error: ${res.status} ${err}`);
+  }
+  const data = await res.json();
+  return data.content?.[0]?.text ?? '';
+}
+
 export async function POST(req: NextRequest) {
   if (!checkAuth(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -67,7 +88,7 @@ export async function POST(req: NextRequest) {
 
   const platformLabel = platform === 'all' ? 'social media' : platform;
 
-  // Run Exa searches in parallel
+  // Parallel Exa searches
   const [trendRes, redditRes, newsRes] = await Promise.allSettled([
     exaSearch(`trending ${topic} ${platformLabel} content strategy 2025`, {
       numResults: 8, startPublishedDate: daysAgo(14),
@@ -84,9 +105,6 @@ export async function POST(req: NextRequest) {
   const reddit = redditRes.status === 'fulfilled' ? redditRes.value : [];
   const news   = newsRes.status   === 'fulfilled' ? newsRes.value   : [];
 
-  const totalSources = trends.length + reddit.length + news.length;
-
-  // Extract subreddits from reddit URLs
   const subreddits = [...new Set(
     reddit.map(r => {
       const m = r.url.match(/reddit\.com\/r\/([^/]+)/);
@@ -134,13 +152,7 @@ Return ONLY this JSON object (no markdown, no extra text):
 
   let result: any;
   try {
-    const msg = await claude.messages.create({
-      model:      'claude-sonnet-4-6',
-      max_tokens: 2000,
-      messages:   [{ role: 'user', content: prompt }],
-    });
-
-    const raw = (msg.content[0] as any).text ?? '';
+    const raw   = await askClaude(prompt);
     const match = raw.match(/\{[\s\S]*\}/);
     if (!match) throw new Error('Claude returned no JSON');
     result = JSON.parse(match[0]);
@@ -149,10 +161,10 @@ Return ONLY this JSON object (no markdown, no extra text):
   }
 
   return NextResponse.json({
-    ok:             true,
+    ok:              true,
     topic,
     platform,
-    totalSources,
+    totalSources:    trends.length + reddit.length + news.length,
     rankedPostCount: reddit.length,
     avgVelocity:     Math.min(reddit.length * 12 + trends.length * 8, 100),
     topRedditTitles: reddit.slice(0, 5).map(r => r.title),

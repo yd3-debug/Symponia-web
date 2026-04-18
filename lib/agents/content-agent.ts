@@ -119,7 +119,7 @@ export async function generatePlatformContent(
   const prompt = platformPrompt(platform, idea, campaign);
 
   const msg = await claude.messages.create({
-    model: 'claude-opus-4-7',
+    model: 'claude-sonnet-4-6',
     max_tokens: 3000,
     system: SYSTEM_PROMPT,
     messages: [{
@@ -193,7 +193,7 @@ export async function streamPlatformContent(
   const prompt = platformPrompt(platform, idea, campaign);
 
   const stream = await claude.messages.stream({
-    model: 'claude-opus-4-7',
+    model: 'claude-sonnet-4-6',
     max_tokens: 3000,
     system: SYSTEM_PROMPT,
     messages: [{ role: 'user', content: prompt }],

@@ -34,7 +34,7 @@ export async function scoreSeoForPiece(opts: {
   const { contentPieceId, platform, contentBody, hashtags, targetKeywords } = opts;
 
   const msg = await claude.messages.create({
-    model: 'claude-opus-4-7',
+    model: 'claude-sonnet-4-6',
     max_tokens: 2000,
     system: SYSTEM_PROMPT,
     messages: [{

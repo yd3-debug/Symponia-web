@@ -1,16 +1,9 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, JetBrains_Mono, Syne, DM_Sans } from 'next/font/google';
-import localFont from 'next/font/local';
 import './globals.css';
 
-// Cal Sans SemiBold — download CalSans-SemiBold.woff2 from
-// https://github.com/calcom/font and place at public/fonts/CalSans-SemiBold.woff2
-const calSans = localFont({
-  src: '../public/CalSans-SemiBold.woff2',
-  variable: '--font-cal-sans',
-  weight: '600',
-  display: 'swap',
-});
+// Cal Sans replaced by Syne (similar geometric semi-bold, Google Fonts)
+// --font-cal-sans is aliased to --font-syne for headings
 
 const inter = Inter({
   subsets: ['latin'],
@@ -290,7 +283,7 @@ const jsonLd = [
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${calSans.variable} ${inter.variable} ${jetbrainsMono.variable} ${syne.variable} ${dmSans.variable}`}>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${syne.variable} ${dmSans.variable}`}>
       <head>
         {/* LLM/AI crawler discovery */}
         <link rel="alternate" type="text/plain" title="LLMs.txt" href="/llms.txt" />

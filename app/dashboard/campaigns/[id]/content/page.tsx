@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactElement } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -326,7 +327,7 @@ function RichContentView({ piece, platform }: { piece: ContentPiece; platform: s
     );
   }
 
-  const sections: JSX.Element[] = [];
+  const sections: ReactElement[] = [];
 
   // Instagram
   if (platform === 'Instagram') {

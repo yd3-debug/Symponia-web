@@ -38,13 +38,13 @@ export async function POST(req: NextRequest) {
   const supabase = createSupabaseServerClient();
 
   // Find the Supabase job that corresponds to this Kie task
-  const { data: jobs } = await supabase
+  const { data: jobs } = await (supabase as any)
     .from('generation_jobs')
     .select('id, status')
     .eq('kie_task_id', taskId)
     .limit(1);
 
-  const job = jobs?.[0];
+  const job = jobs?.[0] as { id: string; status: string } | undefined;
   if (!job) {
     // Unknown task — may be a retry for an already-deleted job, ignore gracefully
     return NextResponse.json({ ok: true, note: 'task not found, ignored' });

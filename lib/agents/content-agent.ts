@@ -161,13 +161,13 @@ export async function runContentAgent(
       const content = await generatePlatformContent(campaign, idea, platform, research);
       pieces.push(content);
 
-      // Save to Airtable
+      // Save to Airtable — contentBody stores the full JSON so scripts/slides are preserved
       if (campaign.id) {
         await createContentPiece({
           campaignId:    campaign.id,
           platform:      platform as any,
           contentType:   content.contentType as any,
-          contentBody:   content.body,
+          contentBody:   JSON.stringify(content.additionalFields ?? { body: content.body }),
           hashtags:      content.hashtags,
           visualDirection: JSON.stringify({ platform, tone: campaign.tone, style: 'brand-aligned' }),
           status:        'Draft',

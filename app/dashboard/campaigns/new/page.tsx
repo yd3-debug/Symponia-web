@@ -27,13 +27,33 @@ interface FormData {
   competitors: string;
   postingFrequency: string;
   referenceImages: File[];
+  contentFormats: string[];
+  imageModel: string;
 }
 
 const INITIAL: FormData = {
   brandName: '', productOrService: '', targetAudience: '',
   platforms: [], goal: '', tone: '', competitors: '',
   postingFrequency: '', referenceImages: [],
+  contentFormats: [], imageModel: 'flux-kontext',
 };
+
+const CONTENT_FORMATS = [
+  { id: 'carousel',  label: 'Carousels',        desc: 'Multi-slide educational posts', icon: '🎠' },
+  { id: 'reel',      label: 'Reels & Shorts',   desc: 'Short videos 15–60 seconds',    icon: '🎬' },
+  { id: 'static',    label: 'Static Posts',     desc: 'Single image + caption',         icon: '📸' },
+  { id: 'story',     label: 'Stories',          desc: 'Ephemeral vertical format',      icon: '◎' },
+  { id: 'longform',  label: 'Long-form',        desc: 'Articles, threads, documents',   icon: '📝' },
+];
+
+const IMAGE_MODELS = [
+  { id: 'flux-kontext',   label: 'FLUX Pro',      desc: 'Photorealistic · lifestyle & product shots',  badge: 'Default' },
+  { id: 'gpt-image',      label: 'GPT-Image-1',   desc: 'Versatile · follows complex instructions',   badge: 'OpenAI' },
+  { id: 'ideogram',       label: 'Ideogram v3',   desc: 'Text-in-image · quotes, infographics',        badge: 'Text' },
+  { id: 'seedream',       label: 'Seedream 3.0',  desc: '4K ultra-detail · high resolution',          badge: '4K' },
+  { id: 'recraft',        label: 'Recraft v3',    desc: 'Design-oriented · brand assets, vectors',    badge: 'Design' },
+  { id: 'dalle3',         label: 'DALL-E 3',      desc: 'Artistic · cinematic & painterly',           badge: 'Creative' },
+];
 
 function ProgressBar({ step, total }: { step: number; total: number }) {
   return (
@@ -190,28 +210,32 @@ function ImageDropzone({ files, onAdd, onRemove }: {
 }
 
 const STEPS = [
-  { field: 'brandName', question: 'What is your brand or product name?', subtitle: 'This will be used throughout all your AI-generated content.' },
-  { field: 'productOrService', question: 'What are you promoting?', subtitle: 'Product launch, service, content, event, or personal brand — be specific.' },
-  { field: 'targetAudience', question: 'Who is your target audience?', subtitle: 'Describe their age range, interests, and pain points.' },
-  { field: 'platforms', question: 'Which platforms are you targeting?', subtitle: 'Select all that apply. Your AI team will generate format-native content for each.' },
-  { field: 'goal', question: 'What is your main goal?', subtitle: 'This shapes the entire campaign strategy.' },
-  { field: 'tone', question: 'What tone fits your brand?', subtitle: 'Your content will be written in this voice across all platforms.' },
-  { field: 'competitors', question: 'Any competitors or accounts you admire?', subtitle: 'Optional — your research agent will analyse their content for gaps and opportunities.' },
-  { field: 'postingFrequency', question: 'How often do you want to post?', subtitle: 'Your calendar will be pre-filled with suggested slots.' },
-  { field: 'referenceImages', question: 'Upload your reference images', subtitle: 'These guide the visual style of all AI-generated images and videos. Up to 5.' },
+  { field: 'brandName',        question: 'What is your brand or product name?',  subtitle: 'This will be used throughout all your AI-generated content.' },
+  { field: 'productOrService', question: 'What are you promoting?',               subtitle: 'Product launch, service, content, event, or personal brand — be specific.' },
+  { field: 'targetAudience',   question: 'Who is your target audience?',          subtitle: 'Describe their age range, interests, and pain points.' },
+  { field: 'platforms',        question: 'Which platforms are you targeting?',    subtitle: 'Select all that apply. Your AI team generates format-native content for each.' },
+  { field: 'contentFormats',   question: 'What content formats do you want?',     subtitle: 'Your AI will generate scripts and copy in these formats for every platform.' },
+  { field: 'goal',             question: 'What is your main goal?',               subtitle: 'This shapes the entire campaign strategy.' },
+  { field: 'tone',             question: 'What tone fits your brand?',            subtitle: 'Your content will be written in this voice across all platforms.' },
+  { field: 'competitors',      question: 'Any competitors or accounts you admire?', subtitle: 'Optional — the research agent will analyse gaps and opportunities.' },
+  { field: 'postingFrequency', question: 'How often do you want to post?',        subtitle: 'Your calendar will be pre-filled with suggested slots.' },
+  { field: 'imageModel',       question: 'Which AI model for image generation?',  subtitle: 'Each model has different strengths. You can change this later per campaign.' },
+  { field: 'referenceImages',  question: 'Upload your reference images',          subtitle: 'These guide the visual style of all generated images and videos. Up to 5.' },
 ] as const;
 
 function stepIsValid(step: number, data: FormData): boolean {
   switch (step) {
-    case 0: return data.brandName.trim().length > 0;
-    case 1: return data.productOrService.trim().length > 0;
-    case 2: return data.targetAudience.trim().length > 0;
-    case 3: return data.platforms.length > 0;
-    case 4: return data.goal.length > 0;
-    case 5: return data.tone.length > 0;
-    case 6: return true; // optional
-    case 7: return data.postingFrequency.length > 0;
-    case 8: return true; // optional
+    case 0:  return data.brandName.trim().length > 0;
+    case 1:  return data.productOrService.trim().length > 0;
+    case 2:  return data.targetAudience.trim().length > 0;
+    case 3:  return data.platforms.length > 0;
+    case 4:  return data.contentFormats.length > 0;
+    case 5:  return data.goal.length > 0;
+    case 6:  return data.tone.length > 0;
+    case 7:  return true; // optional
+    case 8:  return data.postingFrequency.length > 0;
+    case 9:  return data.imageModel.length > 0;
+    case 10: return true; // optional
     default: return false;
   }
 }
@@ -277,6 +301,8 @@ export default function NewCampaignPage() {
           tone:             data.tone,
           competitors:      data.competitors || undefined,
           postingFrequency: data.postingFrequency,
+          contentFormats:   data.contentFormats,
+          imageModel:       data.imageModel,
         }),
       });
 
@@ -361,6 +387,32 @@ export default function NewCampaignPage() {
               {current.field === 'platforms' && (
                 <ChipSelect options={PLATFORMS} selected={data.platforms} onToggle={togglePlatform} />
               )}
+              {current.field === 'contentFormats' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 560 }}>
+                  {CONTENT_FORMATS.map(f => {
+                    const active = data.contentFormats.includes(f.id);
+                    return (
+                      <motion.button key={f.id} whileTap={{ scale: 0.98 }}
+                        onClick={() => set('contentFormats', active ? data.contentFormats.filter(x => x !== f.id) : [...data.contentFormats, f.id])}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 14,
+                          padding: '14px 18px', borderRadius: 12, cursor: 'pointer', textAlign: 'left',
+                          border: `1px solid ${active ? C.purple : C.border}`,
+                          background: active ? `rgba(124,58,237,0.1)` : C.elevated,
+                          transition: 'all 0.15s',
+                        }}
+                      >
+                        <span style={{ fontSize: '1.4rem', lineHeight: 1 }}>{f.icon}</span>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontFamily: 'var(--font-inter)', fontSize: '0.9rem', fontWeight: active ? 600 : 400, color: active ? C.purpleLight : C.fg }}>{f.label}</div>
+                          <div style={{ fontFamily: 'var(--font-inter)', fontSize: '0.75rem', color: C.sub, marginTop: 2 }}>{f.desc}</div>
+                        </div>
+                        {active && <Check size={16} color={C.purpleLight} />}
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              )}
               {current.field === 'goal' && (
                 <ChipSelect options={GOALS} selected={data.goal} onToggle={v => set('goal', v)} single />
               )}
@@ -372,6 +424,34 @@ export default function NewCampaignPage() {
               )}
               {current.field === 'postingFrequency' && (
                 <ChipSelect options={FREQUENCIES} selected={data.postingFrequency} onToggle={v => set('postingFrequency', v)} single />
+              )}
+              {current.field === 'imageModel' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 560 }}>
+                  {IMAGE_MODELS.map(m => {
+                    const active = data.imageModel === m.id;
+                    return (
+                      <motion.button key={m.id} whileTap={{ scale: 0.98 }}
+                        onClick={() => set('imageModel', m.id)}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 14,
+                          padding: '14px 18px', borderRadius: 12, cursor: 'pointer', textAlign: 'left',
+                          border: `1px solid ${active ? C.purple : C.border}`,
+                          background: active ? `rgba(124,58,237,0.1)` : C.elevated,
+                          transition: 'all 0.15s',
+                        }}
+                      >
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
+                            <span style={{ fontFamily: 'var(--font-inter)', fontSize: '0.9rem', fontWeight: active ? 600 : 500, color: active ? C.purpleLight : C.fg }}>{m.label}</span>
+                            <span style={{ fontFamily: 'var(--font-inter)', fontSize: '0.58rem', padding: '1px 6px', borderRadius: 4, background: C.elevated, color: C.dim, border: `1px solid ${C.border}` }}>{m.badge}</span>
+                          </div>
+                          <div style={{ fontFamily: 'var(--font-inter)', fontSize: '0.75rem', color: C.sub }}>{m.desc}</div>
+                        </div>
+                        {active && <Check size={16} color={C.purpleLight} />}
+                      </motion.button>
+                    );
+                  })}
+                </div>
               )}
               {current.field === 'referenceImages' && (
                 <ImageDropzone

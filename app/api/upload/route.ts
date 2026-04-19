@@ -1,10 +1,8 @@
-import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { uploadToStorage } from '@/lib/supabase';
 
 export async function POST(req: Request) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const userId = 'default';
 
   try {
     const formData = await req.formData();

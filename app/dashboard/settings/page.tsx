@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useUser } from '@clerk/nextjs';
 import { motion } from 'framer-motion';
 import { Save, Check, Globe, Zap, User } from 'lucide-react';
 import type { Platform } from '@/lib/airtable';
@@ -52,7 +51,6 @@ const textareaStyle = {
 };
 
 export default function SettingsPage() {
-  const { user } = useUser();
   const [saved, setSaved] = useState(false);
   const [connectedPlatforms, setConnectedPlatforms] = useState<Set<Platform>>(new Set());
 
@@ -103,16 +101,12 @@ export default function SettingsPage() {
       {/* Account info */}
       <SectionCard title="Account" icon={User}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          {user?.imageUrl && (
-            <img src={user.imageUrl} alt="Avatar" style={{ width: 48, height: 48, borderRadius: '50%', border: `2px solid ${C.border}` }} />
-          )}
+          <div style={{ width: 48, height: 48, borderRadius: '50%', background: C.elevated, border: `2px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <User size={20} color={C.purple} />
+          </div>
           <div>
-            <div style={{ fontFamily: 'var(--font-inter)', fontSize: '0.9rem', fontWeight: 500, color: C.fg }}>
-              {user?.fullName ?? user?.firstName ?? 'User'}
-            </div>
-            <div style={{ fontFamily: 'var(--font-inter)', fontSize: '0.75rem', color: C.sub, marginTop: 2 }}>
-              {user?.primaryEmailAddress?.emailAddress}
-            </div>
+            <div style={{ fontFamily: 'var(--font-inter)', fontSize: '0.9rem', fontWeight: 500, color: C.fg }}>Admin</div>
+            <div style={{ fontFamily: 'var(--font-inter)', fontSize: '0.75rem', color: C.sub, marginTop: 2 }}>Internal dashboard</div>
           </div>
         </div>
       </SectionCard>

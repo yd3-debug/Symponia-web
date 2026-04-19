@@ -1,4 +1,3 @@
-import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { getCampaign, getResearchReport } from '@/lib/airtable';
 import { streamPlatformContent } from '@/lib/agents/content-agent';
@@ -7,8 +6,7 @@ import type { ResearchOutput } from '@/lib/agents/research-agent';
 
 // Streaming endpoint — returns Server-Sent Events
 export async function POST(req: Request) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const userId = 'default';
 
   const { campaignId, idea, platform }: { campaignId: string; idea: StrategyIdea; platform: string } = await req.json();
   const campaign = await getCampaign(campaignId);

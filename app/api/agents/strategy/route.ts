@@ -1,12 +1,10 @@
-import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { getCampaign, getResearchReport } from '@/lib/airtable';
 import { runStrategyAgent } from '@/lib/agents/strategy-agent';
 import type { ResearchOutput } from '@/lib/agents/research-agent';
 
 export async function POST(req: Request) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const userId = 'default';
 
   try {
     const { campaignId, research } = await req.json();

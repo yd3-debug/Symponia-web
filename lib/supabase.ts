@@ -62,21 +62,21 @@ export function createSupabaseServerClient() {
 export async function createGenerationJob(
   job: Omit<GenerationJob, 'id' | 'created_at' | 'updated_at' | 'asset_url' | 'kie_task_id' | 'error'>,
 ): Promise<GenerationJob> {
-  const supabase = createSupabaseServerClient();
+  const supabase = createSupabaseServerClient() as any;
   const { data, error } = await supabase
     .from('generation_jobs')
     .insert({ ...job, status: 'queued', asset_url: null, kie_task_id: null, error: null })
     .select()
     .single();
   if (error) throw new Error(`Supabase insert failed: ${error.message}`);
-  return data;
+  return data as GenerationJob;
 }
 
 export async function updateJobStatus(
   id: string,
   updates: { status: GenerationJob['status']; asset_url?: string; error?: string },
 ): Promise<void> {
-  const supabase = createSupabaseServerClient();
+  const supabase = createSupabaseServerClient() as any;
   const { error } = await supabase
     .from('generation_jobs')
     .update({ ...updates, updated_at: new Date().toISOString() })
@@ -85,14 +85,14 @@ export async function updateJobStatus(
 }
 
 export async function getJobsByContentPiece(contentPieceId: string): Promise<GenerationJob[]> {
-  const supabase = createSupabaseServerClient();
+  const supabase = createSupabaseServerClient() as any;
   const { data, error } = await supabase
     .from('generation_jobs')
     .select('*')
     .eq('content_piece_id', contentPieceId)
     .order('created_at', { ascending: true });
   if (error) throw new Error(`Supabase query failed: ${error.message}`);
-  return data ?? [];
+  return (data ?? []) as GenerationJob[];
 }
 
 // ── Storage helpers ────────────────────────────────────────────────────────────

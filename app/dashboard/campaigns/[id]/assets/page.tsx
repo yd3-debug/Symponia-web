@@ -172,7 +172,7 @@ export default function AssetsPage() {
     }
 
     // Initial load
-    supabase
+    (supabase as any)
       .from('generation_jobs')
       .select('*')
       .eq('campaign_id', id)
@@ -183,7 +183,7 @@ export default function AssetsPage() {
       });
 
     // Realtime subscription
-    const channel = supabase
+    const channel = (supabase as any)
       .channel(`campaign-assets-${id}`)
       .on('postgres_changes', {
         event: '*',

@@ -27,7 +27,7 @@ export default function AllAssetsPage() {
       .select('*')
       .order('created_at', { ascending: false })
       .limit(100)
-      .then(({ data }) => { setJobs(data ?? []); setLoading(false); });
+      .then(({ data }: { data: GenerationJob[] | null }) => { setJobs(data ?? []); setLoading(false); });
 
     const channel = (supabase as any)
       .channel('all-assets')

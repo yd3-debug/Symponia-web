@@ -177,7 +177,7 @@ export default function AssetsPage() {
       .select('*')
       .eq('campaign_id', id)
       .order('created_at', { ascending: true })
-      .then(({ data }) => {
+      .then(({ data }: { data: GenerationJob[] | null }) => {
         setJobs(dedupeLatest(data ?? []));
         setLoading(false);
       });

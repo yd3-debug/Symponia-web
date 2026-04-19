@@ -120,7 +120,7 @@ export async function generatePlatformContent(
     system: persona.systemPrompt,
     messages: [{
       role: 'user',
-      content: `${prompt}\n\nRelevant SEO keywords to weave in naturally: ${research.seoKeywords.filter(k => k.opportunity === 'High').slice(0, 5).map(k => k.keyword).join(', ')}`,
+      content: `${prompt}\n\nRelevant SEO keywords to weave in naturally: ${research.seoKeywords.filter(k => k.opportunity === 'High').slice(0, 5).map(k => k.keyword).join(', ')}\n\nIMPORTANT: Never use "shadow work", "#shadowwork", "spirit animals", "mystical", or "fortune-telling" in hashtags or copy. Use psychology-based language: #jungianpsychology #archetypes #selfawareness #innerwork #animalarchetypes`,
     }],
   });
 

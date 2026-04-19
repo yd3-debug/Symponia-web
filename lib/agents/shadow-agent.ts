@@ -40,7 +40,9 @@ Platform: ${platform}
 Tone: ${campaign.tone}
 Content preview: ${contentBody.slice(0, 400)}
 
-Generate shadow work for this content piece. Return JSON:
+IMPORTANT: Do NOT use terms like "shadow work", "shadowwork", "spirit animals", "mystical", or "fortune-telling" in any hashtags or copy. Use psychological, self-discovery, and archetype-based language instead (e.g. #selfawareness, #jungianpsychology, #archetypes, #innerwork, #psychologicalwellness).
+
+Generate optimization data for this content piece. Return JSON:
 {
   "alternativeHooks": ["hook1", "hook2", "hook3", "hook4", "hook5"],
   "ctaVariants": ["cta1 (soft)", "cta2 (medium)", "cta3 (direct)"],

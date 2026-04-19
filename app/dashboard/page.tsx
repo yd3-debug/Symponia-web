@@ -396,9 +396,9 @@ export default function Dashboard() {
   const [loginErr, setLoginErr] = useState('');
   const [token,    setTokenState] = useState('');
 
-  const [dark,     setDark]     = useState(true);
-  const C = dark ? DARK : LIGHT;
-  const STATUS_COLOR = dark ? STATUS_COLOR_DARK : STATUS_COLOR_LIGHT;
+  const dark = true;
+  const C = DARK;
+  const STATUS_COLOR = STATUS_COLOR_DARK;
   const PLATFORM_COLOR: Record<string, string> = {
     instagram: C.pink, tiktok: C.cyan, linkedin: C.teal,
   };
@@ -488,17 +488,7 @@ export default function Dashboard() {
   useEffect(() => {
     const t = getToken();
     if (t) { setTokenState(t); setAuthed(true); }
-    const savedDark = localStorage.getItem(DARKMODE_KEY);
-    // Default: dark mode ON (or honour saved preference)
-    if (savedDark === null) { setDark(true); }
-    else { setDark(savedDark === 'true'); }
   }, []);
-
-  const toggleDark = () => {
-    const next = !dark;
-    setDark(next);
-    localStorage.setItem(DARKMODE_KEY, String(next));
-  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -836,10 +826,6 @@ export default function Dashboard() {
 
         {/* ── Sidebar bottom ── */}
         <div style={{ borderTop: `1px solid ${S.border}`, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-          <button onClick={toggleDark} title={dark ? 'Light mode' : 'Dark mode'}
-            style={{ padding: '6px 10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 6, cursor: 'pointer', fontSize: '0.72rem', color: S.sub, fontFamily: C.body, transition: 'all .15s' }}>
-            {dark ? '☀' : '☾'}
-          </button>
           <button onClick={() => { loadRecords(); loadCounts(); }}
             style={{ padding: '6px 10px', background: 'none', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 6, cursor: 'pointer', fontSize: '0.72rem', color: S.dim, fontFamily: C.body, transition: 'all .15s' }}>
             ↺
@@ -1027,10 +1013,10 @@ export default function Dashboard() {
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
                       {[
-                        { text: 'Create a TikTok video about the wolf archetype and leadership',     icon: '▶', platform: 'TikTok' },
-                        { text: 'Write a LinkedIn post on animal archetype psychology', icon: '◻', platform: 'LinkedIn' },
-                        { text: 'Generate an Instagram carousel on the 7 spirit animals', icon: '◎', platform: 'Instagram' },
-                        { text: 'Create content on biodynamic living and daily oracle practices',    icon: '◈', platform: 'All' },
+                        { text: 'Create a TikTok video about the wolf archetype and leadership',       icon: '▶', platform: 'TikTok' },
+                        { text: 'Write a LinkedIn post on animal archetype psychology',               icon: '◻', platform: 'LinkedIn' },
+                        { text: 'Generate an Instagram carousel on the 7 animal archetypes',          icon: '◎', platform: 'Instagram' },
+                        { text: 'Create content on self-discovery, inner reflection and daily rituals', icon: '◈', platform: 'All' },
                       ].map(s => (
                         <button key={s.text} onClick={() => setChatInput(s.text)}
                           style={{ padding: '12px 14px', background: dark ? 'rgba(255,255,255,0.03)' : '#fff', border: `1px solid ${C.border}`, borderRadius: 10, color: C.sub, fontFamily: C.body, fontSize: '0.78rem', cursor: 'pointer', textAlign: 'left', lineHeight: 1.5, transition: 'all .15s', display: 'flex', flexDirection: 'column', gap: 6 }}
@@ -1220,7 +1206,7 @@ export default function Dashboard() {
                   value={researchTopic}
                   onChange={e => setResearchTopic(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter') runResearch(); }}
-                  placeholder="e.g. wolf archetype and leadership, daily presence practices, shadow animal reveal…"
+                  placeholder="e.g. wolf archetype and leadership, daily presence practices, dream reflection…"
                   style={{ flex: 1, minWidth: 260, padding: '11px 16px', background: dark ? 'rgba(255,255,255,0.05)' : '#ffffff', border: `1px solid ${researchLoading ? C.violet : C.borderMid}`, borderRadius: 10, color: C.fg, fontFamily: C.body, fontSize: '0.9rem', outline: 'none', transition: 'border-color .15s' }}
                 />
                 <select value={researchPlatform} onChange={e => setResearchPlatform(e.target.value as Platform)}

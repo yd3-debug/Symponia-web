@@ -6,13 +6,10 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { runResearch } from '../exa';
 import { createResearchReport, type Campaign } from '../airtable';
+import { PERSONAS } from './personas';
 
 const claude = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-
-const SYSTEM_PROMPT = `You are a world-class digital marketing researcher specialising in content intelligence.
-You receive raw research data from Exa.ai and synthesise it into actionable insights.
-Your job: find what is ACTUALLY trending, what pain points the audience has, and which content angles have viral potential.
-Always return valid JSON. Be specific, not generic.`;
+const ARIA = PERSONAS.aria;
 
 export interface ResearchOutput {
   trendingTopics: Array<{
@@ -94,9 +91,9 @@ Synthesise this into actionable marketing intelligence. Return ONLY valid JSON:
 Return 5 trending topics, 4 Reddit insights, 10 SEO keywords, and all competitor data found.`;
 
   const msg = await claude.messages.create({
-    model: 'claude-opus-4-7',
-    max_tokens: 4000,
-    system: SYSTEM_PROMPT,
+    model: ARIA.model,
+    max_tokens: ARIA.maxTokens,
+    system: ARIA.systemPrompt,
     messages: [{ role: 'user', content: userMessage }],
   });
 

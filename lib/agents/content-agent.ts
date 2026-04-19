@@ -7,15 +7,9 @@ import Anthropic from '@anthropic-ai/sdk';
 import { createContentPiece, type Campaign, type ContentPiece } from '../airtable';
 import type { StrategyIdea } from './strategy-agent';
 import type { ResearchOutput } from './research-agent';
+import { PERSONAS, PLATFORM_AGENT } from './personas';
 
 const claude = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-
-const SYSTEM_PROMPT = `You are a world-class social media copywriter and content strategist.
-You write platform-native content that feels like it belongs — not like marketing.
-You know that the hook is everything. You know that each platform has its own language.
-You never use generic phrases. You never use exclamation marks more than once.
-You write content that makes people stop, feel something, and act.
-Always return valid JSON.`;
 
 export interface PlatformContent {
   platform: string;
@@ -117,11 +111,13 @@ export async function generatePlatformContent(
   research: ResearchOutput,
 ): Promise<PlatformContent> {
   const prompt = platformPrompt(platform, idea, campaign);
+  const agentId = PLATFORM_AGENT[platform] ?? 'zoe';
+  const persona = PERSONAS[agentId];
 
   const msg = await claude.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 3000,
-    system: SYSTEM_PROMPT,
+    model: persona.model,
+    max_tokens: persona.maxTokens,
+    system: persona.systemPrompt,
     messages: [{
       role: 'user',
       content: `${prompt}\n\nRelevant SEO keywords to weave in naturally: ${research.seoKeywords.filter(k => k.opportunity === 'High').slice(0, 5).map(k => k.keyword).join(', ')}`,
@@ -191,11 +187,13 @@ export async function streamPlatformContent(
   platform: string,
 ): Promise<ReadableStream> {
   const prompt = platformPrompt(platform, idea, campaign);
+  const agentId = PLATFORM_AGENT[platform] ?? 'zoe';
+  const persona = PERSONAS[agentId];
 
   const stream = await claude.messages.stream({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 3000,
-    system: SYSTEM_PROMPT,
+    model: persona.model,
+    max_tokens: persona.maxTokens,
+    system: persona.systemPrompt,
     messages: [{ role: 'user', content: prompt }],
   });
 

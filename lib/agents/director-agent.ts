@@ -8,6 +8,9 @@ import { runResearchAgent, type ResearchOutput } from './research-agent';
 import { runStrategyAgent, type StrategyIdea } from './strategy-agent';
 import { runContentAgent, type PlatformContent } from './content-agent';
 import { runSeoAgent, type SeoResult } from './seo-agent';
+import { PERSONAS } from './personas';
+
+const ARC = PERSONAS.arc;
 
 export type DirectorPhase =
   | 'research'
@@ -41,7 +44,7 @@ export async function runDirectorAgent(
 
   // ── Phase 1: Research ─────────────────────────────────────────────────────
 
-  emit('research', 'Scanning Reddit, web, and competitors via Exa.ai…');
+  emit('research', `${ARC.name} → ARIA: Scanning Reddit, web, and competitors via Exa.ai…`);
   await updateCampaignStatus(campaign.id!, 'Research').catch(() => {});
 
   let research: ResearchOutput;
@@ -55,7 +58,7 @@ export async function runDirectorAgent(
 
   // ── Phase 2: Strategy ─────────────────────────────────────────────────────
 
-  emit('strategy', 'Generating 5 campaign ideas…');
+  emit('strategy', `${ARC.name} → MARCO: Generating 5 campaign ideas…`);
   await updateCampaignStatus(campaign.id!, 'Ideas').catch(() => {});
 
   let ideas: StrategyIdea[];
@@ -69,7 +72,7 @@ export async function runDirectorAgent(
 
   // ── Phase 3: Content (auto-select highest scoring idea) ───────────────────
 
-  emit('content', 'Writing platform-specific content for all platforms…');
+  emit('content', `${ARC.name} → Platform Specialists: Writing content for all platforms…`);
   await updateCampaignStatus(campaign.id!, 'Content').catch(() => {});
 
   const topIdea = ideas.reduce((best, idea) => idea.trendingScore > best.trendingScore ? idea : best, ideas[0]);
@@ -85,7 +88,7 @@ export async function runDirectorAgent(
 
   // ── Phase 4: SEO Scoring ──────────────────────────────────────────────────
 
-  emit('seo', 'Scoring and optimising all content for SEO…');
+  emit('seo', `${ARC.name} → REX: Scoring and optimising all content for SEO…`);
 
   let seo: SeoResult[];
   try {

@@ -6,13 +6,10 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { createContentIdeas, type Campaign, type ContentIdea } from '../airtable';
 import type { ResearchOutput } from './research-agent';
+import { PERSONAS } from './personas';
 
 const claude = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-
-const SYSTEM_PROMPT = `You are a senior content strategist with a proven track record of creating viral marketing campaigns.
-You combine deep research insights with platform-native thinking to generate ideas that actually spread.
-You think in hooks, not headlines. You think in formats, not topics. You think in audience psychology, not brand messaging.
-Always return valid JSON. Generate ideas that are SPECIFIC and ACTIONABLE — never generic.`;
+const MARCO = PERSONAS.marco;
 
 export interface StrategyIdea {
   title: string;
@@ -73,9 +70,9 @@ Return ONLY valid JSON array:
 Make idea 1 the highest viral potential. Vary platforms and formats across the 5 ideas.`;
 
   const msg = await claude.messages.create({
-    model: 'claude-opus-4-7',
-    max_tokens: 3000,
-    system: SYSTEM_PROMPT,
+    model: MARCO.model,
+    max_tokens: MARCO.maxTokens,
+    system: MARCO.systemPrompt,
     messages: [{ role: 'user', content: userMessage }],
   });
 

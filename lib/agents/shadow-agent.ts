@@ -4,8 +4,10 @@
 
 import Anthropic from '@anthropic-ai/sdk';
 import type { Campaign } from '@/lib/airtable';
+import { PERSONAS } from '@/lib/agents/personas';
 
 const claude = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const MAX = PERSONAS.max;
 
 export interface ShadowWork {
   alternativeHooks:  string[];
@@ -27,13 +29,9 @@ export async function runShadowAgent(
   contentBody: string,
 ): Promise<ShadowWork> {
   const msg = await claude.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 2000,
-    system: `You are a shadow work specialist for social media marketing.
-Shadow work = the hidden optimization layer that makes content actually perform.
-You generate: alternative hooks for A/B testing, CTA variants, engagement bait questions,
-pattern interrupts that stop thumbs, and platform-native hashtag strategy.
-Return ONLY valid JSON. Be specific, punchy, and never generic.`,
+    model: MAX.model,
+    max_tokens: MAX.maxTokens,
+    system: MAX.systemPrompt,
     messages: [{
       role: 'user',
       content: `Campaign: ${campaign.brandName} | ${campaign.productOrService}

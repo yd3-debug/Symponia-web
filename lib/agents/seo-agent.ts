@@ -5,13 +5,10 @@
 
 import Anthropic from '@anthropic-ai/sdk';
 import { updateContentPiece } from '../airtable';
+import { PERSONAS } from './personas';
 
 const claude = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-
-const SYSTEM_PROMPT = `You are an expert SEO strategist specialising in social media content optimisation.
-You analyse content for search intent alignment, keyword density, readability, and platform SEO factors.
-You give actionable, specific improvements — not generic advice.
-Always return valid JSON.`;
+const REX = PERSONAS.rex;
 
 export interface SeoResult {
   contentPieceId?: string;
@@ -34,9 +31,9 @@ export async function scoreSeoForPiece(opts: {
   const { contentPieceId, platform, contentBody, hashtags, targetKeywords } = opts;
 
   const msg = await claude.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 2000,
-    system: SYSTEM_PROMPT,
+    model: REX.model,
+    max_tokens: REX.maxTokens,
+    system: REX.systemPrompt,
     messages: [{
       role: 'user',
       content: `Analyse this ${platform} content for SEO effectiveness.

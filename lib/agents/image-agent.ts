@@ -6,11 +6,16 @@
 //   Brand edits, product on BG               → kieFluxKontext (edit mode)
 //   All other marketing visuals              → kieNanaBananaPro (Gemini 3, 4K)
 
+import Anthropic from '@anthropic-ai/sdk';
 import { kieNanaBananaPro, kieFluxKontext, kieIdeogram } from '../kei';
 import { uploadToStorage, updateJobStatus } from '../supabase';
 import { updateContentPiece, updateAirtableJob } from '../airtable';
 import { PLATFORM_IMAGE_SPECS, PLATFORM_SPECS, type PlatformSpecKey } from '../platform-specs';
+import { PERSONAS } from './personas';
 import type { Campaign } from '../airtable';
+
+const claude = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const NOVA = PERSONAS.nova;
 
 export interface ImageGenerationResult {
   platformSpecKey: PlatformSpecKey;
@@ -43,21 +48,45 @@ const FLUX_RATIO_MAP: Record<string, '21:9' | '16:9' | '4:3' | '1:1' | '3:4' | '
   '1.91:1': '16:9',
 };
 
-function buildMarketingPrompt(opts: {
+async function buildNovaPrompt(opts: {
   contentMessage: string;
   brandName:      string;
   brandTone:      string;
   platform:       string;
   specLabel:      string;
-}): string {
+}): Promise<string> {
   const { contentMessage, brandName, brandTone, platform, specLabel } = opts;
+
+  try {
+    const msg = await claude.messages.create({
+      model: NOVA.model,
+      max_tokens: 400,
+      system: NOVA.systemPrompt,
+      messages: [{
+        role: 'user',
+        content: `Write a single AI image generation prompt for:
+Brand: ${brandName}
+Platform: ${platform} (format: ${specLabel})
+Tone/style: ${brandTone}
+Content concept: ${contentMessage}
+
+Write one highly specific, cinematic image generation prompt (2-4 sentences). No preamble, no labels — just the prompt text.`,
+      }],
+    });
+
+    const text = msg.content[0].type === 'text' ? msg.content[0].text.trim() : '';
+    if (text.length > 40) return text;
+  } catch {
+    // Fall through to default prompt
+  }
+
+  // Fallback if NOVA call fails
   return [
     `High-quality ${platform} marketing visual for ${brandName}.`,
-    `Style: ${brandTone}, professional, scroll-stopping, brand-consistent.`,
+    `Style: ${brandTone}, professional, scroll-stopping.`,
     `Format: ${specLabel}.`,
     `Visual concept: ${contentMessage}`,
     'Ultra-sharp details, vibrant colours, perfect composition for social media.',
-    'No text overlays unless essential to concept. Photorealistic or cinematic style.',
   ].join(' ');
 }
 
@@ -86,7 +115,7 @@ export async function generateImagesForContent(opts: {
     const platform = spec.label.split(' ')[0] ?? platforms[0] ?? 'Marketing';
     const ratio    = RATIO_MAP[spec.ratio] ?? '1:1';
 
-    const prompt = buildMarketingPrompt({
+    const prompt = await buildNovaPrompt({
       contentMessage,
       brandName:  campaign.brandName,
       brandTone:  campaign.tone,

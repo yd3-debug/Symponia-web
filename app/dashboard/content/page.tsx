@@ -23,7 +23,7 @@ const PLATFORMS: Platform[] = ['Instagram', 'LinkedIn', 'Twitter/X', 'TikTok', '
 
 interface ContentPieceWithCampaign extends ContentPiece {
   campaignName?: string;
-  campaignId?: string;
+  campaignId: string;
 }
 
 function ContentRow({ piece }: { piece: ContentPieceWithCampaign }) {

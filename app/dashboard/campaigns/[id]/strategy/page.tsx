@@ -85,7 +85,7 @@ function IdeaCard({ idea, selected, onSelect }: { idea: StrategyIdea; selected: 
             style={{ height: '100%', background: `linear-gradient(90deg, ${C.purple}, ${C.cyan})`, borderRadius: 2 }}
           />
         </div>
-        <span style={{ fontFamily: 'var(--font-inter)', fontFamily: "var(--font-jetbrains-mono), 'Courier New', monospace", fontSize: '0.7rem', color: C.sub }}>
+        <span style={{ fontFamily: "var(--font-jetbrains-mono), 'Courier New', monospace", fontSize: '0.7rem', color: C.sub }}>
           {idea.trendingScore}/10
         </span>
       </div>

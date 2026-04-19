@@ -84,7 +84,7 @@ function AssetCard({ job }: { job: GenerationJob }) {
               }}>
                 <Play size={10} color="#fff" fill="#fff" />
                 <span style={{ fontFamily: "var(--font-jetbrains-mono), monospace", fontSize: '0.65rem', color: '#fff' }}>
-                  {spec?.duration ? `${spec.duration}s` : 'Video'}
+                  {(spec as any)?.durations?.[0] ? `${(spec as any).durations[0]}s` : 'Video'}
                 </span>
               </div>
             </div>

@@ -106,7 +106,7 @@ export default function AllAssetsPage() {
                   )}
                 </div>
                 <div style={{ padding: '8px 10px' }}>
-                  <div style={{ fontFamily: 'var(--font-inter)', fontSize: '0.62rem', color: C.dim, marginBottom: 3 }}>{spec?.platform ?? job.platform_spec_key}</div>
+                  <div style={{ fontFamily: 'var(--font-inter)', fontSize: '0.62rem', color: C.dim, marginBottom: 3 }}>{spec?.label?.split(' ')[0] ?? job.platform_spec_key}</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                     <div style={{ width: 6, height: 6, borderRadius: '50%', background: color }} />
                     <span style={{ fontFamily: 'var(--font-inter)', fontSize: '0.62rem', color }}>{job.status}</span>

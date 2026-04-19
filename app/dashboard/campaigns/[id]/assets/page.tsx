@@ -37,7 +37,7 @@ function AssetCard({ job }: { job: GenerationJob }) {
   const cfg = STATUS_CONFIG[job.status];
   const StatusIcon = cfg.icon;
   const spec = PLATFORM_SPECS[job.platform_spec_key as keyof typeof PLATFORM_SPECS];
-  const platformColor = PLATFORM_COLORS[spec?.platform as string ?? ''] ?? C.purple;
+  const platformColor = PLATFORM_COLORS[spec?.label?.split(' ')[0] ?? ''] ?? C.purple;
   const isImage = job.job_type === 'image';
 
   return (
@@ -118,7 +118,7 @@ function AssetCard({ job }: { job: GenerationJob }) {
               padding: '2px 7px', borderRadius: 4,
               background: `${platformColor}18`, color: platformColor, border: `1px solid ${platformColor}30`,
             }}>
-              {spec?.platform ?? job.platform_spec_key}
+              {spec?.label?.split(' ')[0] ?? job.platform_spec_key}
             </span>
             <span style={{
               fontFamily: 'var(--font-inter)', fontSize: '0.62rem',

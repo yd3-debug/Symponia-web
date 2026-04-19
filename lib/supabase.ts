@@ -23,6 +23,7 @@ export interface GenerationJob {
   platform_spec_key: string;
   status: 'queued' | 'processing' | 'done' | 'failed';
   asset_url: string | null;
+  kie_task_id: string | null;
   error: string | null;
   created_at: string;
   updated_at: string;
@@ -59,12 +60,12 @@ export function createSupabaseServerClient() {
 // ── Generation job helpers ─────────────────────────────────────────────────────
 
 export async function createGenerationJob(
-  job: Omit<GenerationJob, 'id' | 'created_at' | 'updated_at' | 'asset_url' | 'error'>,
+  job: Omit<GenerationJob, 'id' | 'created_at' | 'updated_at' | 'asset_url' | 'kie_task_id' | 'error'>,
 ): Promise<GenerationJob> {
   const supabase = createSupabaseServerClient();
   const { data, error } = await supabase
     .from('generation_jobs')
-    .insert({ ...job, status: 'queued', asset_url: null, error: null })
+    .insert({ ...job, status: 'queued', asset_url: null, kie_task_id: null, error: null })
     .select()
     .single();
   if (error) throw new Error(`Supabase insert failed: ${error.message}`);

@@ -112,14 +112,8 @@ export async function generateVideosForContent(opts: {
 
         // Callback mode — Kie.ai will POST result to our webhook; nothing to upload yet
         if (callbackUrl) {
-          // Store kie_task_id so the webhook can find this Supabase job
           if (supabaseJobId) {
-            const { createSupabaseServerClient } = await import('../supabase');
-            await createSupabaseServerClient()
-              .from('generation_jobs')
-              .update({ kie_task_id: (await import('../kei')).kieGetTask })  // taskId stored separately
-              .eq('id', supabaseJobId)
-              .then(() => {});
+            await updateJobStatus(supabaseJobId, { status: 'processing' }).catch(() => {});
           }
           continue;
         }

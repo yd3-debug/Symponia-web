@@ -22,16 +22,16 @@ export default function AllAssetsPage() {
   useEffect(() => {
     const supabase = createSupabaseBrowserClient();
 
-    (supabase as any)
+    supabase
       .from('generation_jobs')
       .select('*')
       .order('created_at', { ascending: false })
       .limit(100)
       .then(({ data }: { data: GenerationJob[] | null }) => { setJobs(data ?? []); setLoading(false); });
 
-    const channel = (supabase as any)
+    const channel = supabase
       .channel('all-assets')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'generation_jobs' }, payload => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'generation_jobs' }, (payload: any) => {
         if (payload.eventType === 'INSERT') setJobs(prev => [payload.new as GenerationJob, ...prev]);
         else if (payload.eventType === 'UPDATE') setJobs(prev => prev.map(j => j.id === payload.new.id ? payload.new as GenerationJob : j));
       })

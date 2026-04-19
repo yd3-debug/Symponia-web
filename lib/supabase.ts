@@ -41,7 +41,7 @@ export type Database = {
 // ── Browser client (used in Client Components) ─────────────────────────────────
 
 export function createSupabaseBrowserClient() {
-  return createBrowserClient<Database>(
+  return createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
   );
@@ -50,7 +50,7 @@ export function createSupabaseBrowserClient() {
 // ── Server client (used in API routes / Server Components) ────────────────────
 
 export function createSupabaseServerClient() {
-  return createClient<Database>(
+  return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     { auth: { persistSession: false } },
@@ -62,7 +62,7 @@ export function createSupabaseServerClient() {
 export async function createGenerationJob(
   job: Omit<GenerationJob, 'id' | 'created_at' | 'updated_at' | 'asset_url' | 'kie_task_id' | 'error'>,
 ): Promise<GenerationJob> {
-  const supabase = createSupabaseServerClient() as any;
+  const supabase = createSupabaseServerClient();
   const { data, error } = await supabase
     .from('generation_jobs')
     .insert({ ...job, status: 'queued', asset_url: null, kie_task_id: null, error: null })
@@ -76,7 +76,7 @@ export async function updateJobStatus(
   id: string,
   updates: { status: GenerationJob['status']; asset_url?: string; error?: string },
 ): Promise<void> {
-  const supabase = createSupabaseServerClient() as any;
+  const supabase = createSupabaseServerClient();
   const { error } = await supabase
     .from('generation_jobs')
     .update({ ...updates, updated_at: new Date().toISOString() })
@@ -85,7 +85,7 @@ export async function updateJobStatus(
 }
 
 export async function getJobsByContentPiece(contentPieceId: string): Promise<GenerationJob[]> {
-  const supabase = createSupabaseServerClient() as any;
+  const supabase = createSupabaseServerClient();
   const { data, error } = await supabase
     .from('generation_jobs')
     .select('*')

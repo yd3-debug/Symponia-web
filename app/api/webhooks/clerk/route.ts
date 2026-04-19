@@ -8,7 +8,7 @@ export async function POST(req: Request) {
 
   if (type === 'user.created') {
     const supabase = createSupabaseServerClient();
-    await (supabase.from('users') as any).upsert({
+    await supabase.from('users').upsert({
       clerk_id: data.id,
       email:    data.email_addresses?.[0]?.email_address ?? '',
     }, { onConflict: 'clerk_id' });

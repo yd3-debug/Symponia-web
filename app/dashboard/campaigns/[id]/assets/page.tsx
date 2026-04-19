@@ -172,7 +172,7 @@ export default function AssetsPage() {
     }
 
     // Initial load
-    (supabase as any)
+    supabase
       .from('generation_jobs')
       .select('*')
       .eq('campaign_id', id)
@@ -183,14 +183,14 @@ export default function AssetsPage() {
       });
 
     // Realtime subscription
-    const channel = (supabase as any)
+    const channel = supabase
       .channel(`campaign-assets-${id}`)
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
         table: 'generation_jobs',
         filter: `campaign_id=eq.${id}`,
-      }, payload => {
+      }, (payload: any) => {
         if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
           setJobs(prev => {
             const incoming = payload.new as GenerationJob;

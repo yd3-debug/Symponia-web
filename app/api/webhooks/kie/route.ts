@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
   const supabase = createSupabaseServerClient();
 
   // Find the Supabase job that corresponds to this Kie task
-  const { data: jobs } = await (supabase as any)
+  const { data: jobs } = await supabase
     .from('generation_jobs')
     .select('id, status')
     .eq('kie_task_id', taskId)

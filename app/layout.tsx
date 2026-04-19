@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, JetBrains_Mono, Syne, DM_Sans } from 'next/font/google';
+import { ClerkProvider } from '@clerk/nextjs';
 import './globals.css';
 
 // Cal Sans replaced by Syne (similar geometric semi-bold, Google Fonts)
@@ -283,6 +284,7 @@ const jsonLd = [
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
+    <ClerkProvider>
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${syne.variable} ${dmSans.variable}`}>
       <head>
         {/* LLM/AI crawler discovery */}
@@ -298,5 +300,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>{children}</body>
     </html>
+    </ClerkProvider>
   );
 }

@@ -55,47 +55,161 @@ const DARK = {
   display:      "'Syne', var(--font-syne), 'Inter', sans-serif",
 };
 
-// ── Agent definitions ─────────────────────────────────────────────────────────
+// ── Agent definitions — 20 specialists ───────────────────────────────────────
 const AGENTS = [
+  // ── Command Layer ──────────────────────────────────────────────────────────
   {
-    id: 'orchestrator', name: 'Orchestrator', role: 'Marketing Director', icon: '◈',
-    skills: ['Campaign Strategy', 'Agent Routing', 'Quality Control', 'Brief Writing', 'Brand Voice'],
-    description: 'Reads your command, routes to the right agents, reviews all output before it reaches the queue. Nothing ships without sign-off.',
+    id: 'arc', name: 'ARC', role: 'Marketing Director', icon: '◈', tier: 'command',
+    model: 'claude-opus-4-7',
+    tagline: 'Nothing ships without sign-off.',
+    skills: ['Campaign Orchestration', 'Agent Routing', 'Quality Control', 'Brief Analysis', 'Brand Voice Guardian'],
+    description: 'The director. Reads the brief, routes to the right specialists, reviews every output before it reaches your queue. Holds the entire team accountable to the goal.',
+  },
+  // ── Intelligence Layer ─────────────────────────────────────────────────────
+  {
+    id: 'aria', name: 'ARIA', role: 'Intelligence Analyst', icon: '◉', tier: 'intelligence',
+    model: 'claude-opus-4-7',
+    tagline: "I don't guess. I find.",
+    skills: ['Reddit Signal Mining', 'SEO Opportunity Mapping', 'Competitor Gap Analysis', 'Viral Pattern Detection', 'Audience Pain Points'],
+    description: 'Scans Reddit, Exa, and competitor feeds for signals before they become trends. Surfaces what audiences are searching for — not what brands think they want.',
   },
   {
-    id: 'instagram', name: 'Instagram', role: 'Platform Specialist', icon: '◎',
-    skills: ['Carousel Narratives', 'Reels Hooks', 'Hashtag Research', 'Caption Formulas', 'Collab Strategy'],
-    description: 'Carousel arcs, Reels scripts with 3-sec hooks, optimal hashtag sets (3–8 niche tags), and algorithm-first caption formulas.',
+    id: 'marco', name: 'MARCO', role: 'Campaign Architect', icon: '◻', tier: 'intelligence',
+    model: 'claude-opus-4-7',
+    tagline: 'The brief is a hypothesis. The strategy is the proof.',
+    skills: ['Campaign Ideation', 'Hook Writing', 'Platform Strategy', 'Audience Psychology', 'Content Format Selection'],
+    description: 'Takes ARIA\'s intelligence and builds 5 campaign ideas that actually spread. Thinks in hooks, not headlines. Every idea is surgically matched to this brand and this moment.',
   },
   {
-    id: 'tiktok', name: 'TikTok', role: 'Viral Specialist', icon: '▶',
-    skills: ['3-sec Hook Formulas', 'Sound Strategy', 'Caption SEO', 'Duet/Stitch', 'Comment Bait'],
-    description: 'Pattern-interrupt hooks, trending sound recommendations, TikTok search optimisation, and series formats built for completion rate.',
+    id: 'atlas', name: 'ATLAS', role: 'Brand Guardian', icon: '⬡', tier: 'intelligence',
+    model: 'claude-sonnet-4-6',
+    tagline: 'Your brand is a promise. Every post either keeps it or breaks it.',
+    skills: ['Brand Positioning', 'Messaging Pillars', 'Tone-of-Voice', 'Brand Consistency Audit', 'Competitive Differentiation'],
+    description: 'Guards the brand voice across every piece of content. Defines messaging pillars, maintains tone consistency, and flags anything that dilutes the brand identity.',
+  },
+  // ── Platform Layer ─────────────────────────────────────────────────────────
+  {
+    id: 'zoe', name: 'ZOE', role: 'Instagram Specialist', icon: '◎', tier: 'platform',
+    model: 'claude-sonnet-4-6',
+    tagline: 'Every slide has to earn the next swipe.',
+    skills: ['Carousel Narrative Arcs', 'Reels Hook Scripts', 'Caption Formulas', 'Hashtag Strategy', 'Story Sequences', 'SEO Alt Text'],
+    description: 'Instagram-native from captions to Reels. Carousel slide 1 = promise, slides 2–9 = delivery, final = CTA. Reels hooks land in the first 2 frames, not 3 seconds.',
   },
   {
-    id: 'linkedin', name: 'LinkedIn', role: 'Thought Leader', icon: '◻',
-    skills: ['Thought Leadership', 'Hook Line Formula', 'Document Carousels', 'B2B Positioning', 'Dwell-time Copy'],
-    description: '210-char hooks before "...more", no-link-in-body strategy, PDF carousels, and professional storytelling that builds authority.',
+    id: 'kade', name: 'KADE', role: 'TikTok Viral Architect', icon: '▶', tier: 'platform',
+    model: 'claude-sonnet-4-6',
+    tagline: 'You have 3 seconds. Use them like your life depends on it.',
+    skills: ['Pattern-Interrupt Hooks', 'Retention Mechanics', 'Text Overlay Timing', 'TikTok SEO', 'Sound Strategy', 'Loop Engineering'],
+    description: 'Scripts built for completion rate. Knows that a 90% completion rate video goes viral and a beautiful 5-second skip disappears. Every script has timestamps and a loop engineered into the outro.',
   },
   {
-    id: 'video', name: 'Video Editor', role: 'Clip Architect', icon: '▣',
-    skills: ['Scene Breakdown', 'FFmpeg Pipeline', 'B-roll Direction', 'Text Overlays', 'Kie.ai Prompts'],
-    description: 'Breaks scripts into scenes, generates clips via Kie.ai, stitches them with FFmpeg. Outputs vertical 1080×1920 for Reels/TikTok.',
+    id: 'diana', name: 'DIANA', role: 'LinkedIn Strategist', icon: '⬢', tier: 'platform',
+    model: 'claude-sonnet-4-6',
+    tagline: "Authority isn't claimed. It's demonstrated.",
+    skills: ['Thought Leadership', '210-Char Hook Formula', 'Document Carousels', 'B2B Positioning', 'Dwell-Time Copy', 'Professional Storytelling'],
+    description: 'Writes for the 10-minute commute window — content people want to learn from and share. No links in body, white space discipline, and hooks that make "see more" feel necessary.',
   },
   {
-    id: 'copywriter', name: 'Copywriter', role: 'Word Strategist', icon: '✦',
-    skills: ['Hook Writing', 'Power Words', 'CTA Optimisation', 'A/B Variants', 'Tone Adaptation'],
-    description: "Multi-format copy across platforms. Adapts Symponia's philosophical tone — mystical but grounded — for each audience.",
+    id: 'flux', name: 'FLUX', role: 'Twitter/X Specialist', icon: '✦', tier: 'platform',
+    model: 'claude-haiku-4-5-20251001',
+    tagline: 'One idea. Maximum impact. Minimum words.',
+    skills: ['Quote-Bait Hooks', 'Thread Engineering', 'Contrarian Angles', 'Engagement Mechanics', 'Brevity Discipline'],
+    description: 'Compressed ideas that get retweeted. Every hook is screenshot-worthy. Threads follow the thesis → proof → implication → insight arc. No hedging, no "I think" — assertions only.',
   },
   {
-    id: 'trends', name: 'Trend Researcher', role: 'Signal Hunter', icon: '◉',
-    skills: ['Reddit Scraping', 'YouTube Trending', 'Google Trends', 'Virality Prediction', 'Timing Windows'],
-    description: "No API keys needed. Scrapes Reddit, YouTube, and Google Trends to find what's gaining momentum in the niche right now.",
+    id: 'lena', name: 'LENA', role: 'Facebook Community Specialist', icon: '◎', tier: 'platform',
+    model: 'claude-haiku-4-5-20251001',
+    tagline: 'Facebook rewards conversations, not broadcasts.',
+    skills: ['Community Engagement', 'Conversational Copy', 'Shareability', 'Ad Copy Variants', 'Group Content Strategy'],
+    description: 'Writes posts that make people feel seen and want to respond. Leads with human truth, not brand. Ad copy: pain → solution → proof → CTA in four sentences.',
   },
   {
-    id: 'visual', name: 'Visual Director', role: 'Aesthetic Lead', icon: '◆',
-    skills: ['Brand Consistency', 'Kie.ai Prompting', 'Composition Rules', 'Platform Specs', 'Style Cohesion'],
-    description: "Writes Kie.ai prompts that match Symponia's dark-mystical aesthetic. Reviews every visual for brand alignment before approval.",
+    id: 'vex', name: 'VEX', role: 'YouTube Specialist', icon: '▣', tier: 'platform',
+    model: 'claude-sonnet-4-6',
+    tagline: 'The first 30 seconds either hook or lose them forever.',
+    skills: ['Script Structure', 'Retention Hooks', 'Thumbnail Psychology', 'YouTube SEO', 'Shorts Narration', 'Description Optimization'],
+    description: 'Writes for average view percentage, not raw views. Scripts hook in the first sentence, fulfill the promise, and leave viewers wanting more. Thumbnail text: 3–6 words, curiosity gap every time.',
+  },
+  {
+    id: 'lush', name: 'LUSH', role: 'Pinterest Curator', icon: '◆', tier: 'platform',
+    model: 'claude-haiku-4-5-20251001',
+    tagline: "Pinterest isn't social media. It's a visual search engine.",
+    skills: ['Pinterest SEO', 'Evergreen Copy', 'Keyword-Rich Descriptions', 'Board Strategy', 'Visual Pin Concepts'],
+    description: 'Writes for discovery, not virality. Pinterest content has a 200-day half-life. Every pin title front-loads the keyword. Every description weaves search terms naturally. Always evergreen.',
+  },
+  // ── Optimization Layer ─────────────────────────────────────────────────────
+  {
+    id: 'rex', name: 'REX', role: 'SEO Analyst', icon: '⬡', tier: 'optimization',
+    model: 'claude-sonnet-4-6',
+    tagline: "If they can't find it, it doesn't exist.",
+    skills: ['Search Intent Mapping', 'Keyword Density Analysis', 'Platform SEO', 'Content Scoring', 'Readability Optimization'],
+    description: 'Scores every content piece for discoverability — not just Google SEO, but TikTok search, YouTube search, Pinterest search, LinkedIn. Intent alignment is the only metric that matters.',
+  },
+  {
+    id: 'max', name: 'MAX', role: 'Performance Optimizer', icon: '⬢', tier: 'optimization',
+    model: 'claude-sonnet-4-6',
+    tagline: 'Every word is a choice. Every choice is a test.',
+    skills: ['Hook A/B Variants', 'CTA Science', 'Engagement Triggers', 'Hashtag Tier Strategy', 'Posting Time Windows', 'Copy Refinement'],
+    description: 'Generates the optimization layer: 5 alternative hooks for A/B testing, 3 CTA variants (soft/medium/direct), engagement bait questions, pattern interrupts, and platform-specific posting windows.',
+  },
+  // ── Visual Layer ───────────────────────────────────────────────────────────
+  {
+    id: 'nova', name: 'NOVA', role: 'Visual Director', icon: '◆', tier: 'visual',
+    model: 'claude-sonnet-4-6',
+    tagline: 'An image should stop the thumb, not just fill the space.',
+    skills: ['AI Image Prompt Engineering', 'Composition Rules', 'Platform Format Specs', 'Brand Visual Consistency', 'Lighting & Color Direction'],
+    description: 'Writes cinematic image prompts for Kie.ai. Thinks like a creative director briefing a photographer — subject, light, composition, mood, and what to avoid. Vague prompts produce vague images.',
+  },
+  {
+    id: 'vox', name: 'VOX', role: 'Video Director', icon: '▶', tier: 'visual',
+    model: 'claude-sonnet-4-6',
+    tagline: 'Motion earns attention. Stillness earns nothing.',
+    skills: ['Scene Breakdowns', 'Kling 2.0 Prompts', 'B-roll Direction', 'Transition Logic', 'Cinematic Camera Language'],
+    description: 'Translates scripts into shot-by-shot video briefs for Kling 2.0, Runway, and Wan. Breaks content into scenes, assigns camera moves, describes visual mood per beat.',
+  },
+  // ── Growth Layer ───────────────────────────────────────────────────────────
+  {
+    id: 'echo', name: 'ECHO', role: 'Email Marketing Director', icon: '◻', tier: 'growth',
+    model: 'claude-sonnet-4-6',
+    tagline: 'The inbox is the most personal channel. Treat it that way.',
+    skills: ['Email Sequences', 'Subject Line A/B', 'Newsletter Copy', 'Re-Engagement Flows', 'List Segmentation Copy'],
+    description: 'Writes email campaigns that get opened and acted on. Subject lines tested by curiosity gap, not clickbait. Sequences built on behavior triggers, not broadcast blasts.',
+  },
+  {
+    id: 'pixel', name: 'PIXEL', role: 'Paid Media Director', icon: '◈', tier: 'growth',
+    model: 'claude-sonnet-4-6',
+    tagline: 'Every dollar of ad spend is a vote for what works.',
+    skills: ['Facebook Ad Copy', 'Google Ads', 'TikTok Ads', 'Landing Page Copy', 'ROAS-Focused Messaging'],
+    description: 'Writes paid ad copy optimised for conversion, not impressions. Pain-first headlines, proof-heavy body, benefit-led CTAs. Produces 3–5 variants per campaign for systematic testing.',
+  },
+  {
+    id: 'ivy', name: 'IVY', role: 'Influencer & Collab Architect', icon: '◎', tier: 'growth',
+    model: 'claude-haiku-4-5-20251001',
+    tagline: 'The right collab doubles your audience overnight.',
+    skills: ['Collab Brief Writing', 'Outreach DM Scripts', 'Partnership Pitch Decks', 'UGC Direction', 'Gifting Campaign Copy'],
+    description: 'Writes influencer outreach that gets responses. Crafts collab briefs that give creators direction without killing their voice. Scripts UGC directions and gifting campaign messaging.',
+  },
+  {
+    id: 'cleo', name: 'CLEO', role: 'Community Voice', icon: '◉', tier: 'growth',
+    model: 'claude-haiku-4-5-20251001',
+    tagline: 'One great reply in the comments builds more trust than ten ads.',
+    skills: ['Reply Templates', 'DM Sequences', 'Comment Strategies', 'Community Rituals', 'Brand Tone in Conversation'],
+    description: 'Turns followers into community. Writes reply templates that feel human, DM sequences that convert without being pushy, and comment strategies that seed discussions under every post.',
+  },
+  // ── Intelligence & Reporting Layer ────────────────────────────────────────
+  {
+    id: 'sage', name: 'SAGE', role: 'Content Calendar Planner', icon: '◻', tier: 'planning',
+    model: 'claude-sonnet-4-6',
+    tagline: 'Consistency beats virality. Every time.',
+    skills: ['Content Pillar Architecture', 'Batch Planning', 'Seasonal Timing', 'Cross-Platform Scheduling', 'Content Cadence Design'],
+    description: 'Builds content calendars that create momentum, not just fill slots. Plans pillars, formats, and platform rotation across weeks — so the team always knows what\'s next.',
+  },
+  {
+    id: 'rio', name: 'RIO', role: 'Analytics Interpreter', icon: '⬡', tier: 'planning',
+    model: 'claude-sonnet-4-6',
+    tagline: 'Data without interpretation is just noise.',
+    skills: ['Performance Analysis', 'Platform Analytics', 'Trend Identification', 'A/B Result Reading', 'Actionable Recommendations'],
+    description: 'Reads performance data and translates it into the next campaign decision. Knows which metrics matter per platform and which are vanity. Turns a losing post into a lesson.',
   },
 ];
 
@@ -879,7 +993,7 @@ export default function Dashboard() {
                   <div style={{ fontSize: '0.9rem', fontWeight: 700, color: C.fg, letterSpacing: '-0.01em' }}>Orchestrator</div>
                   <div style={{ fontSize: '0.7rem', color: C.green, display: 'flex', alignItems: 'center', gap: 5 }}>
                     <span style={{ width: 5, height: 5, borderRadius: '50%', background: C.green, display: 'inline-block', boxShadow: `0 0 4px ${C.green}` }} />
-                    Online · Marketing Director · 8 agents ready
+                    Online · Marketing Director · 20 specialists ready
                   </div>
                 </div>
                 <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -1516,19 +1630,42 @@ export default function Dashboard() {
           )}
 
           {/* ── AGENTS TAB ── */}
-          {tab === 'agents' && (
-            <div>
-              <div style={{ marginBottom: 20 }}>
-                <div style={{ fontSize: '1.3rem', fontWeight: 700, color: C.fg, marginBottom: 4 }}>Agent Team</div>
-                <div style={{ fontSize: '0.82rem', color: C.dim, lineHeight: 1.7, maxWidth: 600 }}>
-                  8 specialist agents managed by the Orchestrator. Use Brief Orchestrator to activate them. Each agent has deep platform expertise and reports back before content reaches your queue.
+          {tab === 'agents' && (() => {
+            const TIERS: Array<{ key: string; label: string; desc: string }> = [
+              { key: 'command',      label: 'Command',       desc: 'Orchestration & direction' },
+              { key: 'intelligence', label: 'Intelligence',  desc: 'Research, strategy & brand' },
+              { key: 'platform',     label: 'Platform',      desc: 'Native content specialists' },
+              { key: 'optimization', label: 'Optimization',  desc: 'SEO, scoring & A/B testing' },
+              { key: 'visual',       label: 'Visual',        desc: 'Image & video direction' },
+              { key: 'growth',       label: 'Growth',        desc: 'Email, paid, influencer & community' },
+              { key: 'planning',     label: 'Planning',      desc: 'Calendar & analytics' },
+            ];
+            return (
+              <div>
+                <div style={{ marginBottom: 28 }}>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 700, color: C.fg, marginBottom: 5 }}>Agent Team</div>
+                  <div style={{ fontSize: '0.82rem', color: C.dim, lineHeight: 1.7, maxWidth: 620 }}>
+                    20 named specialists managed by ARC. Each agent has a distinct identity, model selection, and area of mastery — from platform copywriters to paid media, email, community, and analytics. Brief the team to activate them.
+                  </div>
                 </div>
+                {TIERS.map(tier => {
+                  const tierAgents = AGENTS.filter(a => (a as any).tier === tier.key);
+                  if (!tierAgents.length) return null;
+                  return (
+                    <div key={tier.key} style={{ marginBottom: 32 }}>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 14, paddingBottom: 10, borderBottom: `1px solid ${C.border}` }}>
+                        <span style={{ fontSize: '0.6rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.18em', color: C.violet }}>{tier.label}</span>
+                        <span style={{ fontSize: '0.75rem', color: C.dim }}>{tier.desc}</span>
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
+                        {tierAgents.map(a => <AgentCard key={a.id} agent={a} C={C} />)}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 14 }}>
-                {AGENTS.map(a => <AgentCard key={a.id} agent={a} C={C} dark={dark} />)}
-              </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* ── CALENDAR TAB ── */}
           {tab === 'calendar' && (
@@ -1967,29 +2104,67 @@ function ActionBtn({ label, color, onClick }: { label: string; color: string; on
 // ─────────────────────────────────────────────────────────────────────────────
 // AGENT CARD
 // ─────────────────────────────────────────────────────────────────────────────
-function AgentCard({ agent, C, dark }: { agent: typeof AGENTS[number]; C: typeof LIGHT; dark: boolean }) {
-  const agentColors = [C.violet, C.pink, C.cyan, C.teal, C.orange, C.yellow, C.green, '#c084fc'];
-  const color = agentColors[AGENTS.findIndex(a => a.id === agent.id) % agentColors.length];
+const AGENT_COLORS: Record<string, string> = {
+  arc: '#7c3aed', aria: '#22d3ee', marco: '#a78bfa', atlas: '#60a5fa',
+  zoe: '#e879a0', kade: '#fb923c', diana: '#60a5fa', flux: '#f0eeff',
+  lena: '#818cf8', vex: '#f87171', lush: '#f472b6',
+  rex: '#34d399', max: '#fbbf24', nova: '#c084fc', vox: '#f87171',
+  echo: '#5ce8d0', pixel: '#fb923c', ivy: '#e879a0', cleo: '#22d3ee',
+  sage: '#a78bfa', rio: '#34d399',
+};
+const MODEL_LABELS: Record<string, string> = {
+  'claude-opus-4-7': 'Opus 4.7',
+  'claude-sonnet-4-6': 'Sonnet 4.6',
+  'claude-haiku-4-5-20251001': 'Haiku 4.5',
+};
+
+function AgentCard({ agent, C }: { agent: typeof AGENTS[number]; C: typeof LIGHT }) {
+  const color = AGENT_COLORS[agent.id] ?? C.violet;
+  const modelLabel = MODEL_LABELS[(agent as any).model ?? ''] ?? '';
+  const tagline = (agent as any).tagline ?? '';
   return (
-    <div style={{ background: C.bgCard, border: `1px solid ${C.border}`, borderRadius: 12, padding: '20px', boxShadow: C.shadow }}>
-      <div style={{ height: 3, background: `linear-gradient(90deg, ${color}, transparent)`, borderRadius: 2, marginBottom: 16 }} />
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 10 }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+    <div style={{ background: C.bgCard, border: `1px solid ${C.border}`, borderRadius: 14, padding: '20px', boxShadow: C.shadow, display: 'flex', flexDirection: 'column', gap: 0 }}>
+      {/* Color bar */}
+      <div style={{ height: 2, background: `linear-gradient(90deg, ${color}, transparent)`, borderRadius: 2, marginBottom: 18 }} />
+
+      {/* Header row */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+          <div style={{ width: 34, height: 34, borderRadius: 9, background: `${color}18`, border: `1px solid ${color}35`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <span style={{ color, fontSize: '1rem' }}>{agent.icon}</span>
-            <span style={{ fontSize: '0.95rem', fontWeight: 600, color: C.fg }}>{agent.name}</span>
           </div>
-          <div style={{ fontSize: '0.68rem', fontWeight: 500, color: C.dim, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{agent.role}</div>
+          <div>
+            <div style={{ fontSize: '0.95rem', fontWeight: 700, color: C.fg, letterSpacing: '-0.01em' }}>{agent.name}</div>
+            <div style={{ fontSize: '0.62rem', fontWeight: 500, color: C.dim, textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 1 }}>{agent.role}</div>
+          </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <div style={{ width: 6, height: 6, borderRadius: '50%', background: C.green }} />
-          <span style={{ fontSize: '0.65rem', color: C.dim }}>Idle</span>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <div style={{ width: 5, height: 5, borderRadius: '50%', background: C.green }} />
+            <span style={{ fontSize: '0.6rem', color: C.dim }}>Idle</span>
+          </div>
+          {modelLabel && (
+            <span style={{ fontSize: '0.58rem', fontFamily: C.mono, color: color, background: `${color}12`, border: `1px solid ${color}25`, borderRadius: 4, padding: '2px 6px' }}>
+              {modelLabel}
+            </span>
+          )}
         </div>
       </div>
-      <div style={{ fontSize: '0.82rem', color: C.sub, lineHeight: 1.65, marginBottom: 14 }}>{agent.description}</div>
+
+      {/* Tagline */}
+      {tagline && (
+        <div style={{ fontSize: '0.75rem', color: color, fontStyle: 'italic', marginBottom: 10, paddingLeft: 2, lineHeight: 1.4 }}>
+          "{tagline}"
+        </div>
+      )}
+
+      {/* Description */}
+      <div style={{ fontSize: '0.8rem', color: C.sub, lineHeight: 1.65, marginBottom: 14, flex: 1 }}>{agent.description}</div>
+
+      {/* Skills */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
         {agent.skills.map(s => (
-          <span key={s} style={{ fontSize: '0.65rem', color, background: `${color}12`, border: `1px solid ${color}30`, borderRadius: 5, padding: '3px 8px' }}>{s}</span>
+          <span key={s} style={{ fontSize: '0.62rem', color, background: `${color}10`, border: `1px solid ${color}28`, borderRadius: 5, padding: '3px 8px' }}>{s}</span>
         ))}
       </div>
     </div>

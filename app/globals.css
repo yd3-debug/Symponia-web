@@ -15,7 +15,7 @@
   --glass-border-strong: rgba(255, 255, 255, 0.13);
   --font-heading: var(--font-cormorant), 'Georgia', serif;
   --font-body: var(--font-inter), 'Helvetica Neue', sans-serif;
-  --font-cal-sans: var(--font-syne), 'Inter', sans-serif;
+  --font-cal-sans: Arial, 'Helvetica Neue', sans-serif;
 
   /* Dashboard design system */
   --dsh-bg: #08080f;

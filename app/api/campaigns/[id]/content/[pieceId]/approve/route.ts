@@ -4,17 +4,18 @@ import { getCampaign, updateContentPiece } from '@/lib/airtable';
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string; pieceId: string } },
+  { params }: { params: Promise<{ id: string; pieceId: string }> },
 ) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const campaign = await getCampaign(params.id);
+  const { id, pieceId } = await params;
+  const campaign = await getCampaign(id);
   if (!campaign || campaign.userId !== userId) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
 
-  const piece = await updateContentPiece(params.pieceId, {
+  const piece = await updateContentPiece(pieceId, {
     status: 'Approved',
     approvedAt: new Date().toISOString(),
   });

@@ -2,7 +2,6 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { useUser } from '@clerk/nextjs';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Home, LayoutGrid, FileText, Image, Calendar, BarChart2,
@@ -20,7 +19,6 @@ const NAV = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { user } = useUser();
 
   function isActive(href: string) {
     if (href === '/dashboard') return pathname === '/dashboard';
@@ -135,19 +133,15 @@ export function Sidebar() {
 
       {/* User */}
       <div style={{ padding: '12px 12px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
-        {user?.imageUrl ? (
-          <img src={user.imageUrl} alt="" style={{ width: 30, height: 30, borderRadius: '50%', objectFit: 'cover', border: '1px solid #2D2D50' }} />
-        ) : (
-          <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#141428', border: '1px solid #2D2D50', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontSize: '0.7rem', color: '#8B8BA8' }}>{user?.firstName?.[0] ?? '?'}</span>
-          </div>
-        )}
+        <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#141428', border: '1px solid #2D2D50', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ fontSize: '0.7rem', color: '#8B8BA8' }}>A</span>
+        </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontFamily: 'var(--font-inter)', fontSize: '0.78rem', fontWeight: 500, color: '#F1F0FF', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {user?.firstName ?? 'Loading…'}
+          <div style={{ fontFamily: 'var(--font-inter)', fontSize: '0.78rem', fontWeight: 500, color: '#F1F0FF' }}>
+            Admin
           </div>
           <div style={{ fontFamily: 'var(--font-inter)', fontSize: '0.62rem', color: '#4A4A6A', letterSpacing: '0.08em' }}>
-            Free plan
+            Internal
           </div>
         </div>
         <Link href="/dashboard/settings" style={{ color: '#4A4A6A', display: 'flex' }}>

@@ -25,7 +25,8 @@ const LIGHT = {
   teal:         '#2563eb',
   yellow:       '#d97706',
   mono:         "'JetBrains Mono', 'Fira Code', monospace",
-  body:         "'Inter', 'Helvetica Neue', system-ui, sans-serif",
+  body:         "'DM Sans', var(--font-dm-sans), 'Helvetica Neue', sans-serif",
+  display:      "'Syne', var(--font-syne), 'Inter', sans-serif",
 };
 
 const DARK = {
@@ -50,7 +51,8 @@ const DARK = {
   teal:         '#5b8df0',
   yellow:       '#fbbf24',
   mono:         "'JetBrains Mono', 'Fira Code', monospace",
-  body:         "'Inter', 'Helvetica Neue', system-ui, sans-serif",
+  body:         "'DM Sans', var(--font-dm-sans), 'Helvetica Neue', sans-serif",
+  display:      "'Syne', var(--font-syne), 'Inter', sans-serif",
 };
 
 // ── Agent definitions ─────────────────────────────────────────────────────────
@@ -626,7 +628,7 @@ export default function Dashboard() {
                 <span style={{ fontSize: '0.8rem', width: 16, textAlign: 'center', flexShrink: 0, opacity: isActive ? 1 : 0.7 }}>{item.icon}</span>
                 <span style={{ flex: 1 }}>{item.label}</span>
                 {badge > 0 && (
-                  <span style={{ fontSize: '0.65rem', fontWeight: 700, background: '#7c3aed', color: '#fff', borderRadius: 10, padding: '1px 7px', flexShrink: 0 }}>{badge}</span>
+                  <span style={{ fontSize: '0.65rem', fontWeight: 700, background: (counts['review'] ?? 0) > 0 ? '#f97316' : '#22c55e', color: '#fff', borderRadius: 10, padding: '1px 7px', flexShrink: 0 }}>{badge}</span>
                 )}
               </button>
             );
@@ -749,19 +751,27 @@ export default function Dashboard() {
 
           <div style={{ flex: 1 }} />
 
-          {/* Quick KPI pills */}
-          {([
-            { key: 'generating' as Status, label: 'Generating', color: '#5ce8d0' },
-            { key: 'review'     as Status, label: 'Review',     color: '#fb923c' },
-            { key: 'approved'   as Status, label: 'Approved',   color: '#4ade80' },
-            { key: 'scheduled'  as Status, label: 'Scheduled',  color: '#5b8df0' },
-          ]).filter(s => (counts[s.key] ?? 0) > 0 || s.key === 'review').map(s => (
-            <div key={s.key} onClick={() => { setTab('queue'); setStatus(s.key); }} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px', cursor: 'pointer', borderRadius: 20, background: status === s.key && tab === 'queue' ? `${s.color}14` : 'transparent', marginRight: 2, transition: 'all .15s' }}>
-              <div style={{ width: 5, height: 5, borderRadius: '50%', background: s.color, boxShadow: s.key === 'generating' && (counts[s.key] ?? 0) > 0 ? `0 0 5px ${s.color}` : 'none', animation: s.key === 'generating' && (counts[s.key] ?? 0) > 0 ? 'pulse 1.2s ease infinite' : 'none' }} />
-              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: s.color, fontFamily: C.mono }}>{counts[s.key] ?? 0}</span>
-              <span style={{ fontSize: '0.62rem', color: C.dim, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{s.label}</span>
-            </div>
-          ))}
+          {/* Status pills + CTA */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            {([
+              { key: 'review'   as Status, label: 'Review',   color: '#f97316' },
+              { key: 'approved' as Status, label: 'Approved', color: '#22c55e' },
+            ]).map(s => (
+              <button key={s.key} onClick={() => { setTab('queue'); setStatus(s.key); }}
+                style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '5px 12px', cursor: 'pointer', borderRadius: 20, background: status === s.key && tab === 'queue' ? `${s.color}18` : `${s.color}0d`, border: `1px solid ${s.color}33`, color: s.color, fontFamily: C.body, fontSize: '0.72rem', fontWeight: 600, transition: 'all .15s' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = `${s.color}20`; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = status === s.key && tab === 'queue' ? `${s.color}18` : `${s.color}0d`; }}>
+                <span style={{ fontWeight: 700 }}>+{counts[s.key] ?? 0}</span>
+                <span style={{ opacity: 0.85 }}>{s.label}</span>
+              </button>
+            ))}
+            <button onClick={() => setTab('brief')}
+              style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '5px 14px', background: '#7c3aed', border: 'none', borderRadius: 20, color: '#fff', fontFamily: C.body, fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', marginLeft: 4, transition: 'all .15s', letterSpacing: '0.02em' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#6d28d9'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}>
+              + Brief Team
+            </button>
+          </div>
         </header>
 
         {/* ── Main content ── */}
@@ -773,22 +783,23 @@ export default function Dashboard() {
               {/* KPI stats bar */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
                 {([
-                  { key: 'review'    as Status, label: 'For Review',  icon: '◎', color: '#fb923c', desc: 'Needs decision' },
-                  { key: 'approved'  as Status, label: 'Approved',    icon: '✓', color: '#4ade80', desc: 'Ready to schedule' },
-                  { key: 'scheduled' as Status, label: 'Scheduled',   icon: '▣', color: '#5b8df0', desc: 'Going out soon' },
-                  { key: 'posted'    as Status, label: 'Published',   icon: '◉', color: '#a78bfa', desc: 'Live content' },
+                  { key: 'review'    as Status, label: 'For Review',  icon: '◎', color: '#f97316', desc: 'Needs decision' },
+                  { key: 'approved'  as Status, label: 'Approved',    icon: '✓', color: '#22c55e', desc: 'Ready to schedule' },
+                  { key: 'scheduled' as Status, label: 'Scheduled',   icon: '▣', color: '#6366f1', desc: 'Going out soon' },
+                  { key: 'posted'    as Status, label: 'Published',   icon: '◉', color: '#6b7280', desc: 'Live content' },
                 ]).map(stat => (
                   <div key={stat.key} onClick={() => setStatus(stat.key)}
-                    style={{ padding: '16px 18px', background: status === stat.key ? `${stat.color}10` : C.bgCard, border: `1px solid ${status === stat.key ? stat.color+'33' : C.border}`, borderRadius: 12, cursor: 'pointer', transition: 'all .15s', position: 'relative', overflow: 'hidden' }}
+                    style={{ padding: '20px 20px 16px', background: status === stat.key ? `${stat.color}0e` : C.bgCard, border: `1px solid ${status === stat.key ? stat.color+'44' : C.border}`, borderRadius: 14, cursor: 'pointer', transition: 'all .15s', position: 'relative', overflow: 'hidden' }}
                     onMouseEnter={e => { if (status !== stat.key) { (e.currentTarget as HTMLElement).style.borderColor = stat.color+'33'; (e.currentTarget as HTMLElement).style.background = `${stat.color}08`; } }}
                     onMouseLeave={e => { if (status !== stat.key) { (e.currentTarget as HTMLElement).style.borderColor = C.border; (e.currentTarget as HTMLElement).style.background = C.bgCard; } }}>
-                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, ${stat.color}, transparent)`, opacity: status === stat.key ? 1 : 0.4 }} />
-                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8 }}>
-                      <span style={{ fontSize: '1.5rem', fontWeight: 800, color: stat.color, fontFamily: C.mono, lineHeight: 1 }}>{counts[stat.key] ?? 0}</span>
-                      <span style={{ fontSize: '0.85rem', color: stat.color, opacity: 0.7 }}>{stat.icon}</span>
-                    </div>
-                    <div style={{ fontSize: '0.78rem', fontWeight: 600, color: C.fg, marginBottom: 2 }}>{stat.label}</div>
-                    <div style={{ fontSize: '0.65rem', color: C.dim }}>{stat.desc}</div>
+                    {/* Solid color top accent line */}
+                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: stat.color, opacity: status === stat.key ? 1 : 0.55 }} />
+                    {/* Subtle background icon */}
+                    <div style={{ position: 'absolute', bottom: -10, right: -2, fontSize: '5rem', color: stat.color, opacity: 0.06, lineHeight: 1, userSelect: 'none', pointerEvents: 'none', fontFamily: C.mono }}>{stat.icon}</div>
+                    {/* Large display number */}
+                    <div style={{ fontSize: '3rem', fontWeight: 800, color: stat.color, fontFamily: C.display, lineHeight: 1, marginTop: 4, marginBottom: 8 }}>{counts[stat.key] ?? 0}</div>
+                    <div style={{ fontSize: '0.82rem', fontWeight: 600, color: C.fg, marginBottom: 3, fontFamily: C.body }}>{stat.label}</div>
+                    <div style={{ fontSize: '0.65rem', color: C.dim, fontFamily: C.body }}>{stat.desc}</div>
                   </div>
                 ))}
               </div>
@@ -1849,61 +1860,86 @@ function ContentCard({ r, f, score, scoreColor, C, STATUS_COLOR, PLATFORM_COLOR,
   STATUS_COLOR: Record<string, string>; PLATFORM_COLOR: Record<string, string>;
   onClick: () => void; onApprove: () => void; onReject: () => void; onSchedule: () => void; onDelete: () => void;
 }) {
-  const plat      = (f(r, 'Platform') as string)?.toLowerCase() ?? '';
-  const status    = (f(r, 'Status')   as string)?.toLowerCase() ?? '';
-  const sc        = score(r);
-  const preview   = f(r, 'Hook') || f(r, 'Caption') || f(r, 'Script') || '';
-  const visualUrl = f(r, 'Visual URL') as string;
+  const plat        = (f(r, 'Platform') as string)?.toLowerCase() ?? '';
+  const status      = (f(r, 'Status')   as string)?.toLowerCase() ?? '';
+  const sc          = score(r);
+  const preview     = f(r, 'Hook') || f(r, 'Caption') || f(r, 'Script') || '';
+  const visualUrl   = f(r, 'Visual URL') as string;
+  const contentType = f(r, 'Content Type') as string;
+  const platColor   = PLATFORM_COLOR[plat] ?? C.violet;
 
   return (
-    <div onClick={onClick} style={{ background: C.bgCard, border: `1px solid ${C.border}`, borderRadius: 12, padding: '18px', cursor: 'pointer', transition: 'all .15s', boxShadow: C.shadow }}
-      onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 20px rgba(0,0,0,0.1)'; }}
-      onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.boxShadow = C.shadow; }}>
-      <div style={{ height: 3, background: `linear-gradient(90deg, ${PLATFORM_COLOR[plat] ?? C.violet}, transparent)`, borderRadius: 2, marginBottom: 14 }} />
+    <div onClick={onClick}
+      style={{ background: C.bgCard, border: `1px solid ${C.border}`, borderRadius: 14, overflow: 'hidden', cursor: 'pointer', transition: 'all .15s', boxShadow: C.shadow, display: 'flex', flexDirection: 'column' }}
+      onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = `${platColor}44`; (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-1px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 8px 32px rgba(0,0,0,0.18)'; }}
+      onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = C.border; (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLDivElement).style.boxShadow = C.shadow; }}>
 
-      {/* Visual preview — shown if Kie.ai has generated an image/video */}
-      {visualUrl && (
-        <div style={{ marginBottom: 12, borderRadius: 8, overflow: 'hidden', background: '#000', position: 'relative' }}>
-          {visualUrl.match(/\.(mp4|webm|mov)$/i) ? (
-            <video src={visualUrl} muted playsInline style={{ width: '100%', maxHeight: 180, objectFit: 'cover', display: 'block' }} />
+      {/* ── Media area (always rendered, provides overlay anchor) ── */}
+      <div style={{ position: 'relative', background: 'rgba(255,255,255,0.02)', borderBottom: `1px solid ${C.border}` }}>
+        {visualUrl ? (
+          visualUrl.match(/\.(mp4|webm|mov)$/i) ? (
+            <video src={visualUrl} muted playsInline style={{ width: '100%', height: 180, objectFit: 'cover', display: 'block' }} />
           ) : (
-            <img src={visualUrl} alt="Visual" style={{ width: '100%', maxHeight: 180, objectFit: 'cover', display: 'block' }} />
-          )}
-          <div style={{ position: 'absolute', bottom: 6, right: 6, fontSize: '0.6rem', fontWeight: 600, background: 'rgba(0,0,0,0.6)', color: '#fff', padding: '2px 7px', borderRadius: 5 }}>
-            {visualUrl.match(/\.(mp4|webm|mov)$/i) ? '▶ Video' : '◆ Visual'}
+            <img src={visualUrl} alt="Visual" style={{ width: '100%', height: 180, objectFit: 'cover', display: 'block' }} />
+          )
+        ) : (
+          <div style={{ height: 90, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{ fontSize: '2.5rem', color: platColor, opacity: 0.12, lineHeight: 1, fontFamily: C.mono }}>{PLATFORM_ICON[plat] ?? '◈'}</span>
           </div>
-        </div>
-      )}
+        )}
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: PLATFORM_COLOR[plat] ?? C.dim, background: `${PLATFORM_COLOR[plat] ?? C.dim}18`, padding: '3px 8px', borderRadius: 5 }}>
-            {PLATFORM_ICON[plat]} {plat}
-          </span>
-          {f(r, 'Content Type') && <span style={{ fontSize: '0.65rem', color: C.dim }}>{f(r, 'Content Type')}</span>}
+        {/* Platform tag — glassmorphism — top-left */}
+        <div style={{ position: 'absolute', top: 8, left: 8, display: 'flex', alignItems: 'center', gap: 5, padding: '3px 10px', background: 'rgba(8,8,15,0.6)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 20, color: platColor, fontSize: '0.63rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: C.body }}>
+          <span>{PLATFORM_ICON[plat]}</span>
+          <span>{plat || 'post'}</span>
         </div>
-        {sc > 0 && <span style={{ fontSize: '0.88rem', fontWeight: 700, color: scoreColor(sc), fontFamily: C.mono }}>{sc.toFixed(1)}</span>}
+
+        {/* Score badge — glassmorphism — top-right */}
+        {sc > 0 && (
+          <div style={{ position: 'absolute', top: 8, right: 8, padding: '3px 8px', background: 'rgba(8,8,15,0.65)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', border: `1px solid ${scoreColor(sc)}55`, borderRadius: 8, color: scoreColor(sc), fontSize: '0.82rem', fontWeight: 700, fontFamily: C.mono, letterSpacing: '-0.02em' }}>
+            {sc.toFixed(1)}
+          </div>
+        )}
+
+        {/* Format tag — bottom-right (only when visual present) */}
+        {contentType && (
+          <div style={{ position: 'absolute', bottom: 8, right: 8, padding: '2px 8px', background: 'rgba(8,8,15,0.6)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 5, color: 'rgba(255,255,255,0.6)', fontSize: '0.6rem', fontWeight: 500, letterSpacing: '0.04em', fontFamily: C.body }}>
+            {contentType}
+          </div>
+        )}
       </div>
-      <div style={{ fontSize: '0.85rem', color: C.sub, lineHeight: 1.6, marginBottom: 12, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-        {preview || <span style={{ opacity: 0.4, fontStyle: 'italic' }}>No preview</span>}
+
+      {/* ── Card body ── */}
+      <div style={{ padding: '14px 16px 10px', flex: 1 }}>
+        {/* Copy */}
+        <div style={{ fontSize: '0.84rem', color: C.sub, lineHeight: 1.65, marginBottom: 10, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', fontFamily: C.body }}>
+          {preview || <span style={{ opacity: 0.35, fontStyle: 'italic' }}>No preview</span>}
+        </div>
+        {/* Hashtags */}
+        {f(r, 'Hashtags') && (
+          <div style={{ fontSize: '0.7rem', color: platColor, opacity: 0.75, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontFamily: C.mono }}>
+            {f(r, 'Hashtags')}
+          </div>
+        )}
       </div>
-      {f(r, 'Hashtags') && <div style={{ fontSize: '0.72rem', color: C.violet, marginBottom: 12, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{f(r, 'Hashtags')}</div>}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+
+      {/* ── Footer ── */}
+      <div style={{ padding: '8px 16px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: `1px solid ${C.border}` }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-          <div style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_COLOR[status] ?? C.dim }} />
-          <span style={{ fontSize: '0.68rem', color: C.dim, textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 500 }}>{status}</span>
+          <div style={{ width: 5, height: 5, borderRadius: '50%', background: STATUS_COLOR[status] ?? C.dim, flexShrink: 0 }} />
+          <span style={{ fontSize: '0.64rem', color: C.dim, textTransform: 'uppercase', letterSpacing: '0.07em', fontWeight: 500, fontFamily: C.body }}>{status}</span>
         </div>
         {status === 'review' && (
-          <div style={{ display: 'flex', gap: 5 }} onClick={e => e.stopPropagation()}>
-            <ActionBtn label="✓ Approve" color={C.green}  onClick={onApprove} />
-            <ActionBtn label="✗ Reject"  color={C.red}    onClick={onReject} />
-            <ActionBtn label="Schedule"  color={C.teal}   onClick={onSchedule} />
+          <div style={{ display: 'flex', gap: 4 }} onClick={e => e.stopPropagation()}>
+            <ActionBtn label="Approve"  color="#22c55e" onClick={onApprove} />
+            <ActionBtn label="Reject"   color="#ef4444" onClick={onReject} />
+            <ActionBtn label="Schedule" color="#6366f1" onClick={onSchedule} />
             <ActionBtn label="🗑" color={C.dim} onClick={onDelete} />
           </div>
         )}
         {status === 'approved' && (
-          <div style={{ display: 'flex', gap: 5 }} onClick={e => e.stopPropagation()}>
-            <ActionBtn label="Schedule →" color={C.teal} onClick={onSchedule} />
+          <div style={{ display: 'flex', gap: 4 }} onClick={e => e.stopPropagation()}>
+            <ActionBtn label="Schedule →" color="#6366f1" onClick={onSchedule} />
             <ActionBtn label="🗑" color={C.dim} onClick={onDelete} />
           </div>
         )}
@@ -1919,7 +1955,10 @@ function ContentCard({ r, f, score, scoreColor, C, STATUS_COLOR, PLATFORM_COLOR,
 
 function ActionBtn({ label, color, onClick }: { label: string; color: string; onClick: () => void }) {
   return (
-    <button onClick={onClick} style={{ padding: '4px 10px', background: `${color}18`, border: `1px solid ${color}44`, borderRadius: 6, color, fontFamily: "'Inter', sans-serif", fontSize: '0.72rem', fontWeight: 500, cursor: 'pointer' }}>
+    <button onClick={onClick}
+      style={{ padding: '4px 9px', background: `${color}14`, border: `1px solid ${color}30`, borderRadius: 6, color, fontFamily: "'DM Sans', 'Inter', sans-serif", fontSize: '0.69rem', fontWeight: 500, cursor: 'pointer', transition: 'all .12s', letterSpacing: '0.01em' }}
+      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = `${color}28`; (e.currentTarget as HTMLElement).style.borderColor = `${color}55`; }}
+      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = `${color}14`; (e.currentTarget as HTMLElement).style.borderColor = `${color}30`; }}>
       {label}
     </button>
   );

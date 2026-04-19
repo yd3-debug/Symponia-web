@@ -15,6 +15,18 @@
   --glass-border-strong: rgba(255, 255, 255, 0.13);
   --font-heading: var(--font-cormorant), 'Georgia', serif;
   --font-body: var(--font-inter), 'Helvetica Neue', sans-serif;
+
+  /* Dashboard design system */
+  --dsh-bg: #08080f;
+  --dsh-surface: #10101a;
+  --dsh-elevated: #18182a;
+  --dsh-border: rgba(255,255,255,0.07);
+  --dsh-orange: #f97316;
+  --dsh-green: #22c55e;
+  --dsh-indigo: #6366f1;
+  --dsh-gray: #6b7280;
+  --font-display: var(--font-syne), var(--font-inter), sans-serif;
+  --font-ui: var(--font-dm-sans), var(--font-inter), 'Helvetica Neue', sans-serif;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }

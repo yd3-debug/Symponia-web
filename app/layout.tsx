@@ -171,7 +171,7 @@ const jsonLd = [
         name: 'Free starter credits',
         price: '0',
         priceCurrency: 'USD',
-        description: '10 free conversations included on first install',
+        description: '25 free conversations included on first install',
       },
       {
         '@type': 'Offer',
@@ -250,7 +250,7 @@ const jsonLd = [
         name: 'Is Symponia free?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Symponia is free to download on the App Store. New users receive 10 free credits to begin. Additional credits are available as one-time token pack purchases — there is no subscription required.',
+          text: 'Symponia is free to download on the App Store. New users receive 25 free credits to begin. Additional credits are available as one-time token pack purchases — there is no subscription required.',
         },
       },
       {

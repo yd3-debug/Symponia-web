@@ -21,7 +21,7 @@ const PACKS = [
     tokens: 10,
     price: 'Free',
     desc: 'Begin your journey.',
-    detail: '10 free conversations to begin',
+    detail: '25 free conversations to begin',
     accent: C.dim,
     popular: false,
   },
@@ -124,7 +124,7 @@ export default function CreditsPage() {
             Choose your depth
           </h1>
           <p style={{ fontFamily: C.body, fontSize: '0.95rem', fontWeight: 300, color: C.sub, maxWidth: 480, margin: '0 auto', lineHeight: 1.85 }}>
-            New to Symponia? You get 10 free conversations to explore the app. When you're ready to go deeper, top up with tokens or subscribe — all from within the app.
+            New to Symponia? You get 25 free conversations to explore the app. When you're ready to go deeper, top up with tokens or subscribe — all from within the app.
           </p>
         </div>
 

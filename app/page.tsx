@@ -560,7 +560,7 @@ const FAQS = [
   { q: 'What are the animal archetypes?', a: 'Your animals are a map of your inner world. The six you choose instinctively reveal the energies that move through you — gifts, struggles, and bridges between them. The seventh, the one that disturbs you, is the shadow: the most important of all.' },
   { q: 'Is this therapy?', a: 'No. Symponia is not a medical or psychological service. It is a reflective tool — a contemplative space. If you are in crisis or need clinical support, please reach out to a licensed professional.' },
   { q: 'How does Symponia work?', a: "Symponia is powered by Claude, Anthropic's AI, shaped by instructions drawn from Jungian psychology, animal symbolism, dream work, and contemplative tradition. It has been trained to never give surface answers, never rush to solutions, and never judge." },
-  { q: 'How do tokens work?', a: 'Each conversation exchange uses 1 token — roughly 2 messages back and forth. New users start with 10 free credits. Top up with token packs available in the app. Tokens never expire.' },
+  { q: 'How do tokens work?', a: 'Each conversation exchange uses 1 token — roughly 2 messages back and forth. New users start with 25 free credits. Top up with token packs available in the app. Tokens never expire.' },
   { q: 'Is my data private?', a: 'Your conversations are not stored on our servers beyond what is needed to maintain the session. Your animals and settings are stored locally on your device. We do not sell or share your data. See our Privacy Policy for full details.' },
   { q: 'Where can I download Symponia?', a: 'Symponia is available on the Apple App Store for iPhone and iPad. Tap the download button on this page or search "Symponia" in the App Store.' },
 ];

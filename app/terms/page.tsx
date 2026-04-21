@@ -46,11 +46,12 @@ export default function TermsPage() {
         </Section>
 
         <div id="tokens"><Section title="Tokens and payments">
-          <p>Symponia uses a token system. Each conversation exchange uses 1 token. New users receive 10 free conversations. Additional tokens and monthly subscriptions are available for purchase within the app. The following applies:</p>
+          <p>Symponia uses a token system. Each conversation exchange uses 1 token. New users receive 25 free conversations. Additional tokens and a Symponia Monthly subscription are available for purchase within the app. The following applies:</p>
           <ul style={{ marginTop: 10, paddingLeft: 20, lineHeight: 2 }}>
             <li>Tokens are non-refundable once used.</li>
             <li>Unused tokens do not expire.</li>
-            <li>Monthly subscriptions renew automatically and can be cancelled at any time. Access continues until the end of the current billing period.</li>
+            <li>The Symponia Monthly subscription renews automatically and can be cancelled at any time. Access continues until the end of the current billing period.</li>
+            <li>Symponia Monthly includes 350 reflection sessions per month (£12.99/month). A fresh 350 sessions arrives at each renewal; unused monthly sessions do not carry over. Top-up packs (Reflection Sessions Pack 50 at £4.99 and Reflection Sessions Pack 150 at £9.99) are available for active subscribers and never expire.</li>
             <li>Prices are displayed within the app and are subject to change.</li>
             <li>Payment is processed securely by Stripe. We do not store your payment details.</li>
             <li>All purchases are final. Refunds are considered on a case-by-case basis — contact <a href="mailto:hello@symponia.io" style={{ color: C.cyan, textDecoration: 'none' }}>hello@symponia.io</a>.</li>

@@ -1,7 +1,7 @@
 import { PageShell } from '@/components/PageShell';
 
 const C = {
-  fg: '#F1F0FF', sub: '#8B8BA8', dim: '#4A4A6A', cyan: '#06B6D4',
+  fg: '#F1F0FF', sub: '#AEAECE', dim: '#8585B0', cyan: '#06B6D4',
   border: '#1A1A30',
   heading: "var(--font-cal-sans), 'Inter', sans-serif",
   body: "var(--font-inter), 'Helvetica Neue', sans-serif",
@@ -27,13 +27,13 @@ export default function TermsPage() {
         <p style={{ fontFamily: C.body, fontSize: '0.82rem', fontWeight: 300, color: C.dim, marginBottom: 56 }}>Last updated: April 2026</p>
 
         <Section title="Acceptance">
-          <p>By downloading or using Symponia, you agree to these Terms of Service. If you do not agree, please do not use the app. These terms form a binding legal agreement between you and Symponia Ltd.</p>
+          <p>By downloading or using Symponia, you agree to these Terms of Service. If you do not agree, please do not use the app. These terms form a binding legal agreement between you and Boroto Ltd.</p>
         </Section>
 
         <Section title="The service">
           <p>Symponia provides an AI-powered reflective tool for personal exploration. This includes:</p>
           <ul style={{ marginTop: 10, paddingLeft: 20, lineHeight: 2 }}>
-            <li>Conversation modes (Sense, Animal, Daily, Dream, Shadow, Word)</li>
+            <li>Conversation modes (Sense, Animal, Daily)</li>
             <li>Animal archetype exploration and synthesis</li>
             <li>Daily personalised reflections</li>
             <li>Token-based access to conversations</li>
@@ -46,16 +46,11 @@ export default function TermsPage() {
         </Section>
 
         <div id="tokens"><Section title="Tokens and payments">
-          <p>Symponia uses a token system. Each conversation exchange uses 1 token. New users receive 25 free conversations. Additional tokens and a Symponia Monthly subscription are available for purchase within the app. The following applies:</p>
-          <ul style={{ marginTop: 10, paddingLeft: 20, lineHeight: 2 }}>
-            <li>Tokens are non-refundable once used.</li>
-            <li>Unused tokens do not expire.</li>
-            <li>The Symponia Monthly subscription renews automatically and can be cancelled at any time. Access continues until the end of the current billing period.</li>
-            <li>Symponia Monthly includes 350 reflection sessions per month (£12.99/month). A fresh 350 sessions arrives at each renewal; unused monthly sessions do not carry over. Top-up packs (Reflection Sessions Pack 50 at £4.99 and Reflection Sessions Pack 150 at £9.99) are available for active subscribers and never expire.</li>
-            <li>Prices are displayed within the app and are subject to change.</li>
-            <li>Payment is processed securely by Stripe. We do not store your payment details.</li>
-            <li>All purchases are final. Refunds are considered on a case-by-case basis — contact <a href="mailto:hello@symponia.io" style={{ color: C.cyan, textDecoration: 'none' }}>hello@symponia.io</a>.</li>
-          </ul>
+          <p>Symponia offers two purchase types:</p>
+          <p style={{ marginTop: 16 }}><strong style={{ color: C.fg, fontWeight: 400 }}>Symponia Monthly subscription (£12.99/month):</strong> Includes 350 reflection sessions per month. A fresh allotment of 350 sessions arrives at each renewal; unused sessions do not carry over. Subscription renews automatically and can be cancelled at any time via your Apple ID settings. Access continues until the end of the current billing period.</p>
+          <p style={{ marginTop: 16 }}><strong style={{ color: C.fg, fontWeight: 400 }}>Reflection Packs (top-up tokens):</strong> Reflection Pack 50 (£4.99, 50 sessions) and Reflection Pack 150 (£9.99, 150 sessions) are available for purchase while you have an active subscription. Top-up tokens never expire, even after cancellation.</p>
+          <p style={{ marginTop: 16 }}><strong style={{ color: C.fg, fontWeight: 400 }}>New users</strong> receive a small free allowance to try Symponia before purchasing.</p>
+          <p style={{ marginTop: 16 }}>Payment is processed securely by Apple via In-App Purchase. We never see or store your payment card details. All purchases are final; refunds are handled through Apple's standard refund process. Prices are displayed in the app and are subject to change.</p>
         </Section></div>
 
         <Section title="Acceptable use">
@@ -71,7 +66,7 @@ export default function TermsPage() {
         </Section>
 
         <Section title="Intellectual property">
-          <p>All content within Symponia — including Symponia's AI system, animal archetype framework, interface design, and branding — is the intellectual property of Symponia Ltd. You may not reproduce, distribute, or create derivative works without our written permission.</p>
+          <p>All content within Symponia — including Symponia's AI system, animal archetype framework, interface design, and branding — is the intellectual property of Boroto Ltd. You may not reproduce, distribute, or create derivative works without our written permission.</p>
           <p style={{ marginTop: 12 }}>The content generated by Symponia in response to your input belongs to you. We do not claim ownership over your personal reflections or conversations.</p>
         </Section>
 
@@ -80,7 +75,7 @@ export default function TermsPage() {
         </Section>
 
         <Section title="Limitation of liability">
-          <p>To the fullest extent permitted by law, Symponia Ltd shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the app. Our total liability to you for any claim arising from use of Symponia shall not exceed the amount you paid for tokens or subscriptions in the preceding 30 days.</p>
+          <p>To the fullest extent permitted by law, Boroto Ltd shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the app. Our total liability to you for any claim arising from use of Symponia shall not exceed the amount you paid for tokens or subscriptions in the preceding 30 days.</p>
         </Section>
 
         <Section title="Changes to these terms">

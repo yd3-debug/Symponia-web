@@ -57,14 +57,14 @@ export const metadata: Metadata = {
   keywords: [
     'AI companion',
     'self-discovery app',
-    'spiritual app',
+    'depth psychology app',
     'animal archetypes',
     'daily reflections',
     'self-discovery',
     'soul guidance',
     'inner work',
     'moon phases',
-    'iOS spiritual app',
+    'iOS journaling app',
     'mindfulness',
     'inner wisdom',
     'resonance',
@@ -189,11 +189,9 @@ const jsonLd = [
     featureList: [
       'Daily personalised reflections',
       'Animal archetype discovery',
-      'Six reflective conversation modes',
+      'Three reflective conversation modes',
       'Frequency tuning',
       'AI-powered deep conversations',
-      'Dream and shadow work',
-      'Moon phase and planetary guidance',
       'Personalised companion identity',
     ],
     keywords: 'self-discovery app, AI companion, animal archetypes, daily reflections, inner work, iOS wellness app',
@@ -208,7 +206,7 @@ const jsonLd = [
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'Symponia',
-    legalName: 'Symponia Ltd',
+    legalName: 'Boroto Ltd',
     url: BASE_URL,
     logo: {
       '@type': 'ImageObject',
@@ -234,7 +232,7 @@ const jsonLd = [
         name: 'What is Symponia?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Symponia is an AI-powered self-reflection app for iOS. It uses animal archetypes, daily personalised reflections, and six conversation modes to help you explore your inner life. It is powered by Claude, Anthropic\'s AI.',
+          text: 'Symponia is an AI-powered self-reflection app for iOS. It uses animal archetypes, daily personalised reflections, and three conversation modes to help you explore your inner life. It is powered by Claude, Anthropic\'s AI.',
         },
       },
       {
@@ -242,7 +240,7 @@ const jsonLd = [
         name: 'How does Symponia work?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'You select seven spirit animals that represent facets of your nature. Symponia uses these archetypes along with your resonance frequency to personalise all reflections and conversations. Each session draws on your unique animal constellation.',
+          text: 'You select seven animal archetypes that represent facets of your nature. Symponia uses these archetypes along with your resonance frequency to personalise all reflections and conversations. Each session draws on your unique animal constellation.',
         },
       },
       {
@@ -250,7 +248,7 @@ const jsonLd = [
         name: 'Is Symponia free?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Symponia is free to download on the App Store. New users receive 25 free credits to begin. Additional credits are available as one-time token pack purchases — there is no subscription required.',
+          text: 'Symponia is free to download on the App Store. New users receive a free allowance to begin. A monthly subscription (£12.99/month) provides 350 sessions per month. Reflection Pack top-ups are available for active subscribers.',
         },
       },
       {

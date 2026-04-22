@@ -1,7 +1,7 @@
 import { PageShell } from '@/components/PageShell';
 
 const C = {
-  fg: '#F1F0FF', sub: '#8B8BA8', dim: '#4A4A6A', cyan: '#06B6D4',
+  fg: '#F1F0FF', sub: '#AEAECE', dim: '#8585B0', cyan: '#06B6D4',
   border: '#1A1A30',
   heading: "var(--font-cal-sans), 'Inter', sans-serif",
   body: "var(--font-inter), 'Helvetica Neue', sans-serif",
@@ -27,14 +27,14 @@ export default function PrivacyPage() {
         <p style={{ fontFamily: C.body, fontSize: '0.82rem', fontWeight: 300, color: C.dim, marginBottom: 56 }}>Last updated: April 2026</p>
 
         <Section title="Who we are">
-          <p>Symponia is a self-discovery application developed and operated by Symponia Ltd ("we", "us", "our"). We are committed to protecting your personal information and your right to privacy.</p>
+          <p>Symponia is a self-discovery application developed and operated by Boroto Ltd ("we", "us", "our"). We are committed to protecting your personal information and your right to privacy.</p>
           <p style={{ marginTop: 12 }}>If you have any questions about this policy or our privacy practices, please contact us at <a href="mailto:privacy@symponia.io" style={{ color: C.cyan, textDecoration: 'none' }}>privacy@symponia.io</a>.</p>
         </Section>
 
         <Section title="What data we collect">
           <p><strong style={{ color: C.fg, fontWeight: 400 }}>Data stored locally on your device:</strong></p>
           <ul style={{ marginTop: 10, paddingLeft: 20, lineHeight: 2 }}>
-            <li>Your seven spirit animals</li>
+            <li>Your seven animal archetypes</li>
             <li>Your name and gender (if provided during onboarding)</li>
             <li>Your resonance frequency preference</li>
             <li>Conversation history per mode</li>
@@ -44,9 +44,9 @@ export default function PrivacyPage() {
           <p style={{ marginTop: 16 }}><strong style={{ color: C.fg, fontWeight: 400 }}>Data transmitted during a session:</strong></p>
           <ul style={{ marginTop: 10, paddingLeft: 20, lineHeight: 2 }}>
             <li>Your message text (to generate Symponia responses)</li>
-            <li>Your animal data and preferences (to personalise responses)</li>
+            <li>Your archetype data and preferences (to personalise responses)</li>
           </ul>
-          <p style={{ marginTop: 16 }}>Messages are sent to our secure backend (Supabase Edge Functions) and then to Anthropic's Claude API to generate responses. We do not store the content of your conversations on our servers after the session ends.</p>
+          <p style={{ marginTop: 16 }}>Messages are processed via Anthropic's Claude API to generate responses. Your conversations are stored securely in our Supabase database, associated with your account, and are deleted when you delete your account or request data erasure. You can delete your account at any time from within the app (Profile tab → Account section → "delete account").</p>
         </Section>
 
         <Section title="How we use your data">
@@ -54,7 +54,7 @@ export default function PrivacyPage() {
             <li>To generate personalised Symponia responses</li>
             <li>To deliver your daily reflection</li>
             <li>To maintain your session during a conversation</li>
-            <li>To process token and subscription purchases (via Stripe)</li>
+            <li>To process token and subscription purchases (via Apple In-App Purchase)</li>
             <li>To send optional push notifications (if you have enabled them)</li>
           </ul>
           <p style={{ marginTop: 12 }}>We do not use your data for advertising, profiling, or any purpose beyond the operation of Symponia.</p>
@@ -63,15 +63,14 @@ export default function PrivacyPage() {
         <Section title="Third parties">
           <p>We work with the following third-party services:</p>
           <ul style={{ marginTop: 10, paddingLeft: 20, lineHeight: 2 }}>
-            <li><strong style={{ color: C.fg, fontWeight: 400 }}>Anthropic (Claude API)</strong> — AI response generation. Anthropic's privacy policy applies to data processed through their API.</li>
+            <li><strong style={{ color: C.fg, fontWeight: 400 }}>Anthropic (Claude AI)</strong> — Symponia uses Anthropic's Claude API to generate reflective responses. Anthropic operates under Zero Data Retention (ZDR) terms for Symponia: your conversations are not retained by Anthropic after the response is generated, and are not used to train or improve Anthropic's AI models. Anthropic's standard privacy policy applies to incidental technical metadata. See <a href="https://www.anthropic.com/legal/privacy" style={{ color: C.cyan, textDecoration: 'none' }}>anthropic.com/legal/privacy</a>.</li>
             <li><strong style={{ color: C.fg, fontWeight: 400 }}>Supabase</strong> — Secure backend and edge function hosting.</li>
-            <li><strong style={{ color: C.fg, fontWeight: 400 }}>Stripe</strong> — Payment processing for token and subscription purchases. We never see or store your payment card details.</li>
-            <li><strong style={{ color: C.fg, fontWeight: 400 }}>Apple</strong> — App Store distribution and push notification delivery.</li>
+            <li><strong style={{ color: C.fg, fontWeight: 400 }}>Apple</strong> — App Store distribution, push notification delivery, and in-app purchase processing. Payment details are handled entirely by Apple; we never see or store payment card details.</li>
           </ul>
         </Section>
 
         <Section title="Data retention">
-          <p>All personal data is stored locally on your device and is deleted when you uninstall the app. Session data transmitted to our servers is not retained after the response is returned.</p>
+          <p>Your account and conversation history are stored in our Supabase database and remain until you delete your account. Conversation content transmitted to Anthropic is not retained by them per ZDR terms. Local device data is removed when you uninstall the app.</p>
           <p style={{ marginTop: 12 }}>If you request deletion of any data associated with your account, contact us at <a href="mailto:privacy@symponia.io" style={{ color: C.cyan, textDecoration: 'none' }}>privacy@symponia.io</a> and we will process your request within 30 days.</p>
         </Section>
 

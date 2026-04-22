@@ -4,9 +4,11 @@ import { PageShell } from '@/components/PageShell';
 import { motion } from 'framer-motion';
 import React from 'react';
 
+const APP_STORE_URL = 'https://apps.apple.com/app/symponia/id6744058607';
+
 const C = {
   bg: '#08080F', bgCard: 'rgba(15,15,26,0.85)',
-  fg: '#F1F0FF', sub: '#8B8BA8', dim: '#4A4A6A',
+  fg: '#F1F0FF', sub: '#AEAECE', dim: '#8585B0',
   cyan: '#06B6D4', violet: '#9F67FF',
   border: '#1A1A30',
   borderStrong: '#2D2D50',
@@ -14,50 +16,7 @@ const C = {
   body: "var(--font-inter), 'Helvetica Neue', sans-serif",
 };
 
-const PACKS = [
-  {
-    id: 'free',
-    name: 'New arrivals',
-    tokens: 10,
-    price: 'Free',
-    desc: 'Begin your journey.',
-    detail: '25 free conversations to begin',
-    accent: C.dim,
-    popular: false,
-  },
-  {
-    id: 'starter',
-    name: 'Tokens',
-    tokens: 50,
-    price: '£4.99',
-    desc: 'Yours to keep, forever.',
-    detail: '~100 messages · never expire',
-    accent: C.cyan,
-    popular: false,
-  },
-  {
-    id: 'deeper',
-    name: 'Tokens',
-    tokens: 150,
-    price: '£9.99',
-    desc: 'Yours to keep, forever.',
-    detail: '~300 messages · never expire',
-    accent: C.cyan,
-    popular: true,
-  },
-  {
-    id: 'monthly',
-    name: 'Monthly',
-    tokens: null,
-    price: '£12.99',
-    desc: 'Access as long as it\'s active.',
-    detail: 'per month · cancel anytime',
-    accent: C.violet,
-    popular: false,
-  },
-];
-
-function PricingCard({ pack }: { pack: typeof PACKS[0] }) {
+function Card({ children, style = {}, accent = false }: { children: React.ReactNode; style?: React.CSSProperties; accent?: boolean }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -67,49 +26,122 @@ function PricingCard({ pack }: { pack: typeof PACKS[0] }) {
       style={{
         position: 'relative',
         borderRadius: 22,
-        border: `0.5px solid ${pack.popular ? pack.accent + '50' : C.border}`,
-        background: pack.popular ? `rgba(92,232,208,0.04)` : C.bgCard,
+        border: `0.5px solid ${accent ? C.violet + '50' : C.border}`,
+        background: accent ? 'rgba(159,103,255,0.05)' : C.bgCard,
         backdropFilter: 'blur(12px)',
         padding: '36px 32px',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
         gap: 0,
+        ...style,
       }}
     >
-      {pack.popular && (
-        <div style={{ position: 'absolute', top: 16, right: 16, padding: '4px 12px', borderRadius: 100, background: C.cyan, color: C.bg, fontFamily: C.body, fontSize: '0.62rem', fontWeight: 500, letterSpacing: '0.15em', textTransform: 'uppercase' }}>
-          Most popular
-        </div>
-      )}
-      <div style={{ position: 'absolute', inset: '0 0 auto 0', height: '0.5px', background: pack.popular ? pack.accent + '60' : C.borderStrong }} />
+      <div style={{ position: 'absolute', inset: '0 0 auto 0', height: '0.5px', background: accent ? C.violet + '60' : C.borderStrong }} />
+      {children}
+    </motion.div>
+  );
+}
 
+function Bullet({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 10 }}>
+      <span style={{ color: C.violet, fontSize: '0.7rem', marginTop: 4, flexShrink: 0 }}>◆</span>
+      <span style={{ fontFamily: C.body, fontSize: '0.82rem', fontWeight: 300, color: C.sub, lineHeight: 1.7 }}>{children}</span>
+    </div>
+  );
+}
+
+function BeginCard() {
+  return (
+    <Card>
       <div style={{ marginBottom: 20 }}>
-        <p style={{ fontFamily: C.body, fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: pack.accent, marginBottom: 8 }}>{pack.name}</p>
+        <p style={{ fontFamily: C.body, fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: C.dim, marginBottom: 8 }}>New arrivals</p>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 6 }}>
-          <span style={{ fontFamily: C.heading, fontSize: '3rem', fontWeight: 300, color: C.fg, lineHeight: 1 }}>{pack.price}</span>
+          <span style={{ fontFamily: C.heading, fontSize: '3rem', fontWeight: 300, color: C.fg, lineHeight: 1 }}>Free</span>
         </div>
-        <p style={{ fontFamily: C.body, fontSize: '0.78rem', fontWeight: 300, color: C.dim }}>{pack.detail}</p>
+        <p style={{ fontFamily: C.body, fontSize: '0.78rem', fontWeight: 300, color: C.dim }}>A small free allowance to explore Symponia</p>
       </div>
 
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 0', borderTop: `0.5px solid ${C.border}`, borderBottom: `0.5px solid ${C.border}` }}>
-          {pack.tokens !== null ? (
-            <>
-              <span style={{ fontFamily: C.heading, fontSize: '2rem', fontWeight: 300, color: pack.accent }}>{pack.tokens}</span>
-              <span style={{ fontFamily: C.body, fontSize: '0.75rem', fontWeight: 300, color: C.dim, letterSpacing: '0.08em' }}>tokens</span>
-            </>
-          ) : (
-            <span style={{ fontFamily: C.body, fontSize: '0.75rem', fontWeight: 300, color: C.dim, letterSpacing: '0.08em' }}>Access while active</span>
-          )}
+      <div style={{ padding: '16px 0', borderTop: `0.5px solid ${C.border}`, borderBottom: `0.5px solid ${C.border}`, marginBottom: 20 }}>
+        <p style={{ fontFamily: C.body, fontSize: '0.84rem', fontWeight: 300, color: C.sub, lineHeight: 1.75 }}>
+          Name your seven animal archetypes, receive your constellation portrait, and try a few reflection sessions. No commitment.
+        </p>
+      </div>
+
+      <a
+        href={APP_STORE_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ display: 'block', width: '100%', padding: '14px', borderRadius: 100, background: C.cyan, color: C.bg, fontFamily: C.body, fontSize: '0.82rem', fontWeight: 500, letterSpacing: '0.06em', textAlign: 'center', textDecoration: 'none', marginTop: 'auto' }}
+      >
+        Download on the App Store
+      </a>
+    </Card>
+  );
+}
+
+function MonthlyCard() {
+  return (
+    <Card accent>
+      <div style={{ position: 'absolute', top: 16, right: 16, padding: '4px 12px', borderRadius: 100, background: C.violet, color: '#fff', fontFamily: C.body, fontSize: '0.62rem', fontWeight: 500, letterSpacing: '0.15em', textTransform: 'uppercase' }}>
+        Recommended
+      </div>
+
+      <div style={{ marginBottom: 20 }}>
+        <p style={{ fontFamily: C.body, fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: C.violet, marginBottom: 8 }}>Symponia Monthly</p>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 6 }}>
+          <span style={{ fontFamily: C.heading, fontSize: '3rem', fontWeight: 300, color: C.fg, lineHeight: 1 }}>£12.99</span>
         </div>
-        <p style={{ fontFamily: C.body, fontSize: '0.82rem', fontWeight: 300, color: C.sub, marginTop: 14, lineHeight: 1.7 }}>{pack.desc}</p>
+        <p style={{ fontFamily: C.body, fontSize: '0.78rem', fontWeight: 300, color: C.dim }}>per month · 350 reflection sessions</p>
+      </div>
+
+      <div style={{ padding: '16px 0', borderTop: `0.5px solid ${C.border}`, borderBottom: `0.5px solid ${C.border}`, marginBottom: 20 }}>
+        <Bullet>350 sessions across Sense, Animal, and Daily modes</Bullet>
+        <Bullet>Free daily reflections (don't count against sessions)</Bullet>
+        <Bullet>Fresh allotment each month — sessions do not carry over</Bullet>
+        <Bullet>Cancel anytime via Apple ID settings</Bullet>
+        <Bullet>Access top-up packs while subscribed</Bullet>
+      </div>
+
+      <div style={{ width: '100%', padding: '14px', borderRadius: 100, border: `0.5px solid ${C.violet + '40'}`, background: 'rgba(159,103,255,0.06)', color: C.violet, fontFamily: C.body, fontSize: '0.82rem', fontWeight: 300, letterSpacing: '0.08em', textAlign: 'center', marginTop: 'auto' }}>
+        Available in the app
+      </div>
+    </Card>
+  );
+}
+
+function PacksCard() {
+  const packs = [
+    { name: 'Reflection Pack 50', price: '£4.99', sessions: '50 sessions' },
+    { name: 'Reflection Pack 150', price: '£9.99', sessions: '150 sessions' },
+  ];
+  return (
+    <Card>
+      <div style={{ marginBottom: 20 }}>
+        <p style={{ fontFamily: C.body, fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: C.cyan, marginBottom: 8 }}>Reflection Packs</p>
+        <p style={{ fontFamily: C.body, fontSize: '0.78rem', fontWeight: 300, color: C.dim }}>Top-up tokens that never expire</p>
+      </div>
+
+      <div style={{ padding: '16px 0', borderTop: `0.5px solid ${C.border}`, borderBottom: `0.5px solid ${C.border}`, marginBottom: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {packs.map(p => (
+          <div key={p.name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderRadius: 12, border: `0.5px solid ${C.border}`, background: 'rgba(255,255,255,0.015)' }}>
+            <div>
+              <p style={{ fontFamily: C.body, fontSize: '0.82rem', fontWeight: 400, color: C.fg, marginBottom: 2 }}>{p.name}</p>
+              <p style={{ fontFamily: C.body, fontSize: '0.72rem', fontWeight: 300, color: C.dim }}>{p.sessions} · never expire</p>
+            </div>
+            <span style={{ fontFamily: C.heading, fontSize: '1.5rem', fontWeight: 300, color: C.cyan }}>{p.price}</span>
+          </div>
+        ))}
+        <p style={{ fontFamily: C.body, fontSize: '0.82rem', fontWeight: 300, color: C.sub, lineHeight: 1.75, marginTop: 4 }}>
+          Top up your monthly sessions with packs that never expire. Available while your subscription is active.
+        </p>
       </div>
 
       <div style={{ width: '100%', padding: '14px', borderRadius: 100, border: `0.5px solid ${C.border}`, background: 'rgba(255,255,255,0.02)', color: C.dim, fontFamily: C.body, fontSize: '0.82rem', fontWeight: 300, letterSpacing: '0.08em', textAlign: 'center', marginTop: 'auto' }}>
         Available in the app
       </div>
-    </motion.div>
+    </Card>
   );
 }
 
@@ -124,26 +156,26 @@ export default function CreditsPage() {
             Choose your depth
           </h1>
           <p style={{ fontFamily: C.body, fontSize: '0.95rem', fontWeight: 300, color: C.sub, maxWidth: 480, margin: '0 auto', lineHeight: 1.85 }}>
-            New to Symponia? You get 25 free conversations to explore the app. When you're ready to go deeper, top up with tokens or subscribe — all from within the app.
+            Start free. Go monthly when you&apos;re ready. Top up anytime while subscribed.
           </p>
         </div>
 
         {/* Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 18, marginBottom: 80, maxWidth: 1000, margin: '0 auto 80px' }}>
-          {PACKS.map(pack => (
-            <PricingCard key={pack.id} pack={pack} />
-          ))}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 18, marginBottom: 80 }}>
+          <BeginCard />
+          <MonthlyCard />
+          <PacksCard />
         </div>
 
-        {/* How readings work */}
+        {/* How it works */}
         <div style={{ maxWidth: 640, margin: '0 auto' }}>
           <h2 style={{ fontFamily: C.heading, fontSize: '1.8rem', fontWeight: 300, color: C.fg, marginBottom: 32, textAlign: 'center' }}>How it works</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {[
-              { icon: '◎', title: 'One token per exchange', body: 'Each conversation exchange uses 1 token — roughly 2 messages back and forth with Symponia, regardless of mode.' },
-              { icon: '∞', title: 'Tokens never expire', body: 'Your tokens stay in your account indefinitely. No resets, no monthly fees — just tokens when you need them.' },
-              { icon: '📱', title: 'Purchase inside the app', body: 'Tokens and subscriptions are purchased directly within the Symponia iOS app. Your balance is stored on your device.' },
-              { icon: '🔒', title: 'Secure payment via Stripe', body: 'All payments are processed by Stripe, the world\'s leading payment platform. We never see or store your card details.' },
+              { icon: '◎', title: 'One session per reflection', body: 'Each back-and-forth with Symponia uses one session. Daily reflections are free and do not count toward your allotment.' },
+              { icon: '🔄', title: 'Monthly resets', body: 'Your 350 monthly sessions reset at each renewal. Unused monthly sessions do not carry over — but top-up tokens always do.' },
+              { icon: '📱', title: 'Purchase inside the app', body: 'All purchases happen inside the Symponia iOS app via Apple In-App Purchase.' },
+              { icon: '🔒', title: 'Secure payment via Apple', body: 'All payments are processed by Apple. We never see or store your card details.' },
             ].map((item, i) => (
               <div key={i} style={{ display: 'flex', gap: 18, padding: '20px 24px', borderRadius: 16, border: `0.5px solid ${C.border}`, background: C.bgCard }}>
                 <span style={{ fontSize: '1.2rem', flexShrink: 0, marginTop: 2 }}>{item.icon}</span>
@@ -156,7 +188,7 @@ export default function CreditsPage() {
           </div>
 
           <p style={{ fontFamily: C.body, fontSize: '0.78rem', fontWeight: 300, color: C.dim, textAlign: 'center', marginTop: 40, lineHeight: 1.8 }}>
-            Questions about tokens or billing? Contact us at{' '}
+            Questions about subscriptions or billing? Contact us at{' '}
             <a href="mailto:hello@symponia.io" style={{ color: C.cyan, textDecoration: 'none' }}>hello@symponia.io</a>
             <br />See our <a href="/terms#tokens" style={{ color: C.cyan, textDecoration: 'none' }}>Terms of Service</a> for full details.
           </p>

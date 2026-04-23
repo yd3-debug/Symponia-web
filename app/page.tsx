@@ -232,7 +232,8 @@ function Hero() {
         </motion.div>
 
         <motion.h1 initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          style={{ fontFamily: C.heading, fontWeight: 300, fontSize: 'clamp(3rem, 7vw, 5.8rem)', lineHeight: 1.1, color: C.fg, marginBottom: 28 }}
+          className="hero-h1"
+          style={{ fontFamily: C.heading, fontWeight: 300, color: C.fg, marginBottom: 28 }}
         >
           What if you could
           <br /><em style={{ color: C.cyan, fontStyle: 'italic' }}>hear yourself</em>
@@ -240,7 +241,8 @@ function Hero() {
         </motion.h1>
 
         <motion.p initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.75 }}
-          style={{ fontFamily: C.body, fontWeight: 300, fontSize: '1.05rem', lineHeight: 1.85, color: C.sub, maxWidth: 520, margin: '0 auto 44px' }}
+          className="hero-subp"
+          style={{ fontFamily: C.body, fontWeight: 300, color: C.sub, maxWidth: 520, margin: '0 auto 44px' }}
         >
           Symponia is an AI companion for the inner life — animal archetypes, daily reflections, and deep conversation. Built for the moments when everything feels loud except the one voice that matters.
         </motion.p>
@@ -258,7 +260,8 @@ function Hero() {
 
         {/* Stats */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 1.5 }}
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 48, marginTop: 60, paddingTop: 48, borderTop: `0.5px solid ${C.border}` }}
+          className="stats-row"
+          style={{ alignItems: 'center', justifyContent: 'center', marginTop: 60, paddingTop: 48, borderTop: `0.5px solid ${C.border}` }}
         >
           {[['7','Animal archetypes'],['3','Conversation modes'],['∞','Depth'],['0','Judgment']].map(([v,l]) => (
             <div key={l} style={{ textAlign: 'center' }}>
@@ -679,7 +682,7 @@ function Footer() {
             ))}
           </div>
         </div>
-        <div style={{ borderTop: `0.5px solid ${C.border}`, marginTop: 48, paddingTop: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className="footer-btm" style={{ borderTop: `0.5px solid ${C.border}`, marginTop: 48, paddingTop: 24 }}>
           <p style={{ fontFamily: C.body, fontSize: '0.7rem', fontWeight: 300, color: C.sub }}>© {new Date().getFullYear()} Symponia. All rights reserved.</p>
           <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
             <a href="https://yektad.com" target="_blank" rel="noopener noreferrer"
@@ -698,6 +701,18 @@ function Footer() {
 export default function Home() {
   return (
     <main style={{ position: 'relative', background: C.bg }}>
+      <style>{`
+        .hero-h1{font-size:clamp(3rem,7vw,5.8rem);line-height:1.1}
+        .hero-subp{font-size:1.05rem;line-height:1.85}
+        .stats-row{display:flex;gap:48px}
+        .footer-btm{display:flex;align-items:center;justify-content:space-between}
+        @media(max-width:640px){
+          .hero-h1{font-size:clamp(1.75rem,8.5vw,2.6rem);line-height:1.15}
+          .hero-subp{font-size:0.9rem;line-height:1.75}
+          .stats-row{display:grid;grid-template-columns:1fr 1fr;gap:28px 20px}
+          .footer-btm{flex-direction:column;align-items:flex-start;gap:10px}
+        }
+      `}</style>
       <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
         <GradientDots duration={50} colorCycleDuration={14} dotSize={5} spacing={13} backgroundColor={C.bg} />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(8,8,15,0.84)' }} />

@@ -8,8 +8,8 @@ const APP_STORE_URL = 'https://apps.apple.com/app/symponia/id6744058607';
 
 const C = {
   bg: '#08080F', bgMid: '#0F0F1A',
-  bgCard: 'rgba(15,15,26,0.85)',
-  fg: '#F1F0FF', sub: '#AEAECE', dim: '#7C7C9E',
+  bgCard: 'rgba(15,15,26,0.92)',
+  fg: '#F1F0FF', sub: '#AEAECE', dim: '#A8A8C8',
   cyan: '#06B6D4', violet: '#9F67FF',
   border: '#1A1A30',
   borderStrong: '#2D2D50',
@@ -451,9 +451,9 @@ function HowItWorks() {
 // ── Daily use ─────────────────────────────────────────────────────────────────
 
 const DAILY = [
-  { time: 'Morning', icon: '☀️', title: 'Start with your daily reflection', body: 'Each morning, a personalised reflection arrives based on your animals and resonance frequency. Like a letter written just for you. Read it, sit with it, let it shape the day.' },
-  { time: 'Evening', icon: '🌙', title: 'Reflect in Sense mode', body: 'At the end of the day, speak openly — what happened, what you felt, what surfaced. Symponia holds it all without agenda.' },
-  { time: 'Anytime', icon: '🌊', title: 'Go deeper when you are ready', body: 'Sense mode for what needs voice. Animal mode to revisit your archetypes. Daily mode for the quiet anchor each morning. Symponia is always available, always private, always present.' },
+  { time: 'Morning', icon: '☀️', title: 'Start with your daily reflection', body: 'Each morning, a personalised reflection arrives on your home screen (REFLECTION · TODAY) — based on your archetypes and resonance frequency. Like a letter written just for you. Read it, sit with it, let it shape the day.' },
+  { time: 'Evening', icon: '🌙', title: 'Reflect in My Day mode', body: 'At the end of the day, speak openly — what happened, what you felt, what surfaced. Symponia holds it all without agenda.' },
+  { time: 'Anytime', icon: '🌊', title: 'Go deeper when you are ready', body: 'Conversation mode for what needs voice. Archetype mode to revisit your constellation. Symponia is always available, always private, always present.' },
 ];
 
 function DailyUse() {
@@ -492,9 +492,9 @@ function DailyUse() {
 // ── Modes ─────────────────────────────────────────────────────────────────────
 
 const MODES = [
-  { label: 'Sense', desc: 'Open, unstructured conversation. No prompt, no template — just you speaking and Symponia listening. Ideal for processing, for confusion, for the days when you do not know where to begin.', icon: '◎', color: C.cyan, use: 'For: daily check-ins, processing emotions, open reflection' },
-  { label: 'Animal', desc: 'Your seven animals are read as a constellation. Each receives a full portrait: gift, shadow, action path. Ends with a synthesis of who you are across all seven.', icon: '🐾', color: C.violet, use: 'For: self-understanding, identity work, first sessions' },
-  { label: 'Daily', desc: 'A short, personalised reflection generated each morning. Based on your animals and resonance frequency. Arrives like a letter — quiet, precise, with no demand on your time.', icon: '☽', color: C.cyan, use: 'For: morning ritual, daily anchor, gentle awareness' },
+  { label: 'Archetype', desc: 'Seven animals that reveal who you are. Each receives a full portrait: gift, shadow, and action path. Ends with a synthesis of who you are across all seven.', icon: '🐾', color: C.violet, use: 'For: self-understanding, identity work, first sessions' },
+  { label: 'My Day', desc: 'A guided reflection on today — shaped by your archetypes and how you are feeling right now.', icon: '☽', color: C.cyan, use: 'For: evening check-ins, day processing, ongoing awareness' },
+  { label: 'Conversation', desc: 'Open chat. Bring anything — a question, a thought, a feeling. No structure, no prompt. Ideal for processing, for confusion, for the days when you do not know where to begin.', icon: '◎', color: C.cyan, use: 'For: daily check-ins, processing emotions, open reflection' },
 ];
 
 function Modes() {
@@ -519,7 +519,7 @@ function Modes() {
                   <span style={{ fontSize: '1.3rem' }}>{m.icon}</span>
                   <span style={{ fontFamily: C.body, fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: m.color, fontWeight: 500 }}>{m.label}</span>
                 </div>
-                <p style={{ fontFamily: C.body, fontSize: '0.84rem', fontWeight: 300, lineHeight: 1.85, color: C.dim, marginBottom: 14 }}>{m.desc}</p>
+                <p style={{ fontFamily: C.body, fontSize: '0.84rem', fontWeight: 400, lineHeight: 1.85, color: C.dim, marginBottom: 14 }}>{m.desc}</p>
                 <p style={{ fontFamily: C.body, fontSize: '0.72rem', color: m.color, opacity: 0.6, letterSpacing: '0.04em' }}>{m.use}</p>
               </Card>
             </FadeIn>

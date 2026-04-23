@@ -1,7 +1,7 @@
 import { PageShell } from '@/components/PageShell';
 
 const C = {
-  fg: '#F1F0FF', sub: '#AEAECE', dim: '#8585B0', cyan: '#06B6D4',
+  fg: '#F1F0FF', sub: '#AEAECE', dim: '#A8A8C8', cyan: '#06B6D4',
   border: '#1A1A30',
   heading: "var(--font-cal-sans), 'Inter', sans-serif",
   body: "var(--font-inter), 'Helvetica Neue', sans-serif",
@@ -33,7 +33,7 @@ export default function TermsPage() {
         <Section title="The service">
           <p>Symponia provides an AI-powered reflective tool for personal exploration. This includes:</p>
           <ul style={{ marginTop: 10, paddingLeft: 20, lineHeight: 2 }}>
-            <li>Conversation modes (Sense, Animal, Daily)</li>
+            <li>Three modes: Archetype, My Day, Conversation</li>
             <li>Animal archetype exploration and synthesis</li>
             <li>Daily personalised reflections</li>
             <li>Token-based access to conversations</li>

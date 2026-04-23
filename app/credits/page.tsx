@@ -7,8 +7,8 @@ import React from 'react';
 const APP_STORE_URL = 'https://apps.apple.com/app/symponia/id6744058607';
 
 const C = {
-  bg: '#08080F', bgCard: 'rgba(15,15,26,0.85)',
-  fg: '#F1F0FF', sub: '#AEAECE', dim: '#8585B0',
+  bg: '#08080F', bgCard: 'rgba(15,15,26,0.92)',
+  fg: '#F1F0FF', sub: '#AEAECE', dim: '#A8A8C8',
   cyan: '#06B6D4', violet: '#9F67FF',
   border: '#1A1A30',
   borderStrong: '#2D2D50',
@@ -97,7 +97,7 @@ function MonthlyCard() {
       </div>
 
       <div style={{ padding: '16px 0', borderTop: `0.5px solid ${C.border}`, borderBottom: `0.5px solid ${C.border}`, marginBottom: 20 }}>
-        <Bullet>350 sessions across Sense, Animal, and Daily modes</Bullet>
+        <Bullet>350 sessions across Archetype, My Day, and Conversation modes</Bullet>
         <Bullet>Free daily reflections (don't count against sessions)</Bullet>
         <Bullet>Fresh allotment each month — sessions do not carry over</Bullet>
         <Bullet>Cancel anytime via Apple ID settings</Bullet>

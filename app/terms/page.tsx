@@ -48,7 +48,6 @@ export default function TermsPage() {
         <div id="tokens"><Section title="Tokens and payments">
           <p>Symponia offers two purchase types:</p>
           <p style={{ marginTop: 16 }}><strong style={{ color: C.fg, fontWeight: 400 }}>Symponia Monthly subscription (£12.99/month):</strong> Includes 350 reflection sessions per month. A fresh allotment of 350 sessions arrives at each renewal; unused sessions do not carry over. Subscription renews automatically and can be cancelled at any time via your Apple ID settings. Access continues until the end of the current billing period.</p>
-          <p style={{ marginTop: 16 }}><strong style={{ color: C.fg, fontWeight: 400 }}>Reflection Packs (top-up tokens):</strong> Reflection Pack 50 (£4.99, 50 sessions) and Reflection Pack 150 (£9.99, 150 sessions) are available for purchase while you have an active subscription. Top-up tokens never expire, even after cancellation.</p>
           <p style={{ marginTop: 16 }}><strong style={{ color: C.fg, fontWeight: 400 }}>New users</strong> receive a small free allowance to try Symponia before purchasing.</p>
           <p style={{ marginTop: 16 }}>Payment is processed securely by Apple via In-App Purchase. We never see or store your payment card details. All purchases are final; refunds are handled through Apple's standard refund process. Prices are displayed in the app and are subject to change.</p>
         </Section></div>

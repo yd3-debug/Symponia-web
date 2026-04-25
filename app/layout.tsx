@@ -173,14 +173,6 @@ const jsonLd = [
         priceCurrency: 'USD',
         description: '25 free conversations included on first install',
       },
-      {
-        '@type': 'Offer',
-        name: 'Token packs',
-        price: '0',
-        priceCurrency: 'USD',
-        description: 'Additional one-time token packs available in-app',
-        availability: 'https://schema.org/InStock',
-      },
     ],
     installUrl: 'https://apps.apple.com/app/symponia/id6744058607',
     downloadUrl: 'https://apps.apple.com/app/symponia/id6744058607',
@@ -248,7 +240,7 @@ const jsonLd = [
         name: 'Is Symponia free?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Symponia is free to download on the App Store. New users receive a free allowance to begin. A monthly subscription (£12.99/month) provides 350 sessions per month. Reflection Pack top-ups are available for active subscribers.',
+          text: 'Symponia is free to download on the App Store. New users receive a free allowance to explore before subscribing. A monthly subscription (£12.99/month) provides 350 sessions per month, resetting at each renewal.',
         },
       },
       {

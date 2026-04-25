@@ -101,44 +101,9 @@ function MonthlyCard() {
         <Bullet>Free daily reflections (don't count against sessions)</Bullet>
         <Bullet>Fresh allotment each month — sessions do not carry over</Bullet>
         <Bullet>Cancel anytime via Apple ID settings</Bullet>
-        <Bullet>Access top-up packs while subscribed</Bullet>
       </div>
 
       <div style={{ width: '100%', padding: '14px', borderRadius: 100, border: `0.5px solid ${C.violet + '40'}`, background: 'rgba(159,103,255,0.06)', color: C.violet, fontFamily: C.body, fontSize: '0.82rem', fontWeight: 300, letterSpacing: '0.08em', textAlign: 'center', marginTop: 'auto' }}>
-        Available in the app
-      </div>
-    </Card>
-  );
-}
-
-function PacksCard() {
-  const packs = [
-    { name: 'Reflection Pack 50', price: '£4.99', sessions: '50 sessions' },
-    { name: 'Reflection Pack 150', price: '£9.99', sessions: '150 sessions' },
-  ];
-  return (
-    <Card>
-      <div style={{ marginBottom: 20 }}>
-        <p style={{ fontFamily: C.body, fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: C.cyan, marginBottom: 8 }}>Reflection Packs</p>
-        <p style={{ fontFamily: C.body, fontSize: '0.78rem', fontWeight: 300, color: C.dim }}>Top-up tokens that never expire</p>
-      </div>
-
-      <div style={{ padding: '16px 0', borderTop: `0.5px solid ${C.border}`, borderBottom: `0.5px solid ${C.border}`, marginBottom: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {packs.map(p => (
-          <div key={p.name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderRadius: 12, border: `0.5px solid ${C.border}`, background: 'rgba(255,255,255,0.015)' }}>
-            <div>
-              <p style={{ fontFamily: C.body, fontSize: '0.82rem', fontWeight: 400, color: C.fg, marginBottom: 2 }}>{p.name}</p>
-              <p style={{ fontFamily: C.body, fontSize: '0.72rem', fontWeight: 300, color: C.dim }}>{p.sessions} · never expire</p>
-            </div>
-            <span style={{ fontFamily: C.heading, fontSize: '1.5rem', fontWeight: 300, color: C.cyan }}>{p.price}</span>
-          </div>
-        ))}
-        <p style={{ fontFamily: C.body, fontSize: '0.82rem', fontWeight: 300, color: C.sub, lineHeight: 1.75, marginTop: 4 }}>
-          Top up your monthly sessions with packs that never expire. Available while your subscription is active.
-        </p>
-      </div>
-
-      <div style={{ width: '100%', padding: '14px', borderRadius: 100, border: `0.5px solid ${C.border}`, background: 'rgba(255,255,255,0.02)', color: C.dim, fontFamily: C.body, fontSize: '0.82rem', fontWeight: 300, letterSpacing: '0.08em', textAlign: 'center', marginTop: 'auto' }}>
         Available in the app
       </div>
     </Card>
@@ -156,15 +121,16 @@ export default function CreditsPage() {
             Choose your depth
           </h1>
           <p style={{ fontFamily: C.body, fontSize: '0.95rem', fontWeight: 300, color: C.sub, maxWidth: 480, margin: '0 auto', lineHeight: 1.85 }}>
-            Start free. Go monthly when you&apos;re ready. Top up anytime while subscribed.
+            Start free. Go monthly when you&apos;re ready.
           </p>
         </div>
 
         {/* Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 18, marginBottom: 80 }}>
-          <BeginCard />
-          <MonthlyCard />
-          <PacksCard />
+        <div style={{ maxWidth: 720, margin: '0 auto 80px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 18 }}>
+            <BeginCard />
+            <MonthlyCard />
+          </div>
         </div>
 
         {/* How it works */}
@@ -173,7 +139,7 @@ export default function CreditsPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {[
               { icon: '◎', title: 'One session per reflection', body: 'Each back-and-forth with Symponia uses one session. Daily reflections are free and do not count toward your allotment.' },
-              { icon: '🔄', title: 'Monthly resets', body: 'Your 350 monthly sessions reset at each renewal. Unused monthly sessions do not carry over — but top-up tokens always do.' },
+              { icon: '🔄', title: 'Monthly resets', body: 'Your 350 monthly sessions reset at each renewal. Unused sessions do not carry over.' },
               { icon: '📱', title: 'Purchase inside the app', body: 'All purchases happen inside the Symponia iOS app via Apple In-App Purchase.' },
               { icon: '🔒', title: 'Secure payment via Apple', body: 'All payments are processed by Apple. We never see or store your card details.' },
             ].map((item, i) => (

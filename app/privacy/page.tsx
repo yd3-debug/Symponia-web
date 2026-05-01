@@ -24,7 +24,7 @@ export default function PrivacyPage() {
       <div style={{ maxWidth: 760, margin: '0 auto', padding: '80px 28px 120px' }}>
         <p style={{ fontFamily: C.body, fontSize: '0.7rem', letterSpacing: '0.22em', color: C.cyan, textTransform: 'uppercase', marginBottom: 16 }}>Legal</p>
         <h1 style={{ fontFamily: C.heading, fontWeight: 300, fontSize: 'clamp(2.4rem, 5vw, 3.6rem)', color: C.fg, marginBottom: 12, lineHeight: 1.1 }}>Privacy Policy</h1>
-        <p style={{ fontFamily: C.body, fontSize: '0.82rem', fontWeight: 300, color: C.dim, marginBottom: 56 }}>Last updated: April 2026</p>
+        <p style={{ fontFamily: C.body, fontSize: '0.82rem', fontWeight: 300, color: C.dim, marginBottom: 56 }}>Last updated: May 2026</p>
 
         <Section title="Who we are">
           <p>Symponia is a self-discovery application developed and operated by Boroto Ltd ("we", "us", "our"). We are committed to protecting your personal information and your right to privacy.</p>
@@ -43,10 +43,13 @@ export default function PrivacyPage() {
           </ul>
           <p style={{ marginTop: 16 }}><strong style={{ color: C.fg, fontWeight: 400 }}>Data transmitted during a session:</strong></p>
           <ul style={{ marginTop: 10, paddingLeft: 20, lineHeight: 2 }}>
-            <li>Your message text (to generate Symponia responses)</li>
-            <li>Your archetype data and preferences (to personalise responses)</li>
+            <li>Your message text</li>
+            <li>Your first name (as provided during onboarding)</li>
+            <li>Your gender (if provided)</li>
+            <li>Your seven animal archetypes</li>
+            <li>Your resonance frequency preference</li>
           </ul>
-          <p style={{ marginTop: 16 }}>Messages are processed via Anthropic's Claude API to generate responses. Your conversations are stored securely in our Supabase database, associated with your account, and are deleted when you delete your account or request data erasure. You can delete your account at any time from within the app (Profile tab → Account section → "delete account").</p>
+          <p style={{ marginTop: 16 }}>This data is processed via Anthropic's Claude API to generate reflective responses. Your conversations are stored securely in our Supabase database, associated with your account, and are deleted when you delete your account or request data erasure. You can delete your account at any time from within the app (Profile tab → Account section → "delete account").</p>
         </Section>
 
         <Section title="How we use your data">

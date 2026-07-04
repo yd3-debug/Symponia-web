@@ -49,11 +49,21 @@ function H2({ children }: { children: React.ReactNode }) {
   return <h2 style={{ fontFamily: C.heading, fontWeight: 300, fontSize: 'clamp(2rem, 4.5vw, 3.4rem)', color: C.fg, lineHeight: 1.15 }}>{children}</h2>;
 }
 
-function AppleIcon() {
+function AppStoreBadge({ height = 54, glow = false, block = false }: { height?: number; glow?: boolean; block?: boolean }) {
+  const w = height * 3;
   return (
-    <svg viewBox="0 0 24 24" style={{ width: 18, height: 18, fill: 'currentColor', flexShrink: 0 }}>
-      <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-    </svg>
+    <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer" aria-label="Download on the App Store"
+      style={{ display: block ? 'block' : 'inline-block', width: block ? '100%' : undefined, lineHeight: 0, borderRadius: Math.round(height * 0.19), boxShadow: glow ? '0 0 60px rgba(6,182,212,0.22)' : 'none', textDecoration: 'none' }}>
+      <svg width={block ? '100%' : w} height={height} viewBox="0 0 120 40" preserveAspectRatio="xMidYMid meet"
+        xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Download on the App Store">
+        <rect x="0.5" y="0.5" width="119" height="39" rx="8.5" fill="#000000" stroke="#3A3A55" strokeWidth="1" />
+        <g transform="translate(8 11) scale(0.78)">
+          <path fill="#FFFFFF" d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
+        </g>
+        <text x="33" y="16" fill="#FFFFFF" fontFamily="'Helvetica Neue', Arial, sans-serif" fontSize="6" letterSpacing="0.3">Download on the</text>
+        <text x="32.4" y="30.5" fill="#FFFFFF" fontFamily="'Helvetica Neue', Arial, sans-serif" fontSize="15" fontWeight="600" letterSpacing="-0.4">App Store</text>
+      </svg>
+    </a>
   );
 }
 
@@ -173,9 +183,7 @@ function Nav() {
             {links.map(([l,h]) => (
               <a key={l} href={h} style={{ fontFamily: C.body, fontSize: '0.75rem', letterSpacing: '0.14em', color: C.dim, textDecoration: 'none', textTransform: 'uppercase' }}>{l}</a>
             ))}
-            <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer"
-              style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 22px', borderRadius: 100, background: C.cyan, color: C.bg, fontFamily: C.body, fontSize: '0.78rem', fontWeight: 500, textDecoration: 'none' }}
-            ><AppleIcon /> Download</a>
+            <AppStoreBadge height={38} />
           </div>
           <button onClick={() => setOpen(!open)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 8, display: 'none' }} className="mob-btn">
             <style>{`.mob-btn{display:none!important}@media(max-width:768px){.mob-btn{display:block!important}}`}</style>
@@ -198,9 +206,7 @@ function Nav() {
                 style={{display:'block',fontFamily:C.body,fontSize:'0.85rem',letterSpacing:'0.14em',color:C.sub,textDecoration:'none',textTransform:'uppercase',padding:'14px 0',borderBottom:`0.5px solid ${C.border}`}}
               >{l}</a>
             ))}
-            <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer"
-              style={{display:'flex',alignItems:'center',justifyContent:'center',gap:10,marginTop:20,padding:'15px',borderRadius:100,background:C.cyan,color:C.bg,fontFamily:C.body,fontSize:'0.88rem',fontWeight:500,textDecoration:'none'}}
-            ><AppleIcon /> Download on the App Store</a>
+            <div style={{ marginTop: 20 }}><AppStoreBadge height={52} block /></div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -250,9 +256,7 @@ function Hero() {
         <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 1 }}
           style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 14 }}
         >
-          <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer"
-            style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '15px 34px', borderRadius: 100, background: C.cyan, color: C.bg, fontFamily: C.body, fontSize: '0.9rem', fontWeight: 500, letterSpacing: '0.04em', textDecoration: 'none', boxShadow: '0 0 60px rgba(6,182,212,0.2)' }}
-          ><AppleIcon /> Download on the App Store</a>
+          <AppStoreBadge height={54} glow />
           <a href="#how-it-works"
             style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '15px 28px', borderRadius: 100, border: `0.5px solid ${C.borderStrong}`, color: C.sub, fontFamily: C.body, fontSize: '0.88rem', fontWeight: 300, textDecoration: 'none', background: 'rgba(255,255,255,0.02)' }}
           >See how it works <span style={{ opacity: 0.5 }}>↓</span></a>
@@ -342,9 +346,7 @@ function AppShowcase() {
       </div>
 
       <FadeIn style={{ display: 'flex', justifyContent: 'center', marginTop: 48, padding: '0 28px' }}>
-        <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '15px 34px', borderRadius: 100, background: C.cyan, color: C.bg, fontFamily: C.body, fontSize: '0.9rem', fontWeight: 500, letterSpacing: '0.04em', textDecoration: 'none', boxShadow: '0 0 60px rgba(6,182,212,0.2)' }}
-        ><AppleIcon /> Download on the App Store</a>
+        <AppStoreBadge height={54} glow />
       </FadeIn>
     </section>
   );
@@ -711,9 +713,7 @@ function CTA() {
         <p style={{ fontFamily: C.body, fontSize: '0.9rem', fontWeight: 300, lineHeight: 1.85, color: C.dim, marginBottom: 44 }}>
           Available now on iPhone and iPad.<br />Free to begin. Secure sign-in required.
         </p>
-        <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 12, padding: '16px 40px', borderRadius: 100, background: C.cyan, color: C.bg, fontFamily: C.body, fontSize: '0.9rem', fontWeight: 500, letterSpacing: '0.04em', textDecoration: 'none', boxShadow: '0 0 80px rgba(6,182,212,0.2)' }}
-        ><AppleIcon /> Download on the App Store</a>
+        <div style={{ display: 'flex', justifyContent: 'center' }}><AppStoreBadge height={58} glow /></div>
       </FadeIn>
     </section>
   );

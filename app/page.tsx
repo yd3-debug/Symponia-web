@@ -510,8 +510,9 @@ function HowItWorks() {
           ))}
         </div>
 
-        <FadeIn style={{ display: 'flex', justifyContent: 'center', marginTop: 64 }}>
+        <FadeIn style={{ display: 'flex', flexWrap: 'wrap', gap: 'clamp(32px, 6vw, 72px)', justifyContent: 'center', alignItems: 'center', marginTop: 64 }}>
           <OracleSVG />
+          <PhoneMockup src="/screens/06-animals.png" alt="Choose the animal that speaks to you most" caption="Name your seven animals" delay={0.1} />
         </FadeIn>
       </div>
     </section>
@@ -550,8 +551,9 @@ function DailyUse() {
           ))}
         </div>
 
-        {/* Moon phases */}
-        <FadeIn style={{ display: 'flex', justifyContent: 'center', marginTop: 56 }}>
+        {/* Home screen + moon phases */}
+        <FadeIn style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 44, marginTop: 56 }}>
+          <PhoneMockup src="/screens/00-home.png" alt="Symponia home screen with today's reflection" caption="Your reflection, every morning" delay={0.1} />
           <MoonPhaseSVG />
         </FadeIn>
       </div>

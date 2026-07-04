@@ -49,11 +49,11 @@ function H2({ children }: { children: React.ReactNode }) {
   return <h2 style={{ fontFamily: C.heading, fontWeight: 300, fontSize: 'clamp(2rem, 4.5vw, 3.4rem)', color: C.fg, lineHeight: 1.15 }}>{children}</h2>;
 }
 
-function AppStoreBadge({ height = 54, glow = false, block = false }: { height?: number; glow?: boolean; block?: boolean }) {
+function AppStoreBadge({ height = 54, block = false }: { height?: number; block?: boolean }) {
   const w = height * 3;
   return (
     <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer" aria-label="Download on the App Store"
-      style={{ display: block ? 'block' : 'inline-block', width: block ? '100%' : undefined, lineHeight: 0, borderRadius: Math.round(height * 0.19), boxShadow: glow ? '0 0 60px rgba(6,182,212,0.22)' : 'none', textDecoration: 'none' }}>
+      style={{ display: block ? 'block' : 'inline-block', width: block ? '100%' : undefined, lineHeight: 0, borderRadius: Math.round(height * 0.19), textDecoration: 'none' }}>
       <svg width={block ? '100%' : w} height={height} viewBox="0 0 120 40" preserveAspectRatio="xMidYMid meet"
         xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Download on the App Store">
         <rect x="0.5" y="0.5" width="119" height="39" rx="8.5" fill="#000000" stroke="#3A3A55" strokeWidth="1" />
@@ -256,7 +256,7 @@ function Hero() {
         <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 1 }}
           style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 14 }}
         >
-          <AppStoreBadge height={54} glow />
+          <AppStoreBadge height={54} />
           <a href="#how-it-works"
             style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '15px 28px', borderRadius: 100, border: `0.5px solid ${C.borderStrong}`, color: C.sub, fontFamily: C.body, fontSize: '0.88rem', fontWeight: 300, textDecoration: 'none', background: 'rgba(255,255,255,0.02)' }}
           >See how it works <span style={{ opacity: 0.5 }}>↓</span></a>
@@ -290,9 +290,10 @@ function Hero() {
 // ── App showcase ──────────────────────────────────────────────────────────────
 
 const SCREENS = [
+  { src: '/screens/00-home.png',    alt: "Symponia home screen with today's reflection", caption: 'Your daily home' },
+  { src: '/screens/06-animals.png', alt: 'Choose the animal that speaks to you most', caption: 'Choose your seven' },
   { src: '/screens/01-welcome.png', alt: 'Symponia welcome screen', caption: 'A resonant presence' },
   { src: '/screens/02-here.png',    alt: 'What brings you here, right now?', caption: 'What brings you here' },
-  { src: '/screens/03-mirror.png',  alt: 'The trait that irritates you most in others', caption: 'A mirror, not a fix' },
   { src: '/screens/04-story.png',   alt: 'The story you tell about yourself', caption: 'The story you tell' },
   { src: '/screens/05-change.png',  alt: 'How change usually arrives for you', caption: 'Where it leads' },
 ];
@@ -330,7 +331,7 @@ function AppShowcase() {
         </FadeIn>
         <FadeIn delay={0.1} style={{ textAlign: 'center', marginBottom: 54 }}>
           <p style={{ fontFamily: C.body, fontSize: '0.9rem', fontWeight: 300, color: C.dim, maxWidth: 480, margin: '16px auto 0', lineHeight: 1.85 }}>
-            Quiet by design — soft light, no clutter, nothing to perform for. This is the attuning ritual: the first conversation Symponia has with you.
+            Quiet by design — soft light, no clutter, nothing to perform for. From your daily home to the attuning ritual that shapes it, this is how Symponia meets you.
           </p>
         </FadeIn>
       </div>
@@ -346,7 +347,7 @@ function AppShowcase() {
       </div>
 
       <FadeIn style={{ display: 'flex', justifyContent: 'center', marginTop: 48, padding: '0 28px' }}>
-        <AppStoreBadge height={54} glow />
+        <AppStoreBadge height={54} />
       </FadeIn>
     </section>
   );
@@ -713,7 +714,7 @@ function CTA() {
         <p style={{ fontFamily: C.body, fontSize: '0.9rem', fontWeight: 300, lineHeight: 1.85, color: C.dim, marginBottom: 44 }}>
           Available now on iPhone and iPad.<br />Free to begin. Secure sign-in required.
         </p>
-        <div style={{ display: 'flex', justifyContent: 'center' }}><AppStoreBadge height={58} glow /></div>
+        <div style={{ display: 'flex', justifyContent: 'center' }}><AppStoreBadge height={58} /></div>
       </FadeIn>
     </section>
   );

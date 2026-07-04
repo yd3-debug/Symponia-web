@@ -49,11 +49,21 @@ function H2({ children }: { children: React.ReactNode }) {
   return <h2 style={{ fontFamily: C.heading, fontWeight: 300, fontSize: 'clamp(2rem, 4.5vw, 3.4rem)', color: C.fg, lineHeight: 1.15 }}>{children}</h2>;
 }
 
-function AppleIcon() {
+function AppStoreBadge({ height = 54, block = false }: { height?: number; block?: boolean }) {
+  const w = height * 3;
   return (
-    <svg viewBox="0 0 24 24" style={{ width: 18, height: 18, fill: 'currentColor', flexShrink: 0 }}>
-      <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-    </svg>
+    <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer" aria-label="Download on the App Store"
+      style={{ display: block ? 'block' : 'inline-block', width: block ? '100%' : undefined, lineHeight: 0, borderRadius: Math.round(height * 0.19), textDecoration: 'none' }}>
+      <svg width={block ? '100%' : w} height={height} viewBox="0 0 120 40" preserveAspectRatio="xMidYMid meet"
+        xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Download on the App Store">
+        <rect x="0.5" y="0.5" width="119" height="39" rx="8.5" fill="#000000" stroke="#3A3A55" strokeWidth="1" />
+        <g transform="translate(8 11) scale(0.78)">
+          <path fill="#FFFFFF" d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
+        </g>
+        <text x="33" y="16" fill="#FFFFFF" fontFamily="'Helvetica Neue', Arial, sans-serif" fontSize="6" letterSpacing="0.3">Download on the</text>
+        <text x="32.4" y="30.5" fill="#FFFFFF" fontFamily="'Helvetica Neue', Arial, sans-serif" fontSize="15" fontWeight="600" letterSpacing="-0.4">App Store</text>
+      </svg>
+    </a>
   );
 }
 
@@ -159,7 +169,7 @@ function SacredCircleSVG() {
 
 function Nav() {
   const [open, setOpen] = useState(false);
-  const links = [['How it works','#how-it-works'],['Modes','#modes'],['Pricing','/credits'],['FAQ','#faq']];
+  const links = [['The app','#app'],['How it works','#how-it-works'],['Modes','#modes'],['Pricing','/credits'],['FAQ','#faq']];
   return (
     <>
       <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, background: 'rgba(8,8,15,0.88)', backdropFilter: 'blur(24px)', borderBottom: `0.5px solid ${C.border}` }}>
@@ -173,9 +183,7 @@ function Nav() {
             {links.map(([l,h]) => (
               <a key={l} href={h} style={{ fontFamily: C.body, fontSize: '0.75rem', letterSpacing: '0.14em', color: C.dim, textDecoration: 'none', textTransform: 'uppercase' }}>{l}</a>
             ))}
-            <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer"
-              style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 22px', borderRadius: 100, background: C.cyan, color: C.bg, fontFamily: C.body, fontSize: '0.78rem', fontWeight: 500, textDecoration: 'none' }}
-            ><AppleIcon /> Download</a>
+            <AppStoreBadge height={38} />
           </div>
           <button onClick={() => setOpen(!open)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 8, display: 'none' }} className="mob-btn">
             <style>{`.mob-btn{display:none!important}@media(max-width:768px){.mob-btn{display:block!important}}`}</style>
@@ -198,9 +206,7 @@ function Nav() {
                 style={{display:'block',fontFamily:C.body,fontSize:'0.85rem',letterSpacing:'0.14em',color:C.sub,textDecoration:'none',textTransform:'uppercase',padding:'14px 0',borderBottom:`0.5px solid ${C.border}`}}
               >{l}</a>
             ))}
-            <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer"
-              style={{display:'flex',alignItems:'center',justifyContent:'center',gap:10,marginTop:20,padding:'15px',borderRadius:100,background:C.cyan,color:C.bg,fontFamily:C.body,fontSize:'0.88rem',fontWeight:500,textDecoration:'none'}}
-            ><AppleIcon /> Download on the App Store</a>
+            <div style={{ marginTop: 20 }}><AppStoreBadge height={52} block /></div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -250,9 +256,7 @@ function Hero() {
         <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 1 }}
           style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 14 }}
         >
-          <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer"
-            style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '15px 34px', borderRadius: 100, background: C.cyan, color: C.bg, fontFamily: C.body, fontSize: '0.9rem', fontWeight: 500, letterSpacing: '0.04em', textDecoration: 'none', boxShadow: '0 0 60px rgba(6,182,212,0.2)' }}
-          ><AppleIcon /> Download on the App Store</a>
+          <AppStoreBadge height={54} />
           <a href="#how-it-works"
             style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '15px 28px', borderRadius: 100, border: `0.5px solid ${C.borderStrong}`, color: C.sub, fontFamily: C.body, fontSize: '0.88rem', fontWeight: 300, textDecoration: 'none', background: 'rgba(255,255,255,0.02)' }}
           >See how it works <span style={{ opacity: 0.5 }}>↓</span></a>
@@ -279,6 +283,72 @@ function Hero() {
           style={{ width: 1, height: 52, background: `linear-gradient(to bottom, ${C.cyan}80, transparent)` }}
         />
       </motion.div>
+    </section>
+  );
+}
+
+// ── App showcase ──────────────────────────────────────────────────────────────
+
+const SCREENS = [
+  { src: '/screens/00-home.png',    alt: "Symponia home screen with today's reflection", caption: 'Your daily home' },
+  { src: '/screens/06-animals.png', alt: 'Choose the animal that speaks to you most', caption: 'Choose your seven' },
+  { src: '/screens/01-welcome.png', alt: 'Symponia welcome screen', caption: 'A resonant presence' },
+  { src: '/screens/02-here.png',    alt: 'What brings you here, right now?', caption: 'What brings you here' },
+  { src: '/screens/04-story.png',   alt: 'The story you tell about yourself', caption: 'The story you tell' },
+  { src: '/screens/05-change.png',  alt: 'How change usually arrives for you', caption: 'Where it leads' },
+];
+
+function PhoneMockup({ src, alt, caption, delay = 0 }: { src: string; alt: string; caption: string; delay?: number }) {
+  return (
+    <FadeIn delay={delay} style={{ flex: '0 0 auto', scrollSnapAlign: 'center' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 18 }}>
+        <div style={{
+          position: 'relative', width: 230, aspectRatio: '390 / 820',
+          borderRadius: 36, padding: 7,
+          background: 'linear-gradient(160deg, #20203a 0%, #0b0b16 100%)',
+          border: `0.5px solid ${C.borderStrong}`,
+          boxShadow: '0 30px 70px -22px rgba(0,0,0,0.8), 0 0 60px rgba(6,182,212,0.07)',
+        }}>
+          <div style={{ position: 'absolute', top: 15, left: '50%', transform: 'translateX(-50%)', width: 62, height: 5, borderRadius: 3, background: '#000', opacity: 0.5, zIndex: 2 }} />
+          <div style={{ position: 'relative', width: '100%', height: '100%', borderRadius: 30, overflow: 'hidden', background: '#EAF1EE' }}>
+            <img src={src} alt={alt} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          </div>
+        </div>
+        <p style={{ fontFamily: C.body, fontSize: '0.68rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: C.dim, textAlign: 'center', maxWidth: 190 }}>{caption}</p>
+      </div>
+    </FadeIn>
+  );
+}
+
+function AppShowcase() {
+  return (
+    <section id="app" style={{ padding: '70px 0 96px', position: 'relative', overflow: 'hidden' }}>
+      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 60% 55% at 50% 42%, rgba(124,58,237,0.08) 0%, transparent 70%)', pointerEvents: 'none' }} />
+      <div style={{ position: 'relative', maxWidth: 1100, margin: '0 auto', padding: '0 28px' }}>
+        <FadeIn style={{ textAlign: 'center', marginBottom: 14 }}>
+          <Label>Inside the app</Label>
+          <H2>See Symponia<br /><em style={{ fontStyle: 'italic', color: C.dim }}>on your screen</em></H2>
+        </FadeIn>
+        <FadeIn delay={0.1} style={{ textAlign: 'center', marginBottom: 54 }}>
+          <p style={{ fontFamily: C.body, fontSize: '0.9rem', fontWeight: 300, color: C.dim, maxWidth: 480, margin: '16px auto 0', lineHeight: 1.85 }}>
+            Quiet by design — soft light, no clutter, nothing to perform for. From your daily home to the attuning ritual that shapes it, this is how Symponia meets you.
+          </p>
+        </FadeIn>
+      </div>
+
+      <div className="phone-scroll" style={{ position: 'relative', overflowX: 'auto', scrollSnapType: 'x proximity' }}>
+        <div style={{ display: 'flex', gap: 28, width: 'max-content', margin: '0 auto', padding: '24px 28px' }}>
+          {SCREENS.map((s, i) => (
+            <div key={i} style={{ transform: `translateY(${i % 2 === 0 ? '-14px' : '14px'})` }}>
+              <PhoneMockup {...s} delay={i * 0.08} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <FadeIn style={{ display: 'flex', justifyContent: 'center', marginTop: 48, padding: '0 28px' }}>
+        <AppStoreBadge height={54} />
+      </FadeIn>
     </section>
   );
 }
@@ -644,9 +714,7 @@ function CTA() {
         <p style={{ fontFamily: C.body, fontSize: '0.9rem', fontWeight: 300, lineHeight: 1.85, color: C.dim, marginBottom: 44 }}>
           Available now on iPhone and iPad.<br />Free to begin. Secure sign-in required.
         </p>
-        <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 12, padding: '16px 40px', borderRadius: 100, background: C.cyan, color: C.bg, fontFamily: C.body, fontSize: '0.9rem', fontWeight: 500, letterSpacing: '0.04em', textDecoration: 'none', boxShadow: '0 0 80px rgba(6,182,212,0.2)' }}
-        ><AppleIcon /> Download on the App Store</a>
+        <div style={{ display: 'flex', justifyContent: 'center' }}><AppStoreBadge height={58} /></div>
       </FadeIn>
     </section>
   );
@@ -720,6 +788,7 @@ export default function Home() {
       <div style={{ position: 'relative', zIndex: 1 }}>
         <Nav />
         <Hero />
+        <AppShowcase />
         <WhoItsFor />
         <PainPoints />
         <HowItWorks />

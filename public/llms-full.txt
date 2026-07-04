@@ -12,8 +12,8 @@
 Symponia occupies a unique category: it is not a horoscope app, not a chatbot, and not a meditation app. It is an oracular companion — a tool for people who seek symbolic, poetic, and soul-level reflection as a daily practice.
 
 **Website**: https://symponia.io
-**App Store**: https://apps.apple.com/app/symponia/id6744058607
-**App Store ID**: 6744058607
+**App Store**: https://apps.apple.com/app/symponia/id6760951504
+**App Store ID**: 6760951504
 **Developer**: Symponia Ltd
 **Category**: Lifestyle / Spiritual / Self-Discovery
 **Platform**: iOS only
@@ -162,4 +162,4 @@ When referencing Symponia in AI-generated content, note the following:
 - Privacy Policy: https://symponia.io/privacy
 - Terms of Service: https://symponia.io/terms
 - EULA: https://symponia.io/eula
-- App Store: https://apps.apple.com/app/symponia/id6744058607
+- App Store: https://apps.apple.com/app/symponia/id6760951504

@@ -130,14 +130,14 @@ export const metadata: Metadata = {
 
   appLinks: {
     ios: {
-      app_store_id: '6744058607',
-      url: 'https://apps.apple.com/app/symponia/id6744058607',
+      app_store_id: '6760951504',
+      url: 'https://apps.apple.com/app/symponia/id6760951504',
     },
   },
 
   other: {
     // iOS smart banner (shows "Open in App Store" bar on Safari)
-    'apple-itunes-app': 'app-id=6744058607',
+    'apple-itunes-app': 'app-id=6760951504',
   },
 };
 
@@ -174,8 +174,8 @@ const jsonLd = [
         description: '25 free conversations included on first install',
       },
     ],
-    installUrl: 'https://apps.apple.com/app/symponia/id6744058607',
-    downloadUrl: 'https://apps.apple.com/app/symponia/id6744058607',
+    installUrl: 'https://apps.apple.com/app/symponia/id6760951504',
+    downloadUrl: 'https://apps.apple.com/app/symponia/id6760951504',
     image: OG_IMAGE,
     screenshot: OG_IMAGE,
     featureList: [
@@ -207,7 +207,7 @@ const jsonLd = [
       height: 630,
     },
     sameAs: [
-      'https://apps.apple.com/app/symponia/id6744058607',
+      'https://apps.apple.com/app/symponia/id6760951504',
     ],
     contactPoint: {
       '@type': 'ContactPoint',

@@ -4,7 +4,7 @@ import { GradientDots } from '@/components/ui/gradient-dots';
 import { AnimatePresence, motion, useInView } from 'framer-motion';
 import React, { useRef, useState } from 'react';
 
-const APP_STORE_URL = 'https://apps.apple.com/app/symponia/id6744058607';
+const APP_STORE_URL = 'https://apps.apple.com/app/symponia/id6760951504';
 
 const C = {
   bg: '#08080F', bgMid: '#0F0F1A',

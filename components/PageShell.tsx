@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useState } from 'react';
 
-const APP_STORE_URL = 'https://apps.apple.com/app/symponia/id6744058607';
+const APP_STORE_URL = 'https://apps.apple.com/app/symponia/id6760951504';
 const C = {
   bg: '#08061c', fg: '#eae6f8', sub: '#b8b0d8', dim: '#7c70a8',
   cyan: '#5ce8d0', border: 'rgba(255,255,255,0.07)',

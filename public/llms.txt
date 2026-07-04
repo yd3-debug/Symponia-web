@@ -32,8 +32,8 @@ Symponia is for people who feel drawn to something deeper — not therapy, not e
 ## Key Facts
 
 - Platform: iOS (App Store)
-- App Store ID: 6744058607
-- App Store URL: https://apps.apple.com/app/symponia/id6744058607
+- App Store ID: 6760951504
+- App Store URL: https://apps.apple.com/app/symponia/id6760951504
 - Website: https://symponia.io
 - Category: Lifestyle / Spiritual / Self-Discovery
 - Price: Free with optional in-app token packs
